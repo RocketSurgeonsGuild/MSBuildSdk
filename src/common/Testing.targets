@@ -22,13 +22,38 @@
     <!--
         The Microsoft.Testing.Extensions packages only act when their command-line options are
         passed. `dotnet test` (Microsoft.Testing.Platform mode) forwards
-        $(TestingPlatformCommandLineArguments), so coverage and TRX reporting are enabled through
-        the same properties that inject the packages.
+        $(TestingPlatformCommandLineArguments), so everything is enabled through the same
+        properties that inject the packages.
+
+        Coverage collection defaults to CI-only (it slows local runs); set
+        RocketSurgeryCodeCoverage=true to always collect, or =false to disable entirely.
     -->
     <PropertyGroup Condition="'$(IsTestProject)' == 'true' and '$(RocketSurgeryTestingExtensions)' != 'false'">
-        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryCodeCoverage)' != 'false'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
+        <_RocketSurgeryCollectCoverage>false</_RocketSurgeryCollectCoverage>
+        <_RocketSurgeryCollectCoverage Condition="'$(RocketSurgeryCodeCoverage)' == 'true' or ('$(RocketSurgeryCodeCoverage)' == '' and '$(ContinuousIntegrationBuild)' == 'true')">true</_RocketSurgeryCollectCoverage>
+        <RocketSurgeryHangDumpTimeout Condition="'$(RocketSurgeryHangDumpTimeout)' == ''">10m</RocketSurgeryHangDumpTimeout>
+        <RocketSurgeryMinimumExpectedTests Condition="'$(RocketSurgeryMinimumExpectedTests)' == ''">1</RocketSurgeryMinimumExpectedTests>
+
+        <TestingPlatformCommandLineArguments Condition="'$(_RocketSurgeryCollectCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
         <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryTestingTrxReport)' != 'false'">$(TestingPlatformCommandLineArguments) --report-trx</TestingPlatformCommandLineArguments>
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryTestingCrashDump)' != 'false'">$(TestingPlatformCommandLineArguments) --crashdump --crashdump-type mini</TestingPlatformCommandLineArguments>
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryTestingHangDump)' != 'false'">$(TestingPlatformCommandLineArguments) --hangdump --hangdump-timeout $(RocketSurgeryHangDumpTimeout) --hangdump-type mini</TestingPlatformCommandLineArguments>
+        <!-- Fail runs that silently discover zero tests. Set RocketSurgeryMinimumExpectedTests=0 to disable. -->
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryMinimumExpectedTests)' != '0'">$(TestingPlatformCommandLineArguments) --minimum-expected-tests $(RocketSurgeryMinimumExpectedTests)</TestingPlatformCommandLineArguments>
+        <!-- Opt-in flaky-test retry: set RocketSurgeryTestRetryCount to the number of retries. -->
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryTestingRetry)' != 'false' and '$(RocketSurgeryTestRetryCount)' != ''">$(TestingPlatformCommandLineArguments) --retry-failed-tests $(RocketSurgeryTestRetryCount)</TestingPlatformCommandLineArguments>
     </PropertyGroup>
+
+    <!--
+        Analyzers already ran (or will run) in the real build; skip them when compiling for
+        `dotnet test` so test feedback arrives faster. Opt out with RocketSurgeryOptimizeTestBuild=false.
+    -->
+    <Target Name="RocketSurgeryDisableAnalyzersForTestRun" BeforeTargets="_MTPBuild"
+        Condition="'$(IsTestProject)' == 'true' and '$(RocketSurgeryOptimizeTestBuild)' != 'false'">
+        <PropertyGroup>
+            <RunAnalyzers>false</RunAnalyzers>
+        </PropertyGroup>
+    </Target>
 
     <ItemGroup Condition="'$(RocketSurgeryTestingExtensions)' != 'false'">
         <!-- TUnit detected -> Rocket Surgery TUnit extensions. -->
@@ -81,6 +106,16 @@
             Condition="'$(RocketSurgeryCodeCoverage)' != 'false'
                 and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
                 and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.CodeCoverage')) != 'true'"
+            IsImplicitlyDefined="true" />
+        <PackageReference Include="Microsoft.Testing.Extensions.Retry" Version="$(MicrosoftTestingExtensionsVersion)"
+            Condition="'$(RocketSurgeryTestingRetry)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.Retry')) != 'true'"
+            IsImplicitlyDefined="true" />
+        <PackageReference Include="Microsoft.Testing.Extensions.HotReload" Version="$(MicrosoftTestingExtensionsVersion)"
+            Condition="'$(RocketSurgeryTestingHotReload)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.HotReload')) != 'true'"
             IsImplicitlyDefined="true" />
     </ItemGroup>
 </Project>

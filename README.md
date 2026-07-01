@@ -49,6 +49,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 ## What you get
 
 - `LangVersion=preview`, `Features=strict`, `Nullable`, `ImplicitUsings`, `ProduceReferenceAssembly`
+- Default `TargetFramework` (the SDK's newest, e.g. `net10.0`) — a csproj can be a single line
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, .NET analyzers on
 - Roslynator, BannedApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK)
 - Shared editorconfig profiles (common, tests, samples, file-based apps) applied as global analyzer configs — your own `.editorconfig` always wins
@@ -56,6 +57,11 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - Source link / deterministic CI builds auto-detected (`ContinuousIntegrationBuild`)
 - `TreatWarningsAsErrors` in CI and Release builds only
 - A `BannedSymbols.txt` found next to (or above) your project is wired up automatically
+- Package metadata auto-discovery: `README.md` next to the project, `LICENSE`/`packageicon.png` up the tree; `Rocket.Surgery.*` projects get RSG branding defaults
+- SBOM generation on pack in CI (`Microsoft.Sbom.Targets`, opt out with `GenerateSBOM=false`)
+- Package validation: set `RocketSurgeryPackageValidationBaseline` to your last released version
+- `RollForward=LatestMajor` for executables; assemblies carry a `RocketSurgery.Sdk.Name` metadata attribute
+- Applied editorconfigs/BannedSymbols are embedded into `-bl` binary logs for diagnosability
 
 ### Test projects
 
@@ -64,8 +70,14 @@ Use `Rocket.Surgery.Sdk.Test`, then just reference your framework. Detection is 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
 - `xunit.v3` → `Rocket.Surgery.Extensions.Testing.XUnit3`
 
-Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`
-and `CodeCoverage` (cobertura, via the SDK's default `coverage.runsettings`).
+Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`,
+`Retry`, `HotReload` and `CodeCoverage` — with the matching command-line options wired through
+`dotnet test` automatically: crash/hang dumps (mini, 10-minute hang timeout), TRX reports, and
+`--minimum-expected-tests 1` so a run that discovers zero tests fails. Coverage (cobertura, via
+the SDK's default `coverage.runsettings`) is collected in CI by default; set
+`RocketSurgeryCodeCoverage=true` to also collect locally. Analyzers are skipped when compiling
+for `dotnet test` (`RocketSurgeryOptimizeTestBuild=false` to disable). Set
+`RocketSurgeryTestRetryCount` to enable flaky-test retries.
 
 ## Properties
 
@@ -80,9 +92,17 @@ and `CodeCoverage` (cobertura, via the SDK's default `coverage.runsettings`).
 | `RocketSurgerySampleProject` | `false` | Sample profile (no packing, relaxed API tracking) |
 | `RocketSurgeryTestingExtensions` | `true` | All test wiring |
 | `RocketSurgeryTestingTUnit` / `RocketSurgeryTestingXUnit3` | `true` | Framework adapters |
-| `RocketSurgeryTestingCrashDump` / `HangDump` / `TrxReport` | `true` | MTP extensions |
-| `RocketSurgeryCodeCoverage` | `true` | Coverage extension + default runsettings |
+| `RocketSurgeryTestingCrashDump` / `HangDump` / `TrxReport` / `Retry` / `HotReload` | `true` | MTP extensions |
+| `RocketSurgeryCodeCoverage` | CI-only | Coverage collection (`true` = always, `false` = never) |
 | `RocketSurgeryCoverageRunSettings` | — | Path to your own runsettings |
+| `RocketSurgeryHangDumpTimeout` | `10m` | Hang dump timeout |
+| `RocketSurgeryMinimumExpectedTests` | `1` | Fail on empty test runs (`0` disables) |
+| `RocketSurgeryTestRetryCount` | — | Retries for failed tests |
+| `RocketSurgeryOptimizeTestBuild` | `true` | Skip analyzers when building for `dotnet test` |
+| `RocketSurgeryPackageMetadata` | `true` | README/LICENSE/icon auto-discovery |
+| `RocketSurgeryPackageValidationBaseline` | — | Enables package validation against a released version |
+| `RocketSurgeryPublicApiAnalyzers` | `false` | Inject Microsoft.CodeAnalysis.PublicApiAnalyzers |
+| `GenerateSBOM` | CI-only | SBOM generation on pack |
 
 Injected package versions are plain properties (`RoslynatorVersion`, `TUnitVersion`,
 `RocketSurgeryExtensionsTestingVersion`, `MicrosoftTestingExtensionsVersion`,

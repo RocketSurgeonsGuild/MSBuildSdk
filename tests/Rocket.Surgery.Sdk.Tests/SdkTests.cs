@@ -117,6 +117,8 @@ public class SdkTests
             <Project Sdk="Rocket.Surgery.Sdk.Test">
                 <PropertyGroup>
                     <TargetFramework>net10.0</TargetFramework>
+                    <!-- Coverage collection is CI-only by default; force it for this assertion. -->
+                    <RocketSurgeryCodeCoverage>true</RocketSurgeryCodeCoverage>
                 </PropertyGroup>
                 <ItemGroup>
                     <PackageReference Include="TUnit" Version="$(TUnitVersion)" />

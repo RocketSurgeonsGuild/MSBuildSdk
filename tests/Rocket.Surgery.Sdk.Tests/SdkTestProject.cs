@@ -75,6 +75,14 @@ public sealed class SdkTestProject : IDisposable
         psi.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
         psi.Environment.Remove("MSBuildSDKsPath");
         psi.Environment.Remove("TESTINGPLATFORM_UI_LANGUAGE");
+        // Keep scaffolded builds hermetic: CI env vars would flip ContinuousIntegrationBuild
+        // (warnings-as-errors, coverage) and make results differ between local and CI runs.
+        psi.Environment.Remove("GITHUB_ACTIONS");
+        psi.Environment.Remove("CI");
+        psi.Environment.Remove("TF_BUILD");
+        psi.Environment.Remove("GITLAB_CI");
+        psi.Environment.Remove("APPVEYOR");
+        psi.Environment.Remove("TEAMCITY_VERSION");
 
         var output = new StringBuilder();
         using var process = Process.Start(psi)!;
@@ -90,12 +98,13 @@ public sealed class SdkTestProject : IDisposable
     {
         var result = await Dotnet($"msbuild {Path.Combine(Directory, projectDirectory)} -getProperty:{string.Join(',', properties)}");
         result.ShouldHaveSucceeded();
-        using var json = JsonDocument.Parse(result.Output);
         if (properties.Length == 1)
         {
-            return new Dictionary<string, string> { [properties[0]] = json.RootElement.GetString() ?? "" };
+            // A single -getProperty prints the raw value, not JSON.
+            return new Dictionary<string, string> { [properties[0]] = result.Output.Trim() };
         }
 
+        using var json = JsonDocument.Parse(result.Output);
         return json.RootElement.GetProperty("Properties").EnumerateObject()
             .ToDictionary(p => p.Name, p => p.Value.GetString() ?? "");
     }
