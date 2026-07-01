@@ -1,0 +1,101 @@
+name: release
+
+on:
+  schedule:
+    # Weekly, Monday 08:00 UTC. Skipped automatically when there are no new commits.
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version override (default: <year>.<month>.<build-count-this-month>)'
+        required: false
+        type: string
+
+permissions:
+  contents: write # push tag + create release
+  id-token: write # NuGet trusted publishing (OIDC)
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: nuget
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags are needed to compute the build number
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Compute version
+        id: version
+        env:
+          VERSION_OVERRIDE: ${{ inputs.version }}
+        run: |
+          if [ -n "$VERSION_OVERRIDE" ]; then
+            VERSION="$VERSION_OVERRIDE"
+          else
+            YEAR=$(date -u +%Y)
+            MONTH=$(date -u +%-m)
+            BUILD=$(git tag --list "v${YEAR}.${MONTH}.*" | wc -l | tr -d ' ')
+            VERSION="${YEAR}.${MONTH}.${BUILD}"
+          fi
+
+          # Weekly runs with nothing new since the last release are a no-op.
+          SKIP=false
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ "$GITHUB_EVENT_NAME" = 'schedule' ] && [ -n "$LAST_TAG" ] \
+              && [ "$(git rev-list "$LAST_TAG"..HEAD --count)" = '0' ]; then
+            SKIP=true
+            echo "No commits since $LAST_TAG — skipping release."
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION (skip=$SKIP)"
+
+      - name: Pack SDKs
+        if: steps.version.outputs.skip != 'true'
+        run: ./build.sh '${{ steps.version.outputs.version }}'
+
+      - name: Integration tests
+        if: steps.version.outputs.skip != 'true'
+        env:
+          RSG_SDK_VERSION: ${{ steps.version.outputs.version }}
+        run: dotnet test tests/Rocket.Surgery.Sdk.Tests
+
+      # Trusted publishing: exchanges the workflow's OIDC token for a short-lived API key.
+      # One-time setup on nuget.org: Trusted Publishing policy for RocketSurgeonsGuild/rsg-sdk,
+      # workflow release.yml. Set the NUGET_USER repository variable to the nuget.org
+      # user/organization that owns the packages.
+      - name: NuGet login (OIDC)
+        if: steps.version.outputs.skip != 'true'
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Publish to nuget.org
+        if: steps.version.outputs.skip != 'true'
+        run: |
+          dotnet nuget push 'artifacts/*.nupkg' \
+            --api-key '${{ steps.nuget-login.outputs.NUGET_API_KEY }}' \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Tag and create GitHub release
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          gh release create "v$VERSION" artifacts/*.nupkg \
+            --title "v$VERSION" \
+            --generate-notes
