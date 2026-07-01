@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        Deliberately uses the plain Microsoft.NET.Sdk: this project validates the packed
+        Rocket.Surgery.Sdk packages, so it must not depend on them (chicken-and-egg).
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="TUnit" Version="1.58.0" />
+    </ItemGroup>
+</Project>

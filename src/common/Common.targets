@@ -14,6 +14,20 @@
         <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
     </PropertyGroup>
 
+    <!--
+        Sample projects: relax public API tracking, packing and documentation requirements.
+        Handled here (not Common.props) because RocketSurgerySampleProject is usually set in the
+        project body or a Directory.Build.props, both of which evaluate after Common.props.
+    -->
+    <PropertyGroup Condition="'$(RocketSurgerySampleProject)' == 'true'">
+        <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+        <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
+        <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' != 'false' and '$(RocketSurgerySampleProject)' == 'true'">
+        <EditorConfigFiles Include="$(RocketSurgeryConfigurationDirectory)Samples.editorconfig" />
+    </ItemGroup>
+
     <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
     <PropertyGroup Condition="'$(RocketSurgeryAnalyzers)' != 'false' and '$(RocketSurgeryBannedApiAnalyzers)' != 'false'">
         <_RocketSurgeryBannedSymbolsFile>$([MSBuild]::GetPathOfFileAbove('BannedSymbols.txt', '$(MSBuildProjectDirectory)'))</_RocketSurgeryBannedSymbolsFile>

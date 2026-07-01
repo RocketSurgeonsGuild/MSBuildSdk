@@ -57,12 +57,6 @@
         <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == '' and ('$(ContinuousIntegrationBuild)' == 'true' or '$(Configuration)' == 'Release')">true</TreatWarningsAsErrors>
     </PropertyGroup>
 
-    <!-- Sample projects: relax public API tracking and documentation requirements. -->
-    <PropertyGroup Condition="'$(RocketSurgerySampleProject)' == 'true'">
-        <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
-        <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
-    </PropertyGroup>
-
     <!--
         Shared analyzer configuration. Files are global analyzer configs (is_global = true) at a low
         global_level, so consumer .editorconfig / .globalconfig files always take precedence.
@@ -77,9 +71,6 @@
         <EditorConfigFiles
             Include="$(RocketSurgeryConfigurationDirectory)SingleFileApp.editorconfig"
             Condition="'$(RocketSurgerySingleFileApp)' == 'true'" />
-        <EditorConfigFiles
-            Include="$(RocketSurgeryConfigurationDirectory)Samples.editorconfig"
-            Condition="'$(RocketSurgerySampleProject)' == 'true'" />
     </ItemGroup>
 
     <!--
