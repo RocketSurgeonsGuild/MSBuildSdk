@@ -1,0 +1,31 @@
+<Project>
+    <!--
+        Imported after the project body (via BeforeMicrosoftNETSdkTargets), so it can react to
+        properties and items declared in the project file and in packages' props (e.g. TUnit
+        sets IsTestProject from its own props).
+    -->
+    <PropertyGroup>
+        <_RocketSurgeryCommonTargetsImported>true</_RocketSurgeryCommonTargetsImported>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+        <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+        <!-- Only flip the doc default when it is still the value this SDK defaulted in Common.props. -->
+        <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
+    <PropertyGroup Condition="'$(RocketSurgeryAnalyzers)' != 'false' and '$(RocketSurgeryBannedApiAnalyzers)' != 'false'">
+        <_RocketSurgeryBannedSymbolsFile>$([MSBuild]::GetPathOfFileAbove('BannedSymbols.txt', '$(MSBuildProjectDirectory)'))</_RocketSurgeryBannedSymbolsFile>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(_RocketSurgeryBannedSymbolsFile)' != ''">
+        <AdditionalFiles Include="$(_RocketSurgeryBannedSymbolsFile)" />
+    </ItemGroup>
+
+    <!-- Test-only analyzer relaxations; IsTestProject may come from the project body or a framework's props. -->
+    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' != 'false' and '$(IsTestProject)' == 'true'">
+        <EditorConfigFiles Include="$(RocketSurgeryConfigurationDirectory)Tests.editorconfig" />
+    </ItemGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)Testing.targets" />
+</Project>

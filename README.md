@@ -1,0 +1,99 @@
+# Rocket.Surgery.Sdk
+
+MSBuild project SDKs that distill the Rocket Surgeons Guild build conventions into a single
+versioned package family — compiler defaults, analyzers, standardized editorconfigs, NuGet audit,
+source link, and Microsoft.Testing.Platform test wiring.
+
+| Package | Chains to | Use for |
+| --- | --- | --- |
+| `Rocket.Surgery.Sdk` | Microsoft.NET.Sdk | Libraries, console apps, file-based apps |
+| `Rocket.Surgery.Sdk.Web` | Microsoft.NET.Sdk.Web | ASP.NET Core |
+| `Rocket.Surgery.Sdk.Razor` | Microsoft.NET.Sdk.Razor | Razor class libraries |
+| `Rocket.Surgery.Sdk.BlazorWebAssembly` | Microsoft.NET.Sdk.BlazorWebAssembly | Blazor WASM |
+| `Rocket.Surgery.Sdk.Test` | Microsoft.NET.Sdk | Test projects (Microsoft.Testing.Platform) |
+| `Rocket.Surgery.Sdk.WindowsDesktop` | Microsoft.NET.Sdk.WindowsDesktop | WPF / WinForms |
+
+## Usage
+
+Pin the version once in `global.json`:
+
+```json
+{
+    "msbuild-sdks": {
+        "Rocket.Surgery.Sdk": "2026.7.0",
+        "Rocket.Surgery.Sdk.Test": "2026.7.0"
+    }
+}
+```
+
+```xml
+<Project Sdk="Rocket.Surgery.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
+</Project>
+```
+
+Or inline: `<Project Sdk="Rocket.Surgery.Sdk/2026.7.0">`.
+
+### File-based C# apps (.NET 10+)
+
+```csharp
+#:sdk Rocket.Surgery.Sdk@2026.7.0
+
+Console.WriteLine("Hello");
+```
+
+File-based apps are detected automatically and get a relaxed analyzer profile.
+
+## What you get
+
+- `LangVersion=preview`, `Features=strict`, `Nullable`, `ImplicitUsings`, `ProduceReferenceAssembly`
+- `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, .NET analyzers on
+- Roslynator, BannedApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK)
+- Shared editorconfig profiles (common, tests, samples, file-based apps) applied as global analyzer configs — your own `.editorconfig` always wins
+- `NuGetAudit` (mode `all`, level `moderate`)
+- Source link / deterministic CI builds auto-detected (`ContinuousIntegrationBuild`)
+- `TreatWarningsAsErrors` in CI and Release builds only
+- A `BannedSymbols.txt` found next to (or above) your project is wired up automatically
+
+### Test projects
+
+Use `Rocket.Surgery.Sdk.Test`, then just reference your framework. Detection is automatic:
+
+- `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
+- `xunit.v3` → `Rocket.Surgery.Extensions.Testing.XUnit3`
+
+Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`
+and `CodeCoverage` (cobertura, via the SDK's default `coverage.runsettings`).
+
+## Properties
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `RocketSurgeryAnalyzers` | `true` | All injected analyzers |
+| `RocketSurgeryRoslynator` / `RocketSurgeryBannedApiAnalyzers` / `RocketSurgeryCodeAnalysisAnalyzers` | `true` | Individual analyzers |
+| `RocketSurgeryEditorConfig` | `true` | Shipped editorconfig profiles |
+| `RocketSurgeryWarningsAsErrors` | `true` | CI/Release `TreatWarningsAsErrors` |
+| `RocketSurgeryDefaultWarningsAsErrors` | `true` | `RS0017` in `WarningsAsErrors` |
+| `RocketSurgerySourceLink` | `true` | Source link/symbol defaults |
+| `RocketSurgerySampleProject` | `false` | Sample profile (no packing, relaxed API tracking) |
+| `RocketSurgeryTestingExtensions` | `true` | All test wiring |
+| `RocketSurgeryTestingTUnit` / `RocketSurgeryTestingXUnit3` | `true` | Framework adapters |
+| `RocketSurgeryTestingCrashDump` / `HangDump` / `TrxReport` | `true` | MTP extensions |
+| `RocketSurgeryCodeCoverage` | `true` | Coverage extension + default runsettings |
+| `RocketSurgeryCoverageRunSettings` | — | Path to your own runsettings |
+
+Injected package versions are plain properties (`RoslynatorVersion`, `TUnitVersion`,
+`RocketSurgeryExtensionsTestingVersion`, `MicrosoftTestingExtensionsVersion`,
+`MicrosoftTestingExtensionsCodeCoverageVersion`, …) — set them anywhere to override.
+
+> Migrating a repo that used `GlobalPackageReference` for these analyzers? Remove those entries —
+> the SDK injects them.
+
+## Versioning & releases
+
+Versions follow `<year>.<month>.<build>` (e.g. `2026.7.1`) and a release is published weekly by
+GitHub Actions using [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
+(OIDC — no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
+`RocketSurgeonsGuild/rsg-sdk` with workflow `release.yml`.

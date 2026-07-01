@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- Packaging shell only — see Directory.Build.props and Rocket.Surgery.Sdk.Test.nuspec. -->
+</Project>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Rocket.Surgery.Sdk default code coverage settings (Microsoft.Testing.Extensions.CodeCoverage).
+    Used automatically for test projects unless RunSettingsFilePath or
+    RocketSurgeryCoverageRunSettings points at your own file, or RocketSurgeryCodeCoverage=false.
+-->
+<RunSettings>
+    <DataCollectionRunSettings>
+        <DataCollectors>
+            <DataCollector friendlyName="Code Coverage">
+                <Configuration>
+                    <Format>Cobertura</Format>
+                    <CodeCoverage>
+                        <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
+                        <EnableDynamicManagedInstrumentation>True</EnableDynamicManagedInstrumentation>
+                        <Attributes>
+                            <Exclude>
+                                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+                                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+                                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
+                                <Attribute>^System\.Runtime\.CompilerServices\.CompilerGeneratedAttribute$</Attribute>
+                            </Exclude>
+                        </Attributes>
+                        <Functions>
+                            <Exclude>
+                                <Function>^Bogus\..*</Function>
+                                <Function>^DryIoc\..*</Function>
+                                <Function>^FakeItEasy\..*</Function>
+                                <Function>^FluentAssertions\..*</Function>
+                                <Function>^JetBrains\..*</Function>
+                                <Function>^Microsoft\..*</Function>
+                                <Function>^Moq\..*</Function>
+                                <Function>^NSubstitute\..*</Function>
+                                <Function>^NUnit\..*</Function>
+                                <Function>^Serilog\..*</Function>
+                                <Function>^Shouldly\..*</Function>
+                                <Function>^System\..*</Function>
+                                <Function>^TUnit\..*</Function>
+                                <Function>^Verify.*</Function>
+                                <Function>^Xunit\..*</Function>
+                            </Exclude>
+                        </Functions>
+                        <ModulePaths>
+                            <!--
+                                No Include list: unlike a repo-local runsettings, the SDK cannot know
+                                consumer assembly names, so everything not excluded is instrumented.
+                            -->
+                            <Exclude>
+                                <ModulePath>.*microsoft\..*\.dll</ModulePath>
+                                <ModulePath>.*system\..*\.dll</ModulePath>
+                                <ModulePath>.*testhost.*\.dll</ModulePath>
+                                <ModulePath>.*xunit\..*\.dll</ModulePath>
+                                <ModulePath>.*tunit.*\.dll</ModulePath>
+                                <ModulePath>.*nunit.*\.dll</ModulePath>
+                                <ModulePath>.*mstest.*\.dll</ModulePath>
+                                <ModulePath>.*fakeiteasy.*\.dll</ModulePath>
+                                <ModulePath>.*nsubstitute.*\.dll</ModulePath>
+                                <ModulePath>.*moq\.dll</ModulePath>
+                                <ModulePath>.*bogus\.dll</ModulePath>
+                                <ModulePath>.*shouldly\.dll</ModulePath>
+                                <ModulePath>.*fluentassertions.*\.dll</ModulePath>
+                                <ModulePath>.*verify\..*\.dll</ModulePath>
+                                <ModulePath>.*serilog\..*\.dll</ModulePath>
+                                <ModulePath>.*newtonsoft\.json\.dll</ModulePath>
+                            </Exclude>
+                        </ModulePaths>
+                    </CodeCoverage>
+                </Configuration>
+            </DataCollector>
+        </DataCollectors>
+    </DataCollectionRunSettings>
+</RunSettings>

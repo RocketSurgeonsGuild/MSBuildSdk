@@ -1,0 +1,14 @@
+<Project>
+    <!--
+        Source link / symbol defaults. The .NET 8+ SDK ships Microsoft.SourceLink.* inline,
+        so no package reference is required — only configuration.
+        Opt out entirely with <RocketSurgerySourceLink>false</RocketSurgerySourceLink>.
+    -->
+    <PropertyGroup Condition="'$(RocketSurgerySourceLink)' != 'false'">
+        <PublishRepositoryUrl Condition="'$(PublishRepositoryUrl)' == ''">true</PublishRepositoryUrl>
+        <EmbedUntrackedSources Condition="'$(EmbedUntrackedSources)' == ''">true</EmbedUntrackedSources>
+        <IncludeSymbols Condition="'$(IncludeSymbols)' == ''">true</IncludeSymbols>
+        <SymbolPackageFormat Condition="'$(SymbolPackageFormat)' == ''">snupkg</SymbolPackageFormat>
+        <DebugType Condition="'$(DebugType)' == ''">portable</DebugType>
+    </PropertyGroup>
+</Project>

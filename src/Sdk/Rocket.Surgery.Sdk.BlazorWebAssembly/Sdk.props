@@ -1,0 +1,17 @@
+<Project>
+    <PropertyGroup>
+        <RocketSurgerySdkName>Rocket.Surgery.Sdk.BlazorWebAssembly</RocketSurgerySdkName>
+        <_RocketSurgeryMustImportMicrosoftNETSdk Condition="'$(UsingMicrosoftNETSdk)' != 'true'">true</_RocketSurgeryMustImportMicrosoftNETSdk>
+        <!--
+            Hooks honored by Microsoft.Common.props / Microsoft.NET.Sdk targets. Because SDK props
+            always evaluate before any SDK targets, these fire in every usage style (Sdk attribute,
+            Sdk element, or #:sdk in file-based apps).
+        -->
+        <CustomBeforeDirectoryBuildProps>$(CustomBeforeDirectoryBuildProps);$(MSBuildThisFileDirectory)../common/Common.props</CustomBeforeDirectoryBuildProps>
+        <BeforeMicrosoftNETSdkTargets>$(BeforeMicrosoftNETSdkTargets);$(MSBuildThisFileDirectory)../common/Common.targets</BeforeMicrosoftNETSdkTargets>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.BlazorWebAssembly" Condition="'$(_RocketSurgeryMustImportMicrosoftNETSdk)' == 'true'" />
+    <!-- Microsoft.NET.Sdk was already imported (Sdk element usage): the props hook above is too late, import directly. -->
+    <Import Project="$(MSBuildThisFileDirectory)../common/Common.props" Condition="'$(_RocketSurgeryMustImportMicrosoftNETSdk)' != 'true' and '$(_RocketSurgeryCommonPropsImported)' != 'true'" />
+</Project>

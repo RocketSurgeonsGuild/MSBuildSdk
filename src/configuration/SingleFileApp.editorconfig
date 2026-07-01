@@ -1,0 +1,20 @@
+# Rocket.Surgery.Sdk — analyzer relaxations for file-based C# apps (dotnet run app.cs).
+# Applied automatically when FileBasedProgram=true.
+is_global = true
+global_level = -40
+
+# Scripts are top-level programs: no namespaces, no docs, no library API hygiene.
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CA1014.severity = none
+dotnet_diagnostic.CA1050.severity = none
+dotnet_diagnostic.CA1052.severity = none
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA2000.severity = none
+# Console.WriteLine over logger ceremony is expected in scripts.
+dotnet_diagnostic.CA2254.severity = none
+# Keep top-level statements; don't suggest Program.Main conversion.
+dotnet_diagnostic.IDE0210.severity = none

@@ -1,0 +1,4 @@
+<Project>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.Razor" Condition="'$(_RocketSurgeryMustImportMicrosoftNETSdk)' == 'true'" />
+    <!-- Common.targets is imported via BeforeMicrosoftNETSdkTargets in every scenario; nothing else to do. -->
+</Project>

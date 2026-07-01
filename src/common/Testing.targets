@@ -1,0 +1,86 @@
+<Project>
+    <!--
+        Test framework detection and Microsoft.Testing.Platform wiring.
+
+        Framework adapters are injected by inspecting @(PackageReference) — this must happen in
+        item groups (not property groups) because items are only available to item conditions
+        during evaluation. Versions flow from Packages.props and are consumer-overridable.
+
+        Opt out of everything here with RocketSurgeryTestingExtensions=false.
+    -->
+
+    <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+        <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == ''">true</TestingPlatformDotnetTestSupport>
+        <!-- Coverage aggregation hints consumed by RSG build pipelines. -->
+        <MergeCoverage Condition="'$(MergeCoverage)' == ''">true</MergeCoverage>
+        <IncludeTestAssembly Condition="'$(IncludeTestAssembly)' == ''">true</IncludeTestAssembly>
+        <!-- Run settings: consumer file wins, then RocketSurgeryCoverageRunSettings, then the SDK default. -->
+        <RunSettingsFilePath Condition="'$(RunSettingsFilePath)' == '' and '$(RocketSurgeryCoverageRunSettings)' != ''">$(RocketSurgeryCoverageRunSettings)</RunSettingsFilePath>
+        <RunSettingsFilePath Condition="'$(RunSettingsFilePath)' == '' and '$(RocketSurgeryCodeCoverage)' != 'false'">$([MSBuild]::NormalizePath('$(RocketSurgeryConfigurationDirectory)coverage.runsettings'))</RunSettingsFilePath>
+    </PropertyGroup>
+
+    <!--
+        The Microsoft.Testing.Extensions packages only act when their command-line options are
+        passed. `dotnet test` (Microsoft.Testing.Platform mode) forwards
+        $(TestingPlatformCommandLineArguments), so coverage and TRX reporting are enabled through
+        the same properties that inject the packages.
+    -->
+    <PropertyGroup Condition="'$(IsTestProject)' == 'true' and '$(RocketSurgeryTestingExtensions)' != 'false'">
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryCodeCoverage)' != 'false'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
+        <TestingPlatformCommandLineArguments Condition="'$(RocketSurgeryTestingTrxReport)' != 'false'">$(TestingPlatformCommandLineArguments) --report-trx</TestingPlatformCommandLineArguments>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(RocketSurgeryTestingExtensions)' != 'false'">
+        <!-- TUnit detected -> Rocket Surgery TUnit extensions. -->
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="$(RocketSurgeryExtensionsTestingVersion)"
+            Condition="'$(RocketSurgeryTestingTUnit)' != 'false'
+                and (@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit')) == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.Core')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Rocket.Surgery.Extensions.Testing.TUnit')) != 'true'"
+            IsImplicitlyDefined="true" />
+
+        <!-- xunit.v3 detected -> Rocket Surgery xUnit v3 extensions. -->
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.XUnit3" Version="$(RocketSurgeryExtensionsTestingVersion)"
+            Condition="'$(RocketSurgeryTestingXUnit3)' != 'false'
+                and (@(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3.core')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Rocket.Surgery.Extensions.Testing.XUnit3')) != 'true'"
+            IsImplicitlyDefined="true" />
+
+        <!--
+            NUnit / MSTest: placeholders — no Rocket Surgery adapter exists yet. When one ships,
+            mirror the TUnit block above using @(PackageReference->AnyHaveMetadataValue('Identity', 'NUnit'))
+            / ('Identity', 'MSTest') and a RocketSurgeryTestingNUnit / RocketSurgeryTestingMSTest opt-out.
+        -->
+    </ItemGroup>
+
+    <!--
+        Microsoft.Testing.Platform extensions for every test project. The xunit.v3 item-function
+        check covers projects that reference xunit.v3 without using Rocket.Surgery.Sdk.Test
+        (TUnit's own props already set IsTestProject).
+    -->
+    <PropertyGroup>
+        <_RocketSurgeryInjectTestExtensions>false</_RocketSurgeryInjectTestExtensions>
+        <_RocketSurgeryInjectTestExtensions Condition="'$(RocketSurgeryTestingExtensions)' != 'false' and '$(IsTestProject)' == 'true'">true</_RocketSurgeryInjectTestExtensions>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(RocketSurgeryTestingExtensions)' != 'false'">
+        <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="$(MicrosoftTestingExtensionsVersion)"
+            Condition="'$(RocketSurgeryTestingCrashDump)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.CrashDump')) != 'true'"
+            IsImplicitlyDefined="true" />
+        <PackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="$(MicrosoftTestingExtensionsVersion)"
+            Condition="'$(RocketSurgeryTestingHangDump)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.HangDump')) != 'true'"
+            IsImplicitlyDefined="true" />
+        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingExtensionsVersion)"
+            Condition="'$(RocketSurgeryTestingTrxReport)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.TrxReport')) != 'true'"
+            IsImplicitlyDefined="true" />
+        <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="$(MicrosoftTestingExtensionsCodeCoverageVersion)"
+            Condition="'$(RocketSurgeryCodeCoverage)' != 'false'
+                and ('$(_RocketSurgeryInjectTestExtensions)' == 'true' or @(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3')) == 'true')
+                and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Testing.Extensions.CodeCoverage')) != 'true'"
+            IsImplicitlyDefined="true" />
+    </ItemGroup>
+</Project>
