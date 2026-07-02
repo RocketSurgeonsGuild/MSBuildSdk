@@ -1,18 +1,15 @@
 <Project>
+    <!-- Every default is guarded so the consumer always wins. Coverage collection is CI-only
+         by default (it slows local runs); set RocketSurgeryCodeCoverage=true to always collect. -->
     <PropertyGroup>
-        <RocketSurgeryTestingExtensions>true</RocketSurgeryTestingExtensions>
-        <RocketSurgeryCodeCoverage>true</RocketSurgeryCodeCoverage>
-        <RocketSurgeryTestingTrxReport>true</RocketSurgeryTestingTrxReport>
-        <RocketSurgeryTestingCrashDump>true</RocketSurgeryTestingCrashDump>
-        <RocketSurgeryTestingHangDump>true</RocketSurgeryTestingHangDump>
-        <RocketSurgeryTestingHotReload>true</RocketSurgeryTestingHotReload>
-        <RocketSurgeryMinimumExpectedTests>0</RocketSurgeryMinimumExpectedTests>
-        <RocketSurgeryTestingRetry>false</RocketSurgeryTestingRetry>
-        <RocketSurgeryTestRetryCount>0</RocketSurgeryTestRetryCount>
-    </PropertyGroup>
-
-    <PropertyGroup Label="Documentation" Condition="'$(GenerateDocumentationFile)' == '' and '$(IsTestProject)' != 'true' and '$(RocketSurgerySingleFileApp)' != 'true' and '$(IsSampleProject)' != 'true'">
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <_RocketSurgeryDefaultedGenerateDocumentationFile>true</_RocketSurgeryDefaultedGenerateDocumentationFile>
+        <RocketSurgeryTestingExtensions Condition="'$(RocketSurgeryTestingExtensions)' == ''">true</RocketSurgeryTestingExtensions>
+        <RocketSurgeryCodeCoverage Condition="'$(RocketSurgeryCodeCoverage)' == '' and '$(ContinuousIntegrationBuild)' == 'true'">true</RocketSurgeryCodeCoverage>
+        <RocketSurgeryTestingTrxReport Condition="'$(RocketSurgeryTestingTrxReport)' == ''">true</RocketSurgeryTestingTrxReport>
+        <RocketSurgeryTestingCrashDump Condition="'$(RocketSurgeryTestingCrashDump)' == ''">true</RocketSurgeryTestingCrashDump>
+        <RocketSurgeryTestingHangDump Condition="'$(RocketSurgeryTestingHangDump)' == ''">true</RocketSurgeryTestingHangDump>
+        <RocketSurgeryTestingHotReload Condition="'$(RocketSurgeryTestingHotReload)' == ''">true</RocketSurgeryTestingHotReload>
+        <RocketSurgeryMinimumExpectedTests Condition="'$(RocketSurgeryMinimumExpectedTests)' == ''">0</RocketSurgeryMinimumExpectedTests>
+        <RocketSurgeryTestingRetry Condition="'$(RocketSurgeryTestingRetry)' == ''">false</RocketSurgeryTestingRetry>
+        <RocketSurgeryTestRetryCount Condition="'$(RocketSurgeryTestRetryCount)' == ''">0</RocketSurgeryTestRetryCount>
     </PropertyGroup>
 </Project>

@@ -48,8 +48,17 @@
         <AnalysisLevel Condition="'$(AnalysisLevel)' == ''">latest</AnalysisLevel>
         <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
         <!-- Public API surface tracking mistakes should always fail the build. -->
-        <WarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == 'true'">
-            $(WarningsAsErrors);RS0017</WarningsAsErrors>
+        <WarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == 'true'">$(WarningsAsErrors);RS0017</WarningsAsErrors>
+    </PropertyGroup>
+
+    <!--
+        Library documentation on by default. Test/sample projects usually declare themselves in
+        the project body (after this file evaluates), so Common.targets flips this back off for
+        them — the _RocketSurgeryDefaulted marker tells it the value came from here, not the consumer.
+    -->
+    <PropertyGroup Label="Documentation" Condition="'$(GenerateDocumentationFile)' == '' and '$(IsTestProject)' != 'true' and '$(RocketSurgerySingleFileApp)' != 'true' and '$(IsSampleProject)' != 'true'">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <_RocketSurgeryDefaultedGenerateDocumentationFile>true</_RocketSurgeryDefaultedGenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Label="NuGet Audit">

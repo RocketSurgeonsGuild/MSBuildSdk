@@ -82,7 +82,15 @@ public class SdkTests
         await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CrashDump");
         await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.HangDump");
         await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.TrxReport");
-        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
+        // Coverage collection (and its package) is CI-scoped by default.
+        await Assert.That(packages).DoesNotContain(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
+
+        var ci = project.Evaluate("tests/tests.csproj", new Dictionary<string, string>
+        {
+            ["ContinuousIntegrationBuild"] = "true",
+        });
+        await Assert.That(ci.GetItems("PackageReference"))
+            .Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
     }
 
     [Test]
@@ -122,11 +130,13 @@ public class SdkTests
     }
 
     [Test]
-    public async Task BaseSdk_WithXunitV3_InjectsXUnit3Adapter()
+    public async Task TestSdk_WithXunitV3_InjectsXUnit3Adapter()
     {
+        // Adapter injection lives in Testing.targets, which only imports for test projects —
+        // the Test SDK marks IsTestProject during the props phase.
         using var project = new SdkTestProject();
         project.WriteFile("tests/tests.csproj", """
-            <Project Sdk="Rocket.Surgery.Sdk">
+            <Project Sdk="Rocket.Surgery.Sdk.Test">
                 <PropertyGroup>
                     <TargetFramework>net10.0</TargetFramework>
                     <OutputType>Exe</OutputType>
@@ -140,7 +150,6 @@ public class SdkTests
         var result = await project.Compile("tests/tests.csproj");
         var packages = result.GetItems("PackageReference");
         await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Rocket.Surgery.Extensions.Testing.XUnit3");
-        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
     }
 
     [Test]
@@ -159,7 +168,9 @@ public class SdkTests
             </Project>
             """);
 
-        var result = await project.Compile("tests/tests.csproj");
+        // Evaluation-only: actually restoring 2.2.2 would be a legitimate NU1605 downgrade
+        // against the version TUnit references; this test only proves the override flows through.
+        var result = project.Evaluate("tests/tests.csproj");
         var packages = result.GetItems("PackageReference");
         await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CrashDump" && c.Metadata.Any(m => m.Name == "Version" && m.EvaluatedValue == "2.2.2"));
     }

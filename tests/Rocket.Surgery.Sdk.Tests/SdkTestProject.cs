@@ -1,22 +1,50 @@
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
-using Microsoft.Build.Locator;
+using System.Xml.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Evaluation.Context;
+using Microsoft.Build.Locator;
 using TUnit.Core.Exceptions;
 
 namespace Rocket.Surgery.Sdk.Tests;
 
-class Init
+static class Config
 {
     [Before(HookType.Assembly)]
-    public static void Setup()
+    public static void Setup(AssemblyHookContext context)
     {
         MSBuildLocator.RegisterDefaults();
+
+
+        var root = FindRootDirectory();
+        AllPropertyNames = Directory.EnumerateFiles(Path.Combine(root, "src"), "*.props", SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(Path.Combine(root, "src"), "*.targets", SearchOption.AllDirectories))
+            .SelectMany(z => XDocument.Parse(File.ReadAllText(z)).Document.Descendants("PropertyGroup")
+            .SelectMany(z => z.Elements().Select(e => e.Name.LocalName))
+            .Distinct())
+            .ToFrozenSet();
+
+    }
+
+    public static FrozenSet<string> AllPropertyNames { get; private set; }
+
+    private static string FindRootDirectory()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+        {
+            if (System.IO.Directory.Exists(Path.Combine(directory.FullName, "artifacts")))
+            {
+                return directory.FullName;
+            }
+        }
+
+        throw new InvalidOperationException("Could not locate the repo root directory. This test must be run from within the repo.");
     }
 }
 
@@ -165,12 +193,13 @@ public sealed class SdkTestProject : IDisposable
         await Verify(new
         {
             Properties = project.Properties
-                .Where(p => !p.IsEnvironmentProperty)
+                .Where(p => Config.AllPropertyNames.Contains(p.Name))
                 .ToDictionary(p => p.Name, p => Scrub(p.EvaluatedValue, scrubbers)),
-            PackageReferences = project.GetItems("PackageReference")
+            PackageReferences = project
+                .GetItems("PackageReference")
                 .ToDictionary(
                     i => i.EvaluatedInclude,
-                    i => i.Metadata.ToDictionary(m => m.Name, m => Scrub(m.EvaluatedValue, scrubbers))),
+                    i => i.Metadata.Where(z => z.Name != "Version").ToDictionary(m => m.Name, m => Scrub(m.EvaluatedValue, scrubbers))),
         });
     }
 
@@ -249,6 +278,7 @@ public sealed class SdkTestProject : IDisposable
         AddPropertyToken("NETCoreSdkVersion", "{dotnet-sdk-version}");
         AddPropertyToken("NETCoreSdkRuntimeIdentifier", "{rid}");
         AddPropertyToken("NETCoreSdkPortableRuntimeIdentifier", "{rid}");
+        AddPropertyToken("UserSecretsId", "{user-secrets-id}");
         scrubbers.Add((PackageVersion, "{sdk-version}"));
         scrubbers.Add((Environment.CurrentDirectory, "{cwd}"));
         scrubbers.Add((home, "{home}"));

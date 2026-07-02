@@ -31,7 +31,8 @@ public class FileBasedAppTests
         await project.VerifySnapshot(evaluated);
 
         await Assert.That(evaluated.GetPropertyValue("RocketSurgerySingleFileApp")).IsEqualTo("true");
-        await Assert.That(evaluated.GetPropertyValue("GenerateDocumentationFile")).IsEqualTo("false");
+        // Single-file apps are excluded from the library docs-on default.
+        await Assert.That(evaluated.GetPropertyValue("GenerateDocumentationFile")).IsNotEqualTo("true");
         await Assert.That(evaluated.GetPropertyValue("LangVersion")).IsEqualTo("preview");
     }
 

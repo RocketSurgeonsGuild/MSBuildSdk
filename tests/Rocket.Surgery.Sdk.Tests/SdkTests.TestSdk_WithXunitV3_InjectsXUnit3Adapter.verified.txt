@@ -100,7 +100,7 @@
     Microsoft.Testing.Extensions.TrxReport: {
       IsImplicitlyDefined: true
     },
-    Rocket.Surgery.Extensions.Testing.TUnit: {
+    Rocket.Surgery.Extensions.Testing.XUnit3: {
       IsImplicitlyDefined: true
     },
     Roslynator.Analyzers: {

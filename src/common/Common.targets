@@ -31,7 +31,7 @@
             IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     </ItemGroup>
 
-    <!-- Package validation: set RocketSurgeryPackageValidationBaseline to the last released version. -->
+    <!-- Package validation: set PackageValidationBaselineVersion to the last released version. -->
     <PropertyGroup Condition="'$(PackageValidationBaselineVersion)' != ''">
         <EnablePackageValidation Condition="'$(EnablePackageValidation)' == ''">true</EnablePackageValidation>
     </PropertyGroup>
