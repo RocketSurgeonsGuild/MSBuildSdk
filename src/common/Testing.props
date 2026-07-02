@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+        <RocketSurgeryTestingExtensions>true</RocketSurgeryTestingExtensions>
+        <RocketSurgeryCodeCoverage>true</RocketSurgeryCodeCoverage>
+        <RocketSurgeryTestingTrxReport>true</RocketSurgeryTestingTrxReport>
+        <RocketSurgeryTestingCrashDump>true</RocketSurgeryTestingCrashDump>
+        <RocketSurgeryTestingHangDump>true</RocketSurgeryTestingHangDump>
+        <RocketSurgeryTestingHotReload>true</RocketSurgeryTestingHotReload>
+        <RocketSurgeryMinimumExpectedTests>0</RocketSurgeryMinimumExpectedTests>
+        <RocketSurgeryTestingRetry>false</RocketSurgeryTestingRetry>
+        <RocketSurgeryTestRetryCount>0</RocketSurgeryTestRetryCount>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Documentation" Condition="'$(GenerateDocumentationFile)' == '' and '$(IsTestProject)' != 'true' and '$(RocketSurgerySingleFileApp)' != 'true' and '$(IsSampleProject)' != 'true'">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <_RocketSurgeryDefaultedGenerateDocumentationFile>true</_RocketSurgeryDefaultedGenerateDocumentationFile>
+    </PropertyGroup>
+</Project>

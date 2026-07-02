@@ -89,7 +89,7 @@ for `dotnet test` (`RocketSurgeryOptimizeTestBuild=false` to disable). Set
 | `RocketSurgeryWarningsAsErrors` | `true` | CI/Release `TreatWarningsAsErrors` |
 | `RocketSurgeryDefaultWarningsAsErrors` | `true` | `RS0017` in `WarningsAsErrors` |
 | `RocketSurgerySourceLink` | `true` | Source link/symbol defaults |
-| `RocketSurgerySampleProject` | `false` | Sample profile (no packing, relaxed API tracking) |
+| `IsSampleProject` | `false` | Sample profile (no packing, relaxed API tracking) |
 | `RocketSurgeryTestingExtensions` | `true` | All test wiring |
 | `RocketSurgeryTestingTUnit` / `RocketSurgeryTestingXUnit3` | `true` | Framework adapters |
 | `RocketSurgeryTestingCrashDump` / `HangDump` / `TrxReport` / `Retry` / `HotReload` | `true` | MTP extensions |

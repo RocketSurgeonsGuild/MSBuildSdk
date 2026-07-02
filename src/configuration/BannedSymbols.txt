@@ -1,6 +1,0 @@
-# Rocket.Surgery.Sdk ships Microsoft.CodeAnalysis.BannedApiAnalyzers but deliberately bans
-# nothing by default. Add a BannedSymbols.txt next to your project (or anywhere above it —
-# the nearest one up the directory tree is picked up automatically) to ban APIs, e.g.:
-#
-#   P:System.DateTime.Now;Use TimeProvider.GetLocalNow() instead
-#   M:System.String.ToLower;Use ToLowerInvariant or a culture-specific overload

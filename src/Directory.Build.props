@@ -1,18 +1,20 @@
 <Project>
     <PropertyGroup>
-        <!-- Six SDK csproj files share this directory; keep their obj/bin apart. -->
-        <BaseIntermediateOutputPath>obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
-        <BaseOutputPath>bin/$(MSBuildProjectName)/</BaseOutputPath>
-
         <TargetFramework>netstandard2.0</TargetFramework>
-        <!-- MSBuild SDK packages carry no compiled output — only Sdk/, common/ and configuration/. -->
-        <IncludeBuildOutput>false</IncludeBuildOutput>
         <NoBuild>true</NoBuild>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
-
-        <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+        <PackageType>MSBuildSdk</PackageType>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
         <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
         <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/RocketSurgeonsGuild/rsg-sdk</RepositoryUrl>
-        <NuspecProperties>$(NuspecProperties);version=$(Version);RepositoryUrl=$(RepositoryUrl);RepositoryBranch=$(GITHUB_REF_NAME);RepositoryCommit=$(GITHUB_SHA)</NuspecProperties>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Sdk.props;Sdk.targets" Pack="true" PackagePath="Sdk" />
+        <None Include="$(MSBuildThisFileDirectory)common/**" Pack="true" PackagePath="common" />
+        <None Include="$(MSBuildThisFileDirectory)../README.md" Pack="true" PackagePath="" />
+        <None Include="$(MSBuildThisFileDirectory)../LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
 </Project>

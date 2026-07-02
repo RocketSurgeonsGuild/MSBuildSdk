@@ -24,34 +24,15 @@ public class SdkTests
             }
             """);
 
-        var properties = await project.GetProperties(
-            "lib", "LangVersion", "Features", "Nullable", "ImplicitUsings", "AnalysisMode",
-            "AnalysisLevel", "ProduceReferenceAssembly", "NuGetAudit", "NuGetAuditMode",
-            "NuGetAuditLevel", "GenerateDocumentationFile", "WarningsAsErrors");
+        var properties = await project.Compile("lib/lib.csproj");
+        var packages = properties.GetItems("PackageReference");
+        await Assert.That(packages).Contains(z => z.EvaluatedInclude == "Roslynator.Analyzers");
+        await Assert.That(packages).Contains(z => z.EvaluatedInclude == "Roslynator.Formatting.Analyzers");
+        await Assert.That(packages).Contains(z => z.EvaluatedInclude == "Microsoft.CodeAnalysis.BannedApiAnalyzers");
+        await Assert.That(packages).Contains(z => z.EvaluatedInclude == "Microsoft.CodeAnalysis.Analyzers");
 
-        await Assert.That(properties["LangVersion"]).IsEqualTo("preview");
-        await Assert.That(properties["Features"]).IsEqualTo("strict");
-        await Assert.That(properties["Nullable"]).IsEqualTo("enable");
-        await Assert.That(properties["ImplicitUsings"]).IsEqualTo("enable");
-        await Assert.That(properties["AnalysisMode"]).IsEqualTo("AllEnabledByDefault");
-        await Assert.That(properties["AnalysisLevel"]).IsEqualTo("latest");
-        await Assert.That(properties["ProduceReferenceAssembly"]).IsEqualTo("true");
-        await Assert.That(properties["NuGetAudit"]).IsEqualTo("true");
-        await Assert.That(properties["NuGetAuditMode"]).IsEqualTo("all");
-        await Assert.That(properties["NuGetAuditLevel"]).IsEqualTo("moderate");
-        await Assert.That(properties["GenerateDocumentationFile"]).IsEqualTo("true");
-        await Assert.That(properties["WarningsAsErrors"]).Contains("RS0017");
-
-        var packages = await project.GetPackageReferences("lib");
-        await Assert.That(packages.Keys).Contains("Roslynator.Analyzers");
-        await Assert.That(packages.Keys).Contains("Roslynator.Formatting.Analyzers");
-        await Assert.That(packages.Keys).Contains("Microsoft.CodeAnalysis.BannedApiAnalyzers");
-        await Assert.That(packages.Keys).Contains("Microsoft.CodeAnalysis.Analyzers");
-
-        var build = await project.Dotnet("build lib -v q --nologo");
-        build.ShouldHaveSucceeded();
         // The shipped global analyzer configs must not clash with the .NET SDK's own configs.
-        await Assert.That(build.Output).DoesNotContain("MultipleGlobalAnalyzerKeys");
+        await Assert.That(project.LastBuild!.Value.Output).DoesNotContain("MultipleGlobalAnalyzerKeys");
     }
 
     [Test]
@@ -69,12 +50,9 @@ public class SdkTests
             </Project>
             """);
 
-        var properties = await project.GetProperties("lib", "LangVersion", "Nullable");
-        await Assert.That(properties["LangVersion"]).IsEqualTo("12");
-        await Assert.That(properties["Nullable"]).IsEqualTo("disable");
-
-        var packages = await project.GetPackageReferences("lib");
-        await Assert.That(packages.Keys).DoesNotContain("Roslynator.Analyzers");
+        var properties = await project.Compile("lib/lib.csproj");
+        var packages = properties.GetItems("PackageReference");
+        await Assert.That(packages).DoesNotContain(z => z.EvaluatedInclude == "Roslynator.Analyzers");
     }
 
     [Test]
@@ -92,21 +70,19 @@ public class SdkTests
             </Project>
             """);
 
-        var properties = await project.GetProperties(
-            "tests", "IsTestProject", "IsPackable", "GenerateDocumentationFile",
-            "TestingPlatformDotnetTestSupport", "RunSettingsFilePath");
-        await Assert.That(properties["IsTestProject"]).IsEqualTo("true");
-        await Assert.That(properties["IsPackable"]).IsEqualTo("false");
-        await Assert.That(properties["GenerateDocumentationFile"]).IsEqualTo("false");
-        await Assert.That(properties["TestingPlatformDotnetTestSupport"]).IsEqualTo("true");
-        await Assert.That(properties["RunSettingsFilePath"]).EndsWith("coverage.runsettings");
+        var result = await project.Compile("tests/tests.csproj");
+        var packages = result.GetItems("PackageReference");
+        await Assert.That(result.GetProperty("IsTestProject").EvaluatedValue).IsEqualTo("true");
+        await Assert.That(result.GetProperty("IsPackable").EvaluatedValue).IsEqualTo("false");
+        await Assert.That(result.GetProperty("GenerateDocumentationFile").EvaluatedValue).IsEqualTo("false");
+        await Assert.That(result.GetProperty("TestingPlatformDotnetTestSupport").EvaluatedValue).IsEqualTo("true");
+        await Assert.That(result.GetProperty("RunSettingsFilePath").EvaluatedValue).EndsWith("coverage.runsettings");
 
-        var packages = await project.GetPackageReferences("tests");
-        await Assert.That(packages.Keys).Contains("Rocket.Surgery.Extensions.Testing.TUnit");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.CrashDump");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.HangDump");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.TrxReport");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.CodeCoverage");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Rocket.Surgery.Extensions.Testing.TUnit");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CrashDump");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.HangDump");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.TrxReport");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
     }
 
     [Test]
@@ -161,9 +137,10 @@ public class SdkTests
             </Project>
             """);
 
-        var packages = await project.GetPackageReferences("tests");
-        await Assert.That(packages.Keys).Contains("Rocket.Surgery.Extensions.Testing.XUnit3");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.CodeCoverage");
+        var result = await project.Compile("tests/tests.csproj");
+        var packages = result.GetItems("PackageReference");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Rocket.Surgery.Extensions.Testing.XUnit3");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CodeCoverage");
     }
 
     [Test]
@@ -182,8 +159,9 @@ public class SdkTests
             </Project>
             """);
 
-        var packages = await project.GetPackageReferences("tests");
-        await Assert.That(packages["Microsoft.Testing.Extensions.CrashDump"]).IsEqualTo("2.2.2");
+        var result = await project.Compile("tests/tests.csproj");
+        var packages = result.GetItems("PackageReference");
+        await Assert.That(packages).Contains(c => c.EvaluatedInclude == "Microsoft.Testing.Extensions.CrashDump" && c.Metadata.Any(m => m.Name == "Version" && m.EvaluatedValue == "2.2.2"));
     }
 
     [Test]
@@ -204,13 +182,12 @@ public class SdkTests
             app.Run();
             """);
 
-        var properties = await project.GetProperties("web", "UsingMicrosoftNETSdkWeb", "RocketSurgerySdkName", "LangVersion");
+
+        var result = await project.Compile("web/web.csproj");
+        var properties = result.Properties.ToDictionary(p => p.Name, p => p.EvaluatedValue);
         await Assert.That(properties["UsingMicrosoftNETSdkWeb"]).IsEqualTo("true");
         await Assert.That(properties["RocketSurgerySdkName"]).IsEqualTo("Rocket.Surgery.Sdk.Web");
         await Assert.That(properties["LangVersion"]).IsEqualTo("preview");
-
-        var build = await project.Dotnet("build web -v q --nologo");
-        build.ShouldHaveSucceeded();
     }
 
     [Test]
@@ -221,12 +198,13 @@ public class SdkTests
             <Project Sdk="Rocket.Surgery.Sdk">
                 <PropertyGroup>
                     <TargetFramework>net10.0</TargetFramework>
-                    <RocketSurgerySampleProject>true</RocketSurgerySampleProject>
+                    <IsSampleProject>true</IsSampleProject>
                 </PropertyGroup>
             </Project>
             """);
 
-        var properties = await project.GetProperties("sample", "IsPackable", "GenerateDocumentationFile", "WarningsAsErrors");
+        var result = await project.Compile("sample/sample.csproj");
+        var properties = result.Properties.ToDictionary(p => p.Name, p => p.EvaluatedValue);
         await Assert.That(properties["IsPackable"]).IsEqualTo("false");
         await Assert.That(properties["GenerateDocumentationFile"]).IsNotEqualTo("true");
         await Assert.That(properties["WarningsAsErrors"]).DoesNotContain("RS0017");

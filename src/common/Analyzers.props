@@ -1,0 +1,20 @@
+<Project>
+    <!--
+        Imported before the consumer's Directory.Build.props (via CustomBeforeDirectoryBuildProps),
+        or directly from Sdk.props when Microsoft.NET.Sdk was already imported.
+        Every default is guarded so the consumer always wins.
+    -->
+    <PropertyGroup>
+        <RocketSurgeryAnalyzers Condition="'$(RocketSurgeryAnalyzers)' == ''">true</RocketSurgeryAnalyzers>
+        <RocketSurgeryPublicApiAnalyzers Condition="'$(RocketSurgeryPublicApiAnalyzers)' == ''">true</RocketSurgeryPublicApiAnalyzers>
+        <RocketSurgeryBannedApiAnalyzers Condition="'$(RocketSurgeryBannedApiAnalyzers)' == ''">true</RocketSurgeryBannedApiAnalyzers>
+        <RocketSurgeryBannedNewtonsoftJson Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == ''">true</RocketSurgeryBannedNewtonsoftJson>
+        <RocketSurgeryCodeAnalysisAnalyzers
+            Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == ''">true</RocketSurgeryCodeAnalysisAnalyzers>
+        <RocketSurgeryRoslynatorAnalyzers
+            Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == ''">true</RocketSurgeryRoslynatorAnalyzers>
+        <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
+        <RocketSurgeryEditorConfigJetBrains Condition="'$(RocketSurgeryEditorConfigJetBrains)' == ''">true</RocketSurgeryEditorConfigJetBrains>
+        <RocketSurgeryEditorConfigRoslynator Condition="'$(RocketSurgeryEditorConfigRoslynator)' == ''">true</RocketSurgeryEditorConfigRoslynator>
+    </PropertyGroup>
+</Project>

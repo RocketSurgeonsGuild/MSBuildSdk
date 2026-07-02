@@ -1,61 +1,29 @@
 <Project>
-    <!--
-        Imported after the project body (via BeforeMicrosoftNETSdkTargets), so it can react to
-        properties and items declared in the project file and in packages' props (e.g. TUnit
-        sets IsTestProject from its own props).
-    -->
     <PropertyGroup>
         <_RocketSurgeryCommonTargetsImported>true</_RocketSurgeryCommonTargetsImported>
-        <_IsRocketSurgeryProject>$(MSBuildProjectName.StartsWith('Rocket.Surgery', StringComparison.OrdinalIgnoreCase))</_IsRocketSurgeryProject>
     </PropertyGroup>
 
     <!-- A csproj can omit TargetFramework entirely; default to the newest framework of the current SDK. -->
     <PropertyGroup>
-        <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == '' and '$(NETCoreAppMaximumVersion)' != ''">net$(NETCoreAppMaximumVersion)</TargetFramework>
+        <!-- <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''
+        and '$(NETCoreAppMaximumVersion)' != ''">net$(NETCoreAppMaximumVersion)</TargetFramework> -->
         <!-- Applications keep running on newer installed runtimes. -->
         <RollForward Condition="'$(RollForward)' == '' and '$(OutputType)' == 'Exe' and '$(IsTestProject)' != 'true'">LatestMajor</RollForward>
     </PropertyGroup>
 
     <!-- Provenance: record which SDK variant produced the assembly. -->
-    <ItemGroup Condition="'$(RocketSurgerySdkName)' != '' and '$(GenerateAssemblyInfo)' != 'false'">
+    <ItemGroup Condition="'$(RocketSurgerySdkName)' != '' and '$(GenerateAssemblyInfo)' == 'true'">
         <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
             <_Parameter1>RocketSurgery.Sdk.Name</_Parameter1>
             <_Parameter2>$(RocketSurgerySdkName)</_Parameter2>
         </AssemblyAttribute>
     </ItemGroup>
 
-    <!--
-        Package metadata auto-discovery: README next to the project, LICENSE and icon found up the
-        directory tree. Opt out with RocketSurgeryPackageMetadata=false.
-    -->
-    <PropertyGroup Condition="'$(RocketSurgeryPackageMetadata)' != 'false'">
-        <_RocketSurgeryReadmePath Condition="'$(PackageReadmeFile)' == '' and Exists('$(MSBuildProjectDirectory)/README.md')">$(MSBuildProjectDirectory)/README.md</_RocketSurgeryReadmePath>
-        <_RocketSurgeryReadmePath Condition="'$(PackageReadmeFile)' == '' and '$(_RocketSurgeryReadmePath)' == '' and Exists('$(MSBuildProjectDirectory)/Readme.md')">$(MSBuildProjectDirectory)/Readme.md</_RocketSurgeryReadmePath>
-        <PackageReadmeFile Condition="'$(_RocketSurgeryReadmePath)' != ''">README.md</PackageReadmeFile>
-
-        <_RocketSurgeryLicensePath Condition="'$(PackageLicenseFile)' == '' and '$(PackageLicenseExpression)' == ''">$([MSBuild]::GetPathOfFileAbove('LICENSE', '$(MSBuildProjectDirectory)'))</_RocketSurgeryLicensePath>
-        <PackageLicenseFile Condition="'$(_RocketSurgeryLicensePath)' != ''">LICENSE</PackageLicenseFile>
-
-        <_RocketSurgeryPackageIconPath Condition="'$(PackageIcon)' == ''">$([MSBuild]::GetPathOfFileAbove('packageicon.png', '$(MSBuildProjectDirectory)'))</_RocketSurgeryPackageIconPath>
-        <PackageIcon Condition="'$(_RocketSurgeryPackageIconPath)' != ''">packageicon.png</PackageIcon>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(RocketSurgeryPackageMetadata)' != 'false'">
-        <None Include="$(_RocketSurgeryReadmePath)" Pack="true" PackagePath="README.md" Visible="false" Condition="'$(_RocketSurgeryReadmePath)' != ''" />
-        <None Include="$(_RocketSurgeryLicensePath)" Pack="true" PackagePath="/" Visible="false" Condition="'$(_RocketSurgeryLicensePath)' != ''" />
-        <None Include="$(_RocketSurgeryPackageIconPath)" Pack="true" PackagePath="/" Visible="false" Condition="'$(_RocketSurgeryPackageIconPath)' != ''" />
-    </ItemGroup>
-
-    <!-- Branding defaults, only for Rocket.Surgery.* projects. -->
-    <PropertyGroup Condition="'$(_IsRocketSurgeryProject)' == 'true'">
-        <Company Condition="'$(Company)' == ''">Rocket Surgeons Guild</Company>
-        <Authors Condition="'$(Authors)' == ''">David Driscoll, Rocket Surgeons Guild contributors</Authors>
-        <Copyright Condition="'$(Copyright)' == ''">Copyright Rocket Surgeons Guild © $([System.DateTime]::Now.ToString('yyyy'))</Copyright>
-        <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://rocketsurgeonsguild.github.io/</PackageProjectUrl>
-    </PropertyGroup>
-
     <!-- SBOM generation on pack during CI builds. Opt out with GenerateSBOM=false. -->
     <PropertyGroup>
-        <GenerateSBOM Condition="'$(GenerateSBOM)' == '' and '$(ContinuousIntegrationBuild)' == 'true' and '$(IsPackable)' != 'false'">true</GenerateSBOM>
+        <GenerateSBOM
+            Condition="'$(GenerateSBOM)' == '' and '$(ContinuousIntegrationBuild)' == 'true' and '$(IsPackable)' == 'true'">
+            true</GenerateSBOM>
     </PropertyGroup>
     <ItemGroup Condition="'$(GenerateSBOM)' == 'true'">
         <PackageReference Include="Microsoft.Sbom.Targets" Version="$(MicrosoftSbomTargetsVersion)"
@@ -64,17 +32,9 @@
     </ItemGroup>
 
     <!-- Package validation: set RocketSurgeryPackageValidationBaseline to the last released version. -->
-    <PropertyGroup Condition="'$(RocketSurgeryPackageValidationBaseline)' != ''">
+    <PropertyGroup Condition="'$(PackageValidationBaselineVersion)' != ''">
         <EnablePackageValidation Condition="'$(EnablePackageValidation)' == ''">true</EnablePackageValidation>
-        <PackageValidationBaselineVersion Condition="'$(PackageValidationBaselineVersion)' == ''">$(RocketSurgeryPackageValidationBaseline)</PackageValidationBaselineVersion>
     </PropertyGroup>
-
-    <!-- Public API surface tracking (PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt); opt-in. -->
-    <ItemGroup Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true'">
-        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)"
-            Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.PublicApiAnalyzers')) != 'true'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    </ItemGroup>
 
     <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
         <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
@@ -84,30 +44,14 @@
 
     <!--
         Sample projects: relax public API tracking, packing and documentation requirements.
-        Handled here (not Common.props) because RocketSurgerySampleProject is usually set in the
+        Handled here (not Common.props) because IsSampleProject is usually set in the
         project body or a Directory.Build.props, both of which evaluate after Common.props.
     -->
-    <PropertyGroup Condition="'$(RocketSurgerySampleProject)' == 'true'">
+    <PropertyGroup Condition="'$(IsSampleProject)' == 'true'">
         <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
         <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
         <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
     </PropertyGroup>
-    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' != 'false' and '$(RocketSurgerySampleProject)' == 'true'">
-        <EditorConfigFiles Include="$(RocketSurgeryConfigurationDirectory)Samples.editorconfig" />
-    </ItemGroup>
-
-    <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
-    <PropertyGroup Condition="'$(RocketSurgeryAnalyzers)' != 'false' and '$(RocketSurgeryBannedApiAnalyzers)' != 'false'">
-        <_RocketSurgeryBannedSymbolsFile>$([MSBuild]::GetPathOfFileAbove('BannedSymbols.txt', '$(MSBuildProjectDirectory)'))</_RocketSurgeryBannedSymbolsFile>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(_RocketSurgeryBannedSymbolsFile)' != ''">
-        <AdditionalFiles Include="$(_RocketSurgeryBannedSymbolsFile)" />
-    </ItemGroup>
-
-    <!-- Test-only analyzer relaxations; IsTestProject may come from the project body or a framework's props. -->
-    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' != 'false' and '$(IsTestProject)' == 'true'">
-        <EditorConfigFiles Include="$(RocketSurgeryConfigurationDirectory)Tests.editorconfig" />
-    </ItemGroup>
 
     <!-- Embed the applied analyzer configs and banned-symbol lists into binary logs for diagnosability. -->
     <Target Name="RocketSurgeryEmbedConfigurationInBinLog" AfterTargets="CoreCompile">
@@ -117,5 +61,7 @@
         </ItemGroup>
     </Target>
 
-    <Import Project="$(MSBuildThisFileDirectory)Testing.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)Analyzers.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)Testing.targets" Condition="'$(IsTestProject)' == 'true'" />
 </Project>

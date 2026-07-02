@@ -1,0 +1,9 @@
+<Project>
+    <PropertyGroup>
+        <ContinuousIntegrationBuild Condition="'$(DesignTimeBuild)'=='true'">false</ContinuousIntegrationBuild>
+    </PropertyGroup>
+    <Import Project="$(MSBuildThisFileDirectory)ci/appveyor.props" Condition="'$(APPVEYOR)'!=''" />
+    <Import Project="$(MSBuildThisFileDirectory)ci/azuredevops.props" Condition="'$(TF_BUILD)'!=''" />
+    <Import Project="$(MSBuildThisFileDirectory)ci/github-actions.props" Condition="'$(GITHUB_ACTIONS)'!=''" />
+    <Import Project="$(MSBuildThisFileDirectory)ci/gitlab.props" Condition="'$(GITLAB_CI)'!=''" />
+</Project>

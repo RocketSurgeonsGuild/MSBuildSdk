@@ -1,0 +1,80 @@
+<Project>
+    <!--
+        Shared analyzer configuration. Files are global analyzer configs (is_global = true) at a low
+        global_level, so consumer .editorconfig / .globalconfig files always take precedence.
+        Opt out with RocketSurgeryEditorConfig=false.
+        This file is imported from Common.targets so conditions can see properties set in the
+        consumer's project body (IsTestProject, IsSampleProject, RocketSurgerySingleFileApp).
+    -->
+    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' == 'true'">
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodeAnalysis.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodingStyle.editorconfig" />
+        <EditorConfigFiles
+             Include="$(MSBuildThisFileDirectory)editorconfig/JetBrains.editorconfig"
+            Condition="'$(RocketSurgeryEditorConfigJetBrains)' == 'true'" />
+        <EditorConfigFiles
+             Include="$(MSBuildThisFileDirectory)editorconfig/Roslynator.editorconfig"
+            Condition="'$(RocketSurgeryEditorConfigRoslynator)' == 'true'" />
+        <EditorConfigFiles
+            Include="$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig"
+            Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig')" />
+        <EditorConfigFiles
+            Include="$(MSBuildThisFileDirectory)editorconfig/SingleFileApp.editorconfig"
+            Condition="'$(RocketSurgerySingleFileApp)' == 'true'" />
+        <EditorConfigFiles
+            Include="$(MSBuildThisFileDirectory)editorconfig/Samples.editorconfig"
+            Condition="'$(IsSampleProject)' == 'true'" />
+        <EditorConfigFiles
+            Include="$(MSBuildThisFileDirectory)editorconfig/Tests.editorconfig"
+            Condition="'$(IsTestProject)' == 'true'" />
+    </ItemGroup>
+
+    <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
+    <ItemGroup
+        Condition="'$(RocketSurgeryAnalyzers)' == 'true' and '$(RocketSurgeryBannedApiAnalyzers)' == 'true'">
+        <AdditionalFiles Include="$(MSBuildProjectDirectory)BannedSymbols.txt" Visible="false" />
+        <AdditionalFiles
+            Include="$(MSBuildThisFileDirectory)BannedSymbols.NewtonsoftJson.txt"
+            Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == 'true'"
+            Visible="false"
+        />
+    </ItemGroup>
+
+    <!--
+        Analyzer packages, injected with the SDK's tested versions.
+        Opt out of all with RocketSurgeryAnalyzers=false, or individually per package.
+        Override a version by setting the corresponding *Version property (see Packages.props).
+    -->
+    <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' == 'true'">
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"
+            Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)"
+            Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.PublicApiAnalyzers')) != 'true'"
+            IsImplicitlyDefined="true"
+            PrivateAssets="all"
+            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <PackageReference Include="Roslynator.Analyzers"
+            Version="$(RoslynatorVersion)"
+            Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Analyzers')) != 'true'"
+            IsImplicitlyDefined="true"
+            PrivateAssets="all"
+            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <PackageReference Include="Roslynator.Formatting.Analyzers"
+            Version="$(RoslynatorVersion)"
+            Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Formatting.Analyzers')) != 'true'"
+            IsImplicitlyDefined="true"
+            PrivateAssets="all"
+            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"
+            Version="$(MicrosoftCodeAnalysisBannedApiAnalyzersVersion)"
+            Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.BannedApiAnalyzers')) != 'true'"
+            IsImplicitlyDefined="true"
+            PrivateAssets="all"
+            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers"
+            Version="$(MicrosoftCodeAnalysisAnalyzersVersion)"
+            Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.Analyzers')) != 'true'"
+            IsImplicitlyDefined="true"
+            PrivateAssets="all"
+            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    </ItemGroup>
+</Project>

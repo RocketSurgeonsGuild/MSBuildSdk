@@ -1,0 +1,21 @@
+<Project>
+    <ItemGroup>
+        <AssemblyMetadata Include="AzureDevOps_AgentId" Value="$(AGENT_ID)" />
+        <AssemblyMetadata Include="AzureDevOps_AgentName" Value="$(AGENT_NAME)" />
+        <AssemblyMetadata Include="AzureDevOps_BuildId" Value="$(BUILD_BUILDID)" />
+        <AssemblyMetadata Include="AzureDevOps_BuildNumber" Value="$(BUILD_BUILDNUMBER)" />
+        <AssemblyMetadata Include="AzureDevOps_BuildDefinitionName" Value="$(BUILD_DEFINITIONNAME)" />
+        <AssemblyMetadata Include="AzureDevOps_BuildDefinitionVersion" Value="$(BUILD_DEFINITIONVERSION)" />
+        <AssemblyMetadata Include="AzureDevOps_RepositoryName" Value="$(BUILD_REPOSITORY_NAME)" />
+        <AssemblyMetadata Include="AzureDevOps_RepositoryProvider" Value="$(BUILD_REPOSITORY_PROVIDER)" />
+        <AssemblyMetadata Include="AzureDevOps_RepositoryUri" Value="$(BUILD_REPOSITORY_URI)" />
+        <AssemblyMetadata Include="AzureDevOps_SourceBranch" Value="$(BUILD_SOURCEBRANCH)" />
+        <AssemblyMetadata Include="AzureDevOps_SourceBranchName" Value="$(BUILD_SOURCEBRANCHNAME)" />
+        <AssemblyMetadata Include="AzureDevOps_SourceVersion" Value="$(BUILD_SOURCEVERSION)" />
+        <AssemblyMetadata Include="AzureDevOps_CollectionId" Value="$(SYSTEM_COLLECTIONID)" />
+        <AssemblyMetadata Include="AzureDevOps_DefinitionId" Value="$(SYSTEM_DEFINITIONID)" />
+        <AssemblyMetadata Include="AzureDevOps_CollectionUri" Value="$(SYSTEM_TEAMFOUNDATIONCOLLECTIONURI)" />
+        <AssemblyMetadata Include="AzureDevOps_TeamProject" Value="$(SYSTEM_TEAMPROJECT)" />
+        <AssemblyMetadata Include="AzureDevOps_TeamProjectId" Value="$(SYSTEM_TEAMPROJECTID)" />
+    </ItemGroup>
+</Project>

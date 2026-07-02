@@ -1,5 +1,5 @@
 # Rocket.Surgery.Sdk — analyzer relaxations for sample/demo projects.
-# Applied when RocketSurgerySampleProject=true.
+# Applied when IsSampleProject=true.
 is_global = true
 global_level = -40
 

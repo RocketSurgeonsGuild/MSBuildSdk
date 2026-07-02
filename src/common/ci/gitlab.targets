@@ -1,0 +1,18 @@
+<Project>
+    <ItemGroup>
+        <AssemblyMetadata Include="Commit_Sha" Value="$(GITLAB_COMMIT_SHA)" />
+        <AssemblyMetadata Include="Commit_Before_Sha" Value="$(GITLAB_COMMIT_BEFORE_SHA)" />
+        <AssemblyMetadata Include="Commit_Ref_Name" Value="$(GITLAB_COMMIT_REF_NAME)" />
+        <AssemblyMetadata Include="GitLab_Commit_Sha" Value="$(GITLAB_COMMIT_SHA)" />
+        <AssemblyMetadata Include="GitLab_Commit_Before_Sha" Value="$(GITLAB_COMMIT_BEFORE_SHA)" />
+        <AssemblyMetadata Include="GitLab_Commit_Ref_Name" Value="$(GITLAB_COMMIT_REF_NAME)" />
+        <AssemblyMetadata Include="GitLab_JobId" Value="$(GITLAB_JOB_ID)" />
+        <AssemblyMetadata Include="GitLab_ProjectId" Value="$(GITLAB_PROJECT_ID)" />
+        <AssemblyMetadata Include="GitLab_ProjectName" Value="$(GITLAB_PROJECT_NAME)" />
+        <AssemblyMetadata Include="GitLab_ProjectPath" Value="$(GITLAB_PROJECT_PATH)" />
+        <AssemblyMetadata Include="GitLab_ProjectNamespace" Value="$(GITLAB_PROJECT_NAMESPACE)" />
+        <AssemblyMetadata Include="GitLab_ProjectUrl" Value="$(GITLAB_PROJECT_URL)" />
+        <AssemblyMetadata Include="GitLab_PipelineId" Value="$(GITLAB_PIPELINE_ID)" />
+        <AssemblyMetadata Include="GitLab_RunnerId" Value="$(GITLAB_RUNNER_ID)" />
+    </ItemGroup>
+</Project>

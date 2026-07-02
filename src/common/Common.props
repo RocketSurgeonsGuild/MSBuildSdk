@@ -6,12 +6,12 @@
     -->
     <PropertyGroup>
         <_RocketSurgeryCommonPropsImported>true</_RocketSurgeryCommonPropsImported>
-        <RocketSurgeryConfigurationDirectory>$(MSBuildThisFileDirectory)../configuration/</RocketSurgeryConfigurationDirectory>
+        <RocketSurgeryDefaultWarningsAsErrors
+            Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == ''">true</RocketSurgeryDefaultWarningsAsErrors>
+        <RocketSurgeryWarningsAsErrors Condition="'$(RocketSurgeryWarningsAsErrors)' == ''">true</RocketSurgeryWarningsAsErrors>
+        <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
+        <RocketSurgerySourceLink Condition="'$(RocketSurgerySourceLink)' == ''">true</RocketSurgerySourceLink>
     </PropertyGroup>
-
-    <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegrationBuild.props" />
-    <Import Project="$(MSBuildThisFileDirectory)Packages.props" />
-    <Import Project="$(MSBuildThisFileDirectory)SourceLink.props" />
 
     <!-- File-based C# app detection (`dotnet run app.cs`, .NET 10+). -->
     <PropertyGroup>
@@ -24,18 +24,23 @@
         <UseMicrosoftTestingPlatformRunner Condition="'$(UseMicrosoftTestingPlatformRunner)' == ''">true</UseMicrosoftTestingPlatformRunner>
     </PropertyGroup>
 
+    <PropertyGroup Label="SingleFileApp"
+        Condition="'$(RocketSurgerySingleFileApp)' == 'true'">
+        <ExperimentalFileBasedProgramEnableTransitiveDirectives>true</ExperimentalFileBasedProgramEnableTransitiveDirectives>
+    </PropertyGroup>
+
+    <PropertyGroup Label="SingleFileScript"
+        Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Script'">
+        <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+        <PublishAot>false</PublishAot>
+    </PropertyGroup>
+
     <PropertyGroup Label="Language">
         <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
         <Features Condition="'$(Features)' == ''">strict</Features>
         <Nullable Condition="'$(Nullable)' == ''">enable</Nullable>
         <ImplicitUsings Condition="'$(ImplicitUsings)' == ''">enable</ImplicitUsings>
-        <NukeTelemetryVersion Condition="'$(NukeTelemetryVersion)' == ''">1</NukeTelemetryVersion>
         <ProduceReferenceAssembly Condition="'$(ProduceReferenceAssembly)' == '' and '$(RocketSurgerySingleFileApp)' != 'true'">true</ProduceReferenceAssembly>
-    </PropertyGroup>
-
-    <PropertyGroup Label="Documentation" Condition="'$(GenerateDocumentationFile)' == '' and '$(IsTestProject)' != 'true' and '$(RocketSurgerySingleFileApp)' != 'true' and '$(RocketSurgerySampleProject)' != 'true'">
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <_RocketSurgeryDefaultedGenerateDocumentationFile>true</_RocketSurgeryDefaultedGenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Label="Analysis">
@@ -43,7 +48,8 @@
         <AnalysisLevel Condition="'$(AnalysisLevel)' == ''">latest</AnalysisLevel>
         <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
         <!-- Public API surface tracking mistakes should always fail the build. -->
-        <WarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' != 'false'">$(WarningsAsErrors);RS0017</WarningsAsErrors>
+        <WarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == 'true'">
+            $(WarningsAsErrors);RS0017</WarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup Label="NuGet Audit">
@@ -53,43 +59,13 @@
     </PropertyGroup>
 
     <!-- Strict quality gate where it matters, lenient inner loop. Opt out with RocketSurgeryWarningsAsErrors=false. -->
-    <PropertyGroup Condition="'$(RocketSurgeryWarningsAsErrors)' != 'false'">
+    <PropertyGroup Condition="'$(RocketSurgeryWarningsAsErrors)' == 'true'">
         <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == '' and ('$(ContinuousIntegrationBuild)' == 'true' or '$(Configuration)' == 'Release')">true</TreatWarningsAsErrors>
     </PropertyGroup>
 
-    <!--
-        Shared analyzer configuration. Files are global analyzer configs (is_global = true) at a low
-        global_level, so consumer .editorconfig / .globalconfig files always take precedence.
-        Opt out with RocketSurgeryEditorConfig=false.
-        Tests.editorconfig is added in Common.targets because IsTestProject may be set later.
-    -->
-    <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' != 'false'">
-        <EditorConfigFiles Include="$(RocketSurgeryConfigurationDirectory)Common.editorconfig" />
-        <EditorConfigFiles
-            Include="$(RocketSurgeryConfigurationDirectory)$(RocketSurgerySdkName).editorconfig"
-            Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(RocketSurgeryConfigurationDirectory)$(RocketSurgerySdkName).editorconfig')" />
-        <EditorConfigFiles
-            Include="$(RocketSurgeryConfigurationDirectory)SingleFileApp.editorconfig"
-            Condition="'$(RocketSurgerySingleFileApp)' == 'true'" />
-    </ItemGroup>
-
-    <!--
-        Analyzer packages, injected with the SDK's tested versions.
-        Opt out of all with RocketSurgeryAnalyzers=false, or individually per package.
-        Override a version by setting the corresponding *Version property (see Packages.props).
-    -->
-    <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' != 'false'">
-        <PackageReference Include="Roslynator.Analyzers" Version="$(RoslynatorVersion)"
-            Condition="'$(RocketSurgeryRoslynator)' != 'false'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-        <PackageReference Include="Roslynator.Formatting.Analyzers" Version="$(RoslynatorVersion)"
-            Condition="'$(RocketSurgeryRoslynator)' != 'false'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(MicrosoftCodeAnalysisBannedApiAnalyzersVersion)"
-            Condition="'$(RocketSurgeryBannedApiAnalyzers)' != 'false'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(MicrosoftCodeAnalysisAnalyzersVersion)"
-            Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' != 'false'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    </ItemGroup>
+    <Import Project="$(MSBuildThisFileDirectory)Analyzers.props" />
+    <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)Packages.props" />
+    <Import Project="$(MSBuildThisFileDirectory)SourceLink.props" />
+    <Import Project="$(MSBuildThisFileDirectory)Testing.props" Condition="'$(IsTestProject)' == 'true'" />
 </Project>

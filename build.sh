@@ -12,7 +12,7 @@ for cache in "${NUGET_PACKAGES:-$HOME/.nuget/packages}"/rocket.surgery.sdk*; do
 done
 
 for project in src/*.csproj; do
-    dotnet pack "$project" -o artifacts --nologo -v quiet -p:Version="$VERSION"
+    dotnet pack -o artifacts --nologo -v quiet -p:Version="$VERSION"
 done
 
 ls artifacts/*.nupkg

@@ -4,11 +4,13 @@
         so no package reference is required — only configuration.
         Opt out entirely with <RocketSurgerySourceLink>false</RocketSurgerySourceLink>.
     -->
-    <PropertyGroup Condition="'$(RocketSurgerySourceLink)' != 'false'">
+    <PropertyGroup Condition="'$(RocketSurgerySourceLink)' == 'true'">
         <PublishRepositoryUrl Condition="'$(PublishRepositoryUrl)' == ''">true</PublishRepositoryUrl>
         <EmbedUntrackedSources Condition="'$(EmbedUntrackedSources)' == ''">true</EmbedUntrackedSources>
         <IncludeSymbols Condition="'$(IncludeSymbols)' == ''">true</IncludeSymbols>
         <SymbolPackageFormat Condition="'$(SymbolPackageFormat)' == ''">snupkg</SymbolPackageFormat>
         <DebugType Condition="'$(DebugType)' == ''">portable</DebugType>
+        <CopyDebugSymbolFilesFromPackages Condition="'$(CopyDebugSymbolFilesFromPackages)' == ''">true</CopyDebugSymbolFilesFromPackages>
+        <CopyDocumentationFilesFromPackages Condition="'$(CopyDocumentationFilesFromPackages)' == ''">true</CopyDocumentationFilesFromPackages>
     </PropertyGroup>
 </Project>

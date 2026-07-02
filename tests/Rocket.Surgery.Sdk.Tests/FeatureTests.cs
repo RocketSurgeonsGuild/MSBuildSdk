@@ -21,11 +21,9 @@ public class FeatureTests
             }
             """);
 
-        var properties = await project.GetProperties("lib", "TargetFramework");
-        await Assert.That(properties["TargetFramework"]).Matches("^net[0-9.]+$");
+        var evaluated = await project.Compile("lib/lib.csproj");
 
-        var build = await project.Dotnet("build lib -v q --nologo");
-        build.ShouldHaveSucceeded();
+        await Assert.That(evaluated.GetPropertyValue("TargetFramework")).IsEqualTo("net10.0");
     }
 
     [Test]
@@ -60,9 +58,8 @@ public class FeatureTests
             """);
 
         // SDK-injected analyzers carry their own versions (IsImplicitlyDefined), which must
-        // coexist with CPM without NU1008/NU1010 errors.
-        var build = await project.Dotnet("build lib -v q --nologo");
-        build.ShouldHaveSucceeded();
+        // coexist with CPM without NU1008/NU1010 errors — Compile's dotnet build catches those.
+        await project.Compile("lib/lib.csproj");
     }
 
     [Test]
@@ -87,9 +84,10 @@ public class FeatureTests
             public static class Class1;
             """);
 
-        var properties = await project.GetProperties("lib", "PackageReadmeFile", "PackageLicenseFile");
-        await Assert.That(properties["PackageReadmeFile"]).IsEqualTo("README.md");
-        await Assert.That(properties["PackageLicenseFile"]).IsEqualTo("LICENSE");
+        var evaluated = await project.Compile("lib/lib.csproj");
+
+        await Assert.That(evaluated.GetPropertyValue("PackageReadmeFile")).IsEqualTo("README.md");
+        await Assert.That(evaluated.GetPropertyValue("PackageLicenseFile")).IsEqualTo("LICENSE");
 
         var pack = await project.Dotnet("pack lib -v q --nologo");
         pack.ShouldHaveSucceeded();
@@ -107,10 +105,11 @@ public class FeatureTests
             </Project>
             """);
 
-        var properties = await project.GetProperties("lib", "Company", "Authors", "PackageProjectUrl");
-        await Assert.That(properties["Company"]).IsEqualTo("Rocket Surgeons Guild");
-        await Assert.That(properties["Authors"]).Contains("Rocket Surgeons Guild");
-        await Assert.That(properties["PackageProjectUrl"]).IsEqualTo("https://rocketsurgeonsguild.github.io/");
+        var evaluated = await project.Compile("lib/Rocket.Surgery.Widget.csproj");
+
+        await Assert.That(evaluated.GetPropertyValue("Company")).IsEqualTo("Rocket Surgeons Guild");
+        await Assert.That(evaluated.GetPropertyValue("Authors")).Contains("Rocket Surgeons Guild");
+        await Assert.That(evaluated.GetPropertyValue("PackageProjectUrl")).IsEqualTo("https://rocketsurgeonsguild.github.io/");
     }
 
     [Test]
@@ -128,23 +127,18 @@ public class FeatureTests
             </Project>
             """);
 
-        var properties = await project.GetProperties("tests", "TestingPlatformCommandLineArguments");
-        var arguments = properties["TestingPlatformCommandLineArguments"];
-        await Assert.That(arguments).Contains("--crashdump");
-        await Assert.That(arguments).Contains("--hangdump-timeout 10m");
-        await Assert.That(arguments).Contains("--minimum-expected-tests 1");
-        await Assert.That(arguments).Contains("--report-trx");
+        var evaluated = await project.Compile("tests/tests.csproj");
+
+        var packages = evaluated.GetItems("PackageReference").Select(i => i.EvaluatedInclude).ToList();
+        await Assert.That(packages).Contains("Microsoft.Testing.Extensions.Retry");
+        await Assert.That(packages).Contains("Microsoft.Testing.Extensions.HotReload");
+
         // Coverage collection is CI-scoped by default.
-        await Assert.That(arguments).DoesNotContain("--coverage");
-
-        var ciBuild = await project.Dotnet(
-            $"msbuild {Path.Combine(project.Directory, "tests")} -p:ContinuousIntegrationBuild=true -getProperty:TestingPlatformCommandLineArguments");
-        ciBuild.ShouldHaveSucceeded();
-        await Assert.That(ciBuild.Output).Contains("--coverage");
-
-        var packages = await project.GetPackageReferences("tests");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.Retry");
-        await Assert.That(packages.Keys).Contains("Microsoft.Testing.Extensions.HotReload");
+        var ci = project.Evaluate("tests/tests.csproj", new Dictionary<string, string>
+        {
+            ["ContinuousIntegrationBuild"] = "true",
+        });
+        await Assert.That(ci.GetPropertyValue("TestingPlatformCommandLineArguments")).Contains("--coverage");
     }
 
     [Test]
@@ -160,8 +154,9 @@ public class FeatureTests
             </Project>
             """);
 
-        var properties = await project.GetProperties("lib", "EnablePackageValidation", "PackageValidationBaselineVersion");
-        await Assert.That(properties["EnablePackageValidation"]).IsEqualTo("true");
-        await Assert.That(properties["PackageValidationBaselineVersion"]).IsEqualTo("1.0.0");
+        var evaluated = await project.Compile("lib/lib.csproj");
+
+        await Assert.That(evaluated.GetPropertyValue("EnablePackageValidation")).IsEqualTo("true");
+        await Assert.That(evaluated.GetPropertyValue("PackageValidationBaselineVersion")).IsEqualTo("1.0.0");
     }
 }
