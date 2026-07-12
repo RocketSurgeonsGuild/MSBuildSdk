@@ -29,10 +29,18 @@
         <ExperimentalFileBasedProgramEnableTransitiveDirectives>true</ExperimentalFileBasedProgramEnableTransitiveDirectives>
     </PropertyGroup>
 
-    <PropertyGroup Label="SingleFileScript"
-        Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Script'">
+    <PropertyGroup Label="SingleFileScript" Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Script'">
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
         <PublishAot>false</PublishAot>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PublishRepositoryUrl Condition="'$(PublishRepositoryUrl)' == ''">true</PublishRepositoryUrl>
+        <PublishDocumentationFile Condition="'$(PublishDocumentationFile)' == ''">true</PublishDocumentationFile>
+        <PublishReferencesDocumentationFiles Condition="'$(PublishReferencesDocumentationFiles)' == ''">true</PublishReferencesDocumentationFiles>
+        <PublishReferencesSymbols Condition="'$(PublishReferencesSymbols)' == ''">true</PublishReferencesSymbols>
+        <CopyDebugSymbolFilesFromPackages Condition="'$(CopyDebugSymbolFilesFromPackages)' == ''">true</CopyDebugSymbolFilesFromPackages>
+        <CopyDocumentationFilesFromPackages Condition="'$(CopyDocumentationFilesFromPackages)' == ''">true</CopyDocumentationFilesFromPackages>
     </PropertyGroup>
 
     <PropertyGroup Label="Language">

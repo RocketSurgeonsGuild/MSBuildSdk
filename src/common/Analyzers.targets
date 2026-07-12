@@ -7,37 +7,20 @@
         consumer's project body (IsTestProject, IsSampleProject, RocketSurgerySingleFileApp).
     -->
     <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' == 'true'">
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodeAnalysis.editorconfig" />
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodingStyle.editorconfig" />
-        <EditorConfigFiles
-             Include="$(MSBuildThisFileDirectory)editorconfig/JetBrains.editorconfig"
-            Condition="'$(RocketSurgeryEditorConfigJetBrains)' == 'true'" />
-        <EditorConfigFiles
-             Include="$(MSBuildThisFileDirectory)editorconfig/Roslynator.editorconfig"
-            Condition="'$(RocketSurgeryEditorConfigRoslynator)' == 'true'" />
-        <EditorConfigFiles
-            Include="$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig"
-            Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig')" />
-        <EditorConfigFiles
-            Include="$(MSBuildThisFileDirectory)editorconfig/SingleFileApp.editorconfig"
-            Condition="'$(RocketSurgerySingleFileApp)' == 'true'" />
-        <EditorConfigFiles
-            Include="$(MSBuildThisFileDirectory)editorconfig/Samples.editorconfig"
-            Condition="'$(IsSampleProject)' == 'true'" />
-        <EditorConfigFiles
-            Include="$(MSBuildThisFileDirectory)editorconfig/Tests.editorconfig"
-            Condition="'$(IsTestProject)' == 'true'" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodeAnalysis.editorconfig"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodingStyle.editorconfig"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/JetBrains.editorconfig" Condition="'$(RocketSurgeryEditorConfigJetBrains)' == 'true'"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Roslynator.editorconfig" Condition="'$(RocketSurgeryEditorConfigRoslynator)' == 'true'"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig" Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig')"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/SingleFileApp.editorconfig" Condition="'$(RocketSurgerySingleFileApp)' == 'true'"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Samples.editorconfig" Condition="'$(IsSampleProject)' == 'true'"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Tests.editorconfig" Condition="'$(IsTestProject)' == 'true'"/>
     </ItemGroup>
 
     <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
-    <ItemGroup
-        Condition="'$(RocketSurgeryAnalyzers)' == 'true' and '$(RocketSurgeryBannedApiAnalyzers)' == 'true'">
-        <AdditionalFiles Include="$(MSBuildProjectDirectory)BannedSymbols.txt" Visible="false" />
-        <AdditionalFiles
-            Include="$(MSBuildThisFileDirectory)BannedSymbols.NewtonsoftJson.txt"
-            Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == 'true'"
-            Visible="false"
-        />
+    <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' == 'true' and '$(RocketSurgeryBannedApiAnalyzers)' == 'true'">
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Visible="false"/>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.NewtonsoftJson.txt" Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == 'true'" Visible="false"/>
     </ItemGroup>
 
     <!--
@@ -47,34 +30,34 @@
     -->
     <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' == 'true'">
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"
-            Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)"
-            Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.PublicApiAnalyzers')) != 'true'"
-            IsImplicitlyDefined="true"
-            PrivateAssets="all"
-            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+                          Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)"
+                          Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.PublicApiAnalyzers')) != 'true'"
+                          IsImplicitlyDefined="true"
+                          PrivateAssets="all"
+                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
         <PackageReference Include="Roslynator.Analyzers"
-            Version="$(RoslynatorVersion)"
-            Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Analyzers')) != 'true'"
-            IsImplicitlyDefined="true"
-            PrivateAssets="all"
-            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+                          Version="$(RoslynatorVersion)"
+                          Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Analyzers')) != 'true'"
+                          IsImplicitlyDefined="true"
+                          PrivateAssets="all"
+                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
         <PackageReference Include="Roslynator.Formatting.Analyzers"
-            Version="$(RoslynatorVersion)"
-            Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Formatting.Analyzers')) != 'true'"
-            IsImplicitlyDefined="true"
-            PrivateAssets="all"
-            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+                          Version="$(RoslynatorVersion)"
+                          Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Formatting.Analyzers')) != 'true'"
+                          IsImplicitlyDefined="true"
+                          PrivateAssets="all"
+                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
         <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"
-            Version="$(MicrosoftCodeAnalysisBannedApiAnalyzersVersion)"
-            Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.BannedApiAnalyzers')) != 'true'"
-            IsImplicitlyDefined="true"
-            PrivateAssets="all"
-            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+                          Version="$(MicrosoftCodeAnalysisBannedApiAnalyzersVersion)"
+                          Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.BannedApiAnalyzers')) != 'true'"
+                          IsImplicitlyDefined="true"
+                          PrivateAssets="all"
+                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers"
-            Version="$(MicrosoftCodeAnalysisAnalyzersVersion)"
-            Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.Analyzers')) != 'true'"
-            IsImplicitlyDefined="true"
-            PrivateAssets="all"
-            IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+                          Version="$(MicrosoftCodeAnalysisAnalyzersVersion)"
+                          Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.Analyzers')) != 'true'"
+                          IsImplicitlyDefined="true"
+                          PrivateAssets="all"
+                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
     </ItemGroup>
 </Project>

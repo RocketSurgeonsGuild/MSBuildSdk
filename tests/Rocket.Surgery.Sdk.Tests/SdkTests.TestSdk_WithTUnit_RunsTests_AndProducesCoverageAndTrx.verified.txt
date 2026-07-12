@@ -11,7 +11,6 @@
       AnalysisLevel: latest,
       AnalysisMode: AllEnabledByDefault,
       BeforeMicrosoftNETSdkTargets: ;{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.targets,
-      ContinuousIntegrationBuild: true,
       CopyDebugSymbolFilesFromPackages: true,
       CopyDocumentationFilesFromPackages: true,
       CustomBeforeDirectoryBuildProps: ;{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.props,
@@ -48,6 +47,7 @@
       RocketSurgeryBannedApiAnalyzers: true,
       RocketSurgeryBannedNewtonsoftJson: true,
       RocketSurgeryCodeAnalysisAnalyzers: true,
+      RocketSurgeryCodeCoverage: true,
       RocketSurgeryDefaultWarningsAsErrors: true,
       RocketSurgeryEditorConfig: true,
       RocketSurgeryEditorConfigJetBrains: true,
@@ -71,7 +71,7 @@
       RunSettingsFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings,
       SymbolPackageFormat: snupkg,
       TargetFramework: net10.0,
-      TestingPlatformCommandLineArguments:  --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 10m --hangdump-type mini,
+      TestingPlatformCommandLineArguments:  --coverage --coverage-settings "{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings" --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 10m --hangdump-type mini,
       TestingPlatformDotnetTestSupport: true,
       TreatWarningsAsErrors: false,
       TUnitVersion: 1.58.0,
@@ -109,6 +109,10 @@
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
+        Version: {version}
+      },
+      Microsoft.Testing.Extensions.CodeCoverage: {
+        IsImplicitlyDefined: true,
         Version: {version}
       },
       Microsoft.Testing.Extensions.CrashDump: {

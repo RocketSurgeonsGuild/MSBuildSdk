@@ -1,52 +1,20 @@
-using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
+using Cysharp.Diagnostics;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Evaluation.Context;
-using Microsoft.Build.Locator;
+using Microsoft.Build.Logging.StructuredLogger;
+using Microsoft.Build.Utilities.ProjectCreation;
 using TUnit.Core.Exceptions;
+using Task = System.Threading.Tasks.Task;
 
 namespace Rocket.Surgery.Sdk.Tests;
-
-static class Config
-{
-    [Before(HookType.Assembly)]
-    public static void Setup(AssemblyHookContext context)
-    {
-        MSBuildLocator.RegisterDefaults();
-
-
-        var root = FindRootDirectory();
-        AllPropertyNames = Directory.EnumerateFiles(Path.Combine(root, "src"), "*.props", SearchOption.AllDirectories)
-            .Concat(Directory.EnumerateFiles(Path.Combine(root, "src"), "*.targets", SearchOption.AllDirectories))
-            .SelectMany(z => XDocument.Parse(File.ReadAllText(z)).Document.Descendants("PropertyGroup")
-            .SelectMany(z => z.Elements().Select(e => e.Name.LocalName))
-            .Distinct())
-            .ToFrozenSet();
-
-    }
-
-    public static FrozenSet<string> AllPropertyNames { get; private set; }
-
-    private static string FindRootDirectory()
-    {
-        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
-        {
-            if (System.IO.Directory.Exists(Path.Combine(directory.FullName, "artifacts")))
-            {
-                return directory.FullName;
-            }
-        }
-
-        throw new InvalidOperationException("Could not locate the repo root directory. This test must be run from within the repo.");
-    }
-}
 
 /// <summary>
 /// Scaffolds a throwaway consumer project wired to the packed SDKs in the repo's
@@ -56,104 +24,162 @@ static class Config
 /// </summary>
 public sealed class SdkTestProject : IDisposable
 {
-    public static readonly string ArtifactsDirectory =
-        Environment.GetEnvironmentVariable("RSG_SDK_ARTIFACTS") ?? FindArtifactsDirectory();
+    private readonly List<ProjectCreator> _projects = new();
+    private readonly VerifySettings _settings;
 
-    public static readonly string PackageVersion =
-        Environment.GetEnvironmentVariable("RSG_SDK_VERSION") ?? "0.0.1-local";
-
-    private static readonly string[] SdkNames =
-    [
-        "Rocket.Surgery.Sdk",
-        "Rocket.Surgery.Sdk.Web",
-        "Rocket.Surgery.Sdk.Razor",
-        "Rocket.Surgery.Sdk.BlazorWebAssembly",
-        "Rocket.Surgery.Sdk.Script",
-        "Rocket.Surgery.Sdk.Test",
-        "Rocket.Surgery.Sdk.WindowsDesktop",
-    ];
-
+    public string NugetArtifactsDirectory { get; }
     public string Directory { get; }
 
-    public SdkTestProject()
+    public SdkTestProject(string? nugetArtifactsDirectory = null)
     {
+        NugetArtifactsDirectory = nugetArtifactsDirectory ?? Config.NugetArtifactsDirectory;
+
         Directory = Path.Combine(Path.GetTempPath(), "rsg-sdk-tests", Guid.NewGuid().ToString("N"));
         System.IO.Directory.CreateDirectory(Directory);
 
-        File.WriteAllText(Path.Combine(Directory, "nuget.config"), $"""
-            <?xml version="1.0" encoding="utf-8"?>
-            <configuration>
-                <packageSources>
-                    <clear />
-                    <add key="local" value="{ArtifactsDirectory}" />
-                    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-                </packageSources>
-            </configuration>
-            """);
+        var repository = PackageRepository.Create(Directory, feeds: [new("https://api.nuget.org/v3/index.json"), new(NugetArtifactsDirectory)]);
+        foreach (var package in System.IO.Directory.EnumerateFiles(NugetArtifactsDirectory, "*.nupkg"))
+        {
+            repository.Package(new(package), out _);
+        }
 
-        var sdkEntries = string.Join(",\n        ", SdkNames.Select(name => $"\"{name}\": \"{PackageVersion}\""));
-        File.WriteAllText(Path.Combine(Directory, "global.json"), $$"""
+        _settings = new VerifySettings();
+        _settings.ScrubLinesWithReplace(z => z.Replace(Directory, "{project-root}"));
+
+        var currentGlobalJson = JsonDocument.Parse(File.ReadAllText(Path.Combine(Config.RootDirectory, "global.json")));
+        var version = currentGlobalJson.RootElement.GetProperty("sdk").GetProperty("version").GetString();
+
+        var globalJson = GlobalJsonCreator.Create(new DirectoryInfo(Directory));
+        foreach (var sdkName in repository.Packages.Where(z => z.Id.StartsWith("Rocket.Surgery.Sdk", StringComparison.OrdinalIgnoreCase)))
+        {
+            globalJson.MSBuildSdk(sdkName.Id, sdkName.Version);
+            _settings.ScrubLinesWithReplace(z => z.Replace(sdkName.Version, "{sdk-version}"));
+        }
+
+        globalJson
+            .TestRunner("Microsoft.Testing.Platform")
+            .SdkVersion(version)
+            .SdkRollForward(GlobalJsonSdkRollForward.LatestMajor)
+            .Save();
+    }
+
+    public SdkTestProject AddProject(string path, ProjectCreator project)
+    {
+        project.Save(Path.Combine(Directory, path));
+        if (project.FullPath.EndsWith(".csproj"))
+        {
+            _projects.Add(project);
+        }
+        return this;
+    }
+
+    public SdkTestProject AddFile(string path, string content)
+    {
+        var fullPath = Path.Combine(Directory, path);
+        System.IO.Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        File.WriteAllText(fullPath, content);
+        return this;
+    }
+
+    public async Task VerifyProjects()
+    {
+        var results = new List<ProjectEvaluation>();
+        foreach (var project in _projects)
+        {
+            var relativePath = Path.GetDirectoryName(project.FullPath)!;
+
+            // for some reason... this works... I really don't understand why.
+            // Is it a local machine issue? or just an issual overall??
+
+            var (process, output, error) = ProcessX.GetDualAsyncEnumerable($"dotnet build -bl", workingDirectory: relativePath);
+            await process.WaitForExitAsync();
+            if (process.ExitCode != 0)
             {
-                "test": { "runner": "Microsoft.Testing.Platform" },
-                "msbuild-sdks": {
-                    {{sdkEntries}}
-                }
+                var errorOutput = (await error.ToListAsync()).Concat(await output.ToListAsync());
+                throw new TUnitException($"dotnet build failed for {relativePath}:\n{string.Join("\n", errorOutput)}");
             }
-            """);
+
+            var binlog = Path.Combine(relativePath, "msbuild.binlog");
+            var build = BinaryLog.ReadBuild(binlog);
+            BuildAnalyzer.AnalyzeBuild(build);
+            var projectEvaluation = build.FindChildrenRecursive<ProjectEvaluation>().First();
+            results.Add(projectEvaluation);
+        }
+
+        await Verify(results, settings: _settings);
     }
 
-    public void WriteFile(string relativePath, string contents)
+    public async Task DotnetTest(string projectPath)
     {
-        var path = Path.Combine(Directory, relativePath);
-        System.IO.Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, contents);
+        await ProcessX.StartAsync($"dotnet test -bl", workingDirectory: Path.Combine(Directory, projectPath)).ToTask();
     }
+    //
+    // private IReadOnlyList<(string Token, string Replacement)> CreateScrubbers(Project project)
+    // {
+    //     var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    //     var scrubbers = new List<(string, string)>
+    //     {
+    //         // macOS: Path.GetTempPath() paths surface both with and without the /private prefix,
+    //         // and MSBuildProjectDirectoryNoRoot drops the leading path separator.
+    //         ("/private" + Directory, "{project-root}"),
+    //         (Directory, "{project-root}"),
+    //         ("private" + Directory, "{project-root}"),
+    //         (Directory.TrimStart('/'), "{project-root}"),
+    //         (Path.Combine(home, ".nuget", "packages"), "{nuget}"),
+    //     };
+    //
+    //     // Order matters: full dotnet root before the bare version number it contains.
+    //     scrubbers.Add((Environment.CurrentDirectory, "{cwd}"));
+    //     scrubbers.Add((home, "{home}"));
+    //     scrubbers.Add((Directory, "{solution_root}"));
+    //     return scrubbers;
+    // }
 
-    public async Task<DotnetResult> Dotnet(string arguments, CancellationToken cancellationToken = default)
-    {
-        var psi = CreateDotnetStartInfo(arguments);
+    // public async Task<DotnetResult> Dotnet(string arguments, CancellationToken cancellationToken = default)
+    // {
+    //     var psi = CreateDotnetStartInfo(arguments);
+    //
+    //     var output = new StringBuilder();
+    //     using var process = Process.Start(psi)!;
+    //     var stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
+    //     var stderr = process.StandardError.ReadToEndAsync(cancellationToken);
+    //     await process.WaitForExitAsync(cancellationToken);
+    //     output.Append(await stdout).Append(await stderr);
+    //     return new DotnetResult(process.ExitCode, output.ToString());
+    // }
 
-        var output = new StringBuilder();
-        using var process = Process.Start(psi)!;
-        var stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
-        var stderr = process.StandardError.ReadToEndAsync(cancellationToken);
-        await process.WaitForExitAsync(cancellationToken);
-        output.Append(await stdout).Append(await stderr);
-        return new DotnetResult(process.ExitCode, output.ToString());
-    }
-
-    /// <summary>
-    /// Evaluates a project in-proc with the MSBuild runtime (no build, no restore).
-    /// Each evaluation gets its own <see cref="ProjectCollection"/> so parallel tests
-    /// never contend on shared MSBuild state.
-    /// </summary>
-    public Project Evaluate(string projectPath, IDictionary<string, string>? properties = null)
-    {
-        return Project.FromFile(Path.Combine(Directory, projectPath), CreateProjectOptions(properties));
-    }
-
-    /// <summary>Output of the most recent <see cref="Compile"/> build, for asserting on build diagnostics.</summary>
-    public DotnetResult? LastBuild { get; private set; }
-
-    /// <summary>
-    /// Evaluates the project in-proc, snapshots its normalized surface with Verify, and then
-    /// builds it out-of-proc with <c>dotnet build</c> (restore included — the in-proc
-    /// <c>Project.Build()</c> cannot restore and <c>BuildManager</c> is single-flight,
-    /// which breaks under parallel tests). Build output lands in <see cref="LastBuild"/>.
-    /// </summary>
-    public async Task<Project> Compile(string projectPath, IDictionary<string, string>? properties = null)
-    {
-        var project = Evaluate(projectPath, properties);
-        await VerifySnapshot(project);
-
-        var flags = properties is null
-            ? ""
-            : " " + string.Join(' ', properties.Select(p => $"-p:{p.Key}={p.Value}"));
-        var build = await Dotnet($"build {projectPath} -v q --nologo{flags}");
-        LastBuild = build;
-        build.ShouldHaveSucceeded();
-        return project;
-    }
+    // /// <summary>
+    // /// Evaluates a project in-proc with the MSBuild runtime (no build, no restore).
+    // /// Each evaluation gets its own <see cref="ProjectCollection"/> so parallel tests
+    // /// never contend on shared MSBuild state.
+    // /// </summary>
+    // public Project Evaluate(string projectPath, IDictionary<string, string>? properties = null)
+    // {
+    //     return Project.FromFile(Path.Combine(Directory, projectPath), CreateProjectOptions(properties));
+    // }
+    //
+    // /// <summary>Output of the most recent <see cref="Compile"/> build, for asserting on build diagnostics.</summary>
+    // public DotnetResult? LastBuild { get; private set; }
+    //
+    // /// <summary>
+    // /// Evaluates the project in-proc, snapshots its normalized surface with Verify, and then
+    // /// builds it out-of-proc with <c>dotnet build</c> (restore included — the in-proc
+    // /// <c>Project.Build()</c> cannot restore and <c>BuildManager</c> is single-flight,
+    // /// which breaks under parallel tests). Build output lands in <see cref="LastBuild"/>.
+    // /// </summary>
+    // public async Task<Project> Compile(string projectPath, IDictionary<string, string>? properties = null)
+    // {
+    //     var project = Evaluate(projectPath, properties);
+    //     await VerifySnapshot(project);
+    //
+    //     var flags = properties is null
+    //         ? ""
+    //         : " " + string.Join(' ', properties.Select(p => $"-p:{p.Key}={p.Value}"));
+    //     var build = await Dotnet($"build {projectPath} -v q --nologo{flags}");
+    //     LastBuild = build;
+    //     build.ShouldHaveSucceeded();
+    //     return project;
+    // }
 
     /// <summary>
     /// Evaluates a file-based app (<c>dotnet run app.cs</c>) in-proc with the MSBuild runtime.
@@ -162,55 +188,54 @@ public sealed class SdkTestProject : IDisposable
     /// is evaluated exactly like a project on disk. Contract:
     /// dotnet/sdk src/Cli/dotnet/Commands/Run/Api/RunApiCommand.cs (release/10.0.3xx).
     /// </summary>
-    public async Task<Project> EvaluateFileBasedApp(
-        string entryPointRelativePath,
-        IDictionary<string, string>? properties = null,
-        CancellationToken cancellationToken = default)
+    public async Task<SdkTestProject> AddFileBasedApp(string entryPointRelativePath, string fileContent, CancellationToken cancellationToken = default)
     {
+        AddFile(entryPointRelativePath, fileContent);
         var entryPointPath = Path.Combine(Directory, entryPointRelativePath);
         var (content, projectPath) = await GetVirtualProject(entryPointPath, cancellationToken);
-
         using var reader = XmlReader.Create(new StringReader(content));
         var root = ProjectRootElement.Create(reader);
-        // FullPath anchors SDK resolution (global.json msbuild-sdks), nuget.config, and
-        // Directory.Build.props lookup to the scaffolded directory — same as the CLI's
-        // in-memory evaluation, which uses <entry-point>.csproj as the virtual path.
-        root.FullPath = projectPath;
-
-        return Project.FromProjectRootElement(root, CreateProjectOptions(properties));
+        root.Properties.Single(z => z.Name == "TargetFramework").Value = "net10.0";
+        var ctro = typeof(ProjectCreator).GetTypeInfo().DeclaredConstructors.Single(z => z.GetParameters().Length == 2);
+        var project = (ProjectCreator)ctro.Invoke([root, null]);
+        // var project = (ProjectCreator)Activator.CreateInstance(typeof(ProjectCreator), BindingFlags.NonPublic | BindingFlags.CreateInstance, null, [root, null], null)!;
+        project.Save(projectPath);
+        _projects.Add(project);
+        return this;
     }
-
-    /// <summary>
-    /// Verifies the evaluated properties and package references. Machine-specific fragments
-    /// (scaffold directory, NuGet cache, dotnet install root and version, home directory,
-    /// runfile hash directories, the SDK package version) are replaced with stable tokens so
-    /// snapshots are deterministic across runs and machines.
-    /// </summary>
-    public async Task VerifySnapshot(Project project)
-    {
-        var scrubbers = CreateScrubbers(project);
-
-        await Verify(new
-        {
-            Properties = project.Properties
-                .Where(p => Config.AllPropertyNames.Contains(p.Name))
-                .ToDictionary(p => p.Name, p => Scrub(p.EvaluatedValue, scrubbers)),
-            PackageReferences = project
-                .GetItems("PackageReference")
-                .ToDictionary(
-                    i => i.EvaluatedInclude,
-                    i => i.Metadata.Where(z => z.Name != "Version").ToDictionary(m => m.Name, m => Scrub(m.EvaluatedValue, scrubbers))),
-        });
-    }
-
+    //
+    // /// <summary>
+    // /// Verifies the evaluated properties and package references. Machine-specific fragments
+    // /// (scaffold directory, NuGet cache, dotnet install root and version, home directory,
+    // /// runfile hash directories, the SDK package version) are replaced with stable tokens so
+    // /// snapshots are deterministic across runs and machines.
+    // /// </summary>
+    // public async Task VerifySnapshot(Project project)
+    // {
+    //     var scrubbers = CreateScrubbers(project);
+    //
+    //     await Verify(new
+    //     {
+    //         Properties = project.Properties
+    //             .Where(p => Config.AllPropertyNames.Contains(p.Name))
+    //             .ToDictionary(p => p.Name, p => Scrub(p.EvaluatedValue, scrubbers)),
+    //         PackageReferences = project
+    //             .GetItems("PackageReference")
+    //             .ToDictionary(
+    //                 i => i.EvaluatedInclude,
+    //                 i => i.Metadata.Where(z => z.Name != "Version").ToDictionary(m => m.Name, m => Scrub(m.EvaluatedValue, scrubbers))),
+    //     });
+    // }
+    //
     /// <summary>Asks <c>dotnet run-api</c> for the virtual project XML of a file-based app.</summary>
     private async Task<(string Content, string ProjectPath)> GetVirtualProject(
         string entryPointPath, CancellationToken cancellationToken)
     {
         var psi = CreateDotnetStartInfo("run-api");
         psi.RedirectStandardInput = true;
+        psi.WorkingDirectory = Directory;
 
-        using var process = Process.Start(psi)!;
+        var (process, output, errors) = ProcessX.GetDualAsyncEnumerable(psi);
         await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new Dictionary<string, object>
         {
             ["$type"] = "GetProject",
@@ -218,13 +243,7 @@ public sealed class SdkTestProject : IDisposable
         }));
         process.StandardInput.Close();
 
-        var responseLine = await process.StandardOutput.ReadLineAsync(cancellationToken);
-        if (responseLine is null)
-        {
-            var stderr = await process.StandardError.ReadToEndAsync(cancellationToken);
-            throw new TUnitException($"dotnet run-api produced no response for {entryPointPath}:\n{stderr}");
-        }
-
+        var responseLine = await output.FirstAsync(cancellationToken);
         using var response = JsonDocument.Parse(responseLine);
         var type = response.RootElement.GetProperty("$type").GetString();
         if (type != "Project")
@@ -250,67 +269,32 @@ public sealed class SdkTestProject : IDisposable
             response.RootElement.GetProperty("Content").GetString()!,
             response.RootElement.GetProperty("ProjectPath").GetString()!);
     }
-
-    private static Microsoft.Build.Definition.ProjectOptions CreateProjectOptions(IDictionary<string, string>? properties) => new()
-    {
-        GlobalProperties = properties,
-        ProjectCollection = new ProjectCollection(),
-        EvaluationContext = EvaluationContext.Create(EvaluationContext.SharingPolicy.Isolated),
-    };
-
-    private IReadOnlyList<(string Token, string Replacement)> CreateScrubbers(Project project)
-    {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var scrubbers = new List<(string, string)>
-        {
-            // macOS: Path.GetTempPath() paths surface both with and without the /private prefix,
-            // and MSBuildProjectDirectoryNoRoot drops the leading path separator.
-            ("/private" + Directory, "{project-root}"),
-            (Directory, "{project-root}"),
-            ("private" + Directory, "{project-root}"),
-            (Directory.TrimStart('/'), "{project-root}"),
-            (ArtifactsDirectory, "{artifacts}"),
-            (Path.Combine(home, ".nuget", "packages"), "{nuget}"),
-        };
-
-        // Order matters: full dotnet root before the bare version number it contains.
-        AddPropertyToken("NetCoreRoot", "{dotnet-root}");
-        AddPropertyToken("NETCoreSdkVersion", "{dotnet-sdk-version}");
-        AddPropertyToken("NETCoreSdkRuntimeIdentifier", "{rid}");
-        AddPropertyToken("NETCoreSdkPortableRuntimeIdentifier", "{rid}");
-        AddPropertyToken("UserSecretsId", "{user-secrets-id}");
-        scrubbers.Add((PackageVersion, "{sdk-version}"));
-        scrubbers.Add((Environment.CurrentDirectory, "{cwd}"));
-        scrubbers.Add((home, "{home}"));
-        return scrubbers;
-
-        void AddPropertyToken(string name, string token)
-        {
-            var value = project.GetPropertyValue(name).TrimEnd('/', '\\');
-            if (value.Length > 3)
-            {
-                scrubbers.Add((value, token));
-            }
-        }
-    }
-
-    private static readonly Regex RunfilePathRegex = new(@"runfile[/\\][^/\\""';\s]+", RegexOptions.Compiled);
-
-    private static string Scrub(string value, IReadOnlyList<(string Token, string Replacement)> scrubbers)
-    {
-        if (value.Length == 0)
-        {
-            return value;
-        }
-
-        foreach (var (token, replacement) in scrubbers)
-        {
-            value = value.Replace(token, replacement);
-        }
-
-        return RunfilePathRegex.Replace(value, "runfile/{app}");
-    }
-
+    //
+    // private static Microsoft.Build.Definition.ProjectOptions CreateProjectOptions(IDictionary<string, string>? properties) => new()
+    // {
+    //     GlobalProperties = properties,
+    //     ProjectCollection = new ProjectCollection(),
+    //     EvaluationContext = EvaluationContext.Create(EvaluationContext.SharingPolicy.Isolated),
+    // };
+    //
+    //
+    // private static readonly Regex RunfilePathRegex = new(@"runfile[/\\][^/\\""';\s]+", RegexOptions.Compiled);
+    //
+    // private static string Scrub(string value, IReadOnlyList<(string Token, string Replacement)> scrubbers)
+    // {
+    //     if (value.Length == 0)
+    //     {
+    //         return value;
+    //     }
+    //
+    //     foreach (var (token, replacement) in scrubbers)
+    //     {
+    //         value = value.Replace(token, replacement);
+    //     }
+    //
+    //     return RunfilePathRegex.Replace(value, "runfile/{app}");
+    // }
+    //
     private ProcessStartInfo CreateDotnetStartInfo(string arguments)
     {
         var psi = new ProcessStartInfo("dotnet", arguments)
@@ -345,23 +329,6 @@ public sealed class SdkTestProject : IDisposable
         {
             // Best effort cleanup; temp directory reaping will handle stragglers.
         }
-    }
-
-    private static string FindArtifactsDirectory()
-    {
-        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
-        {
-            var candidate = Path.Combine(directory.FullName, "artifacts");
-            if (System.IO.Directory.Exists(candidate)
-                && System.IO.Directory.EnumerateFiles(candidate, "Rocket.Surgery.Sdk.*.nupkg").Any())
-            {
-                return candidate;
-            }
-        }
-
-        throw new InvalidOperationException(
-            "Could not locate the artifacts directory containing the packed SDKs. "
-            + "Run ./build.sh (or dotnet pack src/*.csproj -o artifacts) first, or set RSG_SDK_ARTIFACTS.");
     }
 }
 

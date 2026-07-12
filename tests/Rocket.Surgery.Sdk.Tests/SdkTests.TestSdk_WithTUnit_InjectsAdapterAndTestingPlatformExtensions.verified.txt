@@ -1,117 +1,195 @@
-﻿{
-  Properties: {
-    _RocketSurgeryCommonPropsImported: true,
-    _RocketSurgeryCommonTargetsImported: true,
-    _RocketSurgeryMustImportMicrosoftNETSdk: true,
-    AnalysisLevel: latest,
-    AnalysisMode: AllEnabledByDefault,
-    BeforeMicrosoftNETSdkTargets: ;{nuget}/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.targets,
-    CopyDebugSymbolFilesFromPackages: true,
-    CopyDocumentationFilesFromPackages: true,
-    CustomBeforeDirectoryBuildProps: ;{nuget}/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.props,
-    DebugType: portable,
-    EmbedUntrackedSources: true,
-    EnableNETAnalyzers: true,
-    Features: strict,
-    GenerateDocumentationFile: false,
-    ImplicitUsings: enable,
-    IncludeBuildOutput: true,
-    IncludeSymbols: true,
-    IncludeTestAssembly: true,
-    IsPackable: false,
-    IsTestProject: true,
-    LangVersion: preview,
-    MergeCoverage: true,
-    MicrosoftCodeAnalysisAnalyzersVersion: 5.3.0,
-    MicrosoftCodeAnalysisBannedApiAnalyzersVersion: 4.14.0,
-    MicrosoftCodeAnalysisPublicApiAnalyzersVersion: 4.14.0,
-    MicrosoftSbomTargetsVersion: 4.1.5,
-    MicrosoftTestingExtensionsCodeCoverageVersion: 18.8.0,
-    MicrosoftTestingExtensionsVersion: 2.2.3,
-    NoWarn: 1701;1702,
-    NuGetAudit: true,
-    NuGetAuditLevel: moderate,
-    NuGetAuditMode: all,
-    Nullable: enable,
-    ProduceReferenceAssembly: true,
-    PublishRepositoryUrl: true,
-    RocketSurgeryAnalyzers: true,
-    RocketSurgeryBannedApiAnalyzers: true,
-    RocketSurgeryBannedNewtonsoftJson: true,
-    RocketSurgeryCodeAnalysisAnalyzers: true,
-    RocketSurgeryDefaultWarningsAsErrors: true,
-    RocketSurgeryEditorConfig: true,
-    RocketSurgeryEditorConfigJetBrains: true,
-    RocketSurgeryEditorConfigRoslynator: true,
-    RocketSurgeryExtensionsTestingVersion: 10.0.5,
-    RocketSurgeryHangDumpTimeout: 10m,
-    RocketSurgeryMinimumExpectedTests: 0,
-    RocketSurgeryPublicApiAnalyzers: true,
-    RocketSurgeryRoslynatorAnalyzers: true,
-    RocketSurgerySdkName: Rocket.Surgery.Sdk.Test,
-    RocketSurgerySourceLink: true,
-    RocketSurgeryTestingCrashDump: true,
-    RocketSurgeryTestingExtensions: true,
-    RocketSurgeryTestingHangDump: true,
-    RocketSurgeryTestingHotReload: true,
-    RocketSurgeryTestingRetry: false,
-    RocketSurgeryTestingTrxReport: true,
-    RocketSurgeryTestRetryCount: 0,
-    RocketSurgeryWarningsAsErrors: true,
-    RoslynatorVersion: 4.15.0,
-    RunSettingsFilePath: {nuget}/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings,
-    SymbolPackageFormat: snupkg,
+﻿[
+  {
+    Name: tests.csproj,
+    Configuration: Debug,
+    Platform: AnyCPU,
     TargetFramework: net10.0,
-    TestingPlatformCommandLineArguments:  --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 10m --hangdump-type mini,
-    TestingPlatformDotnetTestSupport: true,
-    TreatWarningsAsErrors: false,
-    TUnitVersion: 1.58.0,
-    UseMicrosoftTestingPlatformRunner: true,
-    Version: 1.0.0,
-    WarningsAsErrors:
-            ;RS0017;NU1605;SYSLIB0011,
-    XunitV3Version: 3.2.2
-  },
-  PackageReferences: {
-    Microsoft.CodeAnalysis.Analyzers: {
-      IncludeAssets: runtime; build; native; contentfiles; analyzers,
-      IsImplicitlyDefined: true,
-      PrivateAssets: all
+    Properties: {
+      _RocketSurgeryCommonPropsImported: true,
+      _RocketSurgeryCommonTargetsImported: true,
+      _RocketSurgeryMustImportMicrosoftNETSdk: true,
+      AnalysisLevel: latest,
+      AnalysisMode: AllEnabledByDefault,
+      BeforeMicrosoftNETSdkTargets: ;{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.targets,
+      CopyDebugSymbolFilesFromPackages: true,
+      CopyDocumentationFilesFromPackages: true,
+      CustomBeforeDirectoryBuildProps: ;{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/../common/Common.props,
+      DebugType: portable,
+      EmbedUntrackedSources: true,
+      EnableNETAnalyzers: true,
+      Features: strict,
+      GenerateDocumentationFile: false,
+      ImplicitUsings: enable,
+      IncludeBuildOutput: true,
+      IncludeSymbols: true,
+      IncludeTestAssembly: true,
+      IsPackable: false,
+      IsTestProject: true,
+      LangVersion: preview,
+      MergeCoverage: true,
+      MicrosoftCodeAnalysisAnalyzersVersion: 5.3.0,
+      MicrosoftCodeAnalysisBannedApiAnalyzersVersion: 4.14.0,
+      MicrosoftCodeAnalysisPublicApiAnalyzersVersion: 4.14.0,
+      MicrosoftSbomTargetsVersion: 4.1.5,
+      MicrosoftTestingExtensionsCodeCoverageVersion: 18.8.0,
+      MicrosoftTestingExtensionsVersion: 2.2.3,
+      NoWarn: 1701;1702,
+      NuGetAudit: true,
+      NuGetAuditLevel: moderate,
+      NuGetAuditMode: all,
+      Nullable: enable,
+      ProduceReferenceAssembly: true,
+      PublishDocumentationFile: true,
+      PublishReferencesDocumentationFiles: true,
+      PublishReferencesSymbols: true,
+      PublishRepositoryUrl: true,
+      RocketSurgeryAnalyzers: true,
+      RocketSurgeryBannedApiAnalyzers: true,
+      RocketSurgeryBannedNewtonsoftJson: true,
+      RocketSurgeryCodeAnalysisAnalyzers: true,
+      RocketSurgeryDefaultWarningsAsErrors: true,
+      RocketSurgeryEditorConfig: true,
+      RocketSurgeryEditorConfigJetBrains: true,
+      RocketSurgeryEditorConfigRoslynator: true,
+      RocketSurgeryExtensionsTestingVersion: 10.0.5,
+      RocketSurgeryHangDumpTimeout: 10m,
+      RocketSurgeryMinimumExpectedTests: 0,
+      RocketSurgeryPublicApiAnalyzers: true,
+      RocketSurgeryRoslynatorAnalyzers: true,
+      RocketSurgerySdkName: Rocket.Surgery.Sdk.Test,
+      RocketSurgerySourceLink: true,
+      RocketSurgeryTestingCrashDump: true,
+      RocketSurgeryTestingExtensions: true,
+      RocketSurgeryTestingHangDump: true,
+      RocketSurgeryTestingHotReload: true,
+      RocketSurgeryTestingRetry: false,
+      RocketSurgeryTestingTrxReport: true,
+      RocketSurgeryTestRetryCount: 0,
+      RocketSurgeryWarningsAsErrors: true,
+      RoslynatorVersion: 4.15.0,
+      RunSettingsFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings,
+      SymbolPackageFormat: snupkg,
+      TargetFramework: net10.0,
+      TestingPlatformCommandLineArguments:  --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 10m --hangdump-type mini,
+      TestingPlatformDotnetTestSupport: true,
+      TreatWarningsAsErrors: false,
+      TUnitVersion: 1.58.0,
+      UseMicrosoftTestingPlatformRunner: true,
+      Version: 1.0.0,
+      WarningsAsErrors: ;RS0017;NU1605;SYSLIB0011,
+      XunitV3Version: 3.2.2
     },
-    Microsoft.CodeAnalysis.BannedApiAnalyzers: {
-      IncludeAssets: runtime; build; native; contentfiles; analyzers,
-      IsImplicitlyDefined: true,
-      PrivateAssets: all
+    AdditionalFiles: [
+      {
+        Name: /private{project-root}/testsBannedSymbols.txt,
+        Link: testsBannedSymbols.txt,
+        Visible: false
+      },
+      {
+        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
+        Link: BannedSymbols.NewtonsoftJson.txt,
+        Visible: false
+      }
+    ],
+    PackageReference: {
+      Microsoft.CodeAnalysis.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: {version}
+      },
+      Microsoft.CodeAnalysis.BannedApiAnalyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: {version}
+      },
+      Microsoft.CodeAnalysis.PublicApiAnalyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: {version}
+      },
+      Microsoft.Testing.Extensions.CrashDump: {
+        IsImplicitlyDefined: true,
+        Version: {version}
+      },
+      Microsoft.Testing.Extensions.HangDump: {
+        IsImplicitlyDefined: true,
+        Version: {version}
+      },
+      Microsoft.Testing.Extensions.HotReload: {
+        IsImplicitlyDefined: true,
+        Version: {version}
+      },
+      Microsoft.Testing.Extensions.TrxReport: {
+        IsImplicitlyDefined: true,
+        Version: {version}
+      },
+      Rocket.Surgery.Extensions.Testing.TUnit: {
+        IsImplicitlyDefined: true,
+        Version: {version}
+      },
+      Roslynator.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: {version}
+      },
+      Roslynator.Formatting.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: {version}
+      },
+      TUnit: {
+        Version: {version}
+      }
     },
-    Microsoft.CodeAnalysis.PublicApiAnalyzers: {
-      IncludeAssets: runtime; build; native; contentfiles; analyzers,
-      IsImplicitlyDefined: true,
-      PrivateAssets: all
-    },
-    Microsoft.Testing.Extensions.CrashDump: {
-      IsImplicitlyDefined: true
-    },
-    Microsoft.Testing.Extensions.HangDump: {
-      IsImplicitlyDefined: true
-    },
-    Microsoft.Testing.Extensions.HotReload: {
-      IsImplicitlyDefined: true
-    },
-    Microsoft.Testing.Extensions.TrxReport: {
-      IsImplicitlyDefined: true
-    },
-    Rocket.Surgery.Extensions.Testing.TUnit: {
-      IsImplicitlyDefined: true
-    },
-    Roslynator.Analyzers: {
-      IncludeAssets: runtime; build; native; contentfiles; analyzers,
-      IsImplicitlyDefined: true,
-      PrivateAssets: all
-    },
-    Roslynator.Formatting.Analyzers: {
-      IncludeAssets: runtime; build; native; contentfiles; analyzers,
-      IsImplicitlyDefined: true,
-      PrivateAssets: all
-    }
+    Using: [
+      System,
+      System.Collections.Generic,
+      System.IO,
+      System.Linq,
+      System.Net.Http,
+      System.Threading,
+      System.Threading.Tasks
+    ],
+    Imports: [
+      {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.props,
+      {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.targets,
+      {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.props,
+      {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.targets,
+      /private{project-root}/tests/tests.csproj
+    ],
+    NoImports: [
+      {
+        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.props,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)../common/Common.props,
+            Reason: false condition; ('$(_RocketSurgeryMustImportMicrosoftNETSdk)' != 'true' and '$(_RocketSurgeryCommonPropsImported)' != 'true' was evaluated as 'true' != 'true' and 'true' != 'true').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/ContinuousIntegration.props,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)ci/appveyor.props,
+            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/ContinuousIntegration.targets,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)ci/appveyor.targets,
+            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+          }
+        ]
+      }
+    ]
   }
-}
+]
