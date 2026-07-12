@@ -49,7 +49,7 @@
       RocketSurgeryBannedApiAnalyzers: true,
       RocketSurgeryBannedNewtonsoftJson: true,
       RocketSurgeryCodeAnalysisAnalyzers: true,
-      RocketSurgeryCodeCoverage: true,
+      RocketSurgeryTestingCodeCoverage: true,
       RocketSurgeryDefaultWarningsAsErrors: true,
       RocketSurgeryEditorConfig: true,
       RocketSurgeryEditorConfigJetBrains: true,
