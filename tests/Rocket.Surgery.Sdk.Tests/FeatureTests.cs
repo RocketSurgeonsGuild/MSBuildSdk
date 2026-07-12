@@ -33,7 +33,7 @@ public class FeatureTests
         project.AddProject("tests/tests.csproj",
             ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
                 .Property("ContinuousIntegrationBuild", "true")
-                .ItemPackageReference("TUnit", "$(TUnitVersion)"));
+                .ItemPackageReference("TUnit", Config.TUnitVersion));
 
         await project.VerifyProjects();
     }

@@ -5,8 +5,6 @@ namespace Rocket.Surgery.Sdk.Tests;
 
 public class SdkTests
 {
-
-
     [Test]
     public async Task BaseSdk_AppliesSharedDefaults_AndInjectsAnalyzers()
     {
@@ -38,7 +36,7 @@ public class SdkTests
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
             ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
-                .ItemPackageReference("TUnit", "$(TUnitVersion)"));
+                .ItemPackageReference("TUnit", Config.TUnitVersion));
 
         await project.VerifyProjects();
     }
@@ -49,8 +47,8 @@ public class SdkTests
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
             ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
-                   .Property("RocketSurgeryTestingCodeCoverage", "true")
-                   .ItemPackageReference("TUnit", "$(TUnitVersion)")
+                   .Property("RsgSdk_Testing_CodeCoverage", "true")
+                   .ItemPackageReference("TUnit", Config.TUnitVersion)
             )
             .AddFile("tests/MathTests.cs", """
              namespace Scaffolded.Tests;
