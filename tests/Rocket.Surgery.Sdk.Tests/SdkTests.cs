@@ -62,7 +62,7 @@ public class SdkTests
 
         await project.DotnetTest("tests");
 
-        var resultsDirectory = Path.Combine(project.Directory, "tests", "bin", "Debug", "net10.0", "TestResults");
+        var resultsDirectory = Path.Combine(project.Directory, "tests", "TestResults");
         var coverage = Directory.GetFiles(resultsDirectory, "*.cobertura.xml", SearchOption.AllDirectories);
         var trx = Directory.GetFiles(resultsDirectory, "*.trx", SearchOption.AllDirectories);
         await Assert.That(coverage).IsNotEmpty();

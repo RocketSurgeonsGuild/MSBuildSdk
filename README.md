@@ -53,7 +53,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - Default `TargetFramework` (the SDK's newest, e.g. `net10.0`) — a csproj can be a single line
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
-- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK, individually overridable)
+- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK, individually overridable — see [Injected package versions](#injected-package-versions) below)
 - Shared editorconfig profiles (common, coding style, JetBrains, Roslynator, tests, samples, file-based apps, per-SDK-variant) applied as global analyzer configs — your own `.editorconfig` always wins
 - `NuGetAudit=true` (mode `all`, level `moderate`)
 - Source link / deterministic CI builds auto-detected via `ContinuousIntegrationBuild` (GitHub Actions, Azure DevOps, GitLab CI env vars); build-provenance `AssemblyMetadata` (commit SHA, run/job/pipeline IDs, etc.) is embedded automatically on those providers
@@ -74,16 +74,20 @@ is automatic, based on your `PackageReference`s:
 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
 
-Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport` and
-`HotReload` on by default, plus `CodeCoverage` in CI — with the matching command-line options
-wired through `dotnet test` automatically: crash/hang dumps (mini, 10-minute hang timeout), TRX
-reports, and (once `RocketSurgeryTestingExtensions` is on) `--minimum-expected-tests 1` so a run
-that discovers zero tests fails — set `RocketSurgeryMinimumExpectedTests=0` to disable. Coverage
-(cobertura, via the SDK's default `coverage.runsettings`, overridable with `RunSettingsFilePath`)
-is collected in CI by default; set `RocketSurgeryCodeCoverage=true` to also collect locally, or
-`=false` to disable entirely. Analyzers are skipped when compiling for `dotnet test`
+Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`,
+`HotReload`, `AzureDevOpsReport` and `GitHubActionsReport` on by default, plus `CodeCoverage` in
+CI — with the matching command-line options wired through `dotnet test` automatically: crash/hang
+dumps (mini, 1-hour hang timeout), TRX reports, `--report-azdo` (Azure Pipelines) and `--report-gh`
+(GitHub Actions) — both are harmless no-ops outside their respective CI, and (once
+`RsgSdk_Testing_Extensions` is on) `--minimum-expected-tests 1` so a run that discovers zero tests
+fails — set `RsgSdk_Testing_MinimumExpectedTests=0` to disable. Coverage (cobertura, via the SDK's
+default `coverage.runsettings`, overridable with `RunSettingsFilePath`) is collected in CI by
+default; set `RsgSdk_Testing_CodeCoverage=true` to also collect locally, or `=false` to disable
+entirely. `HotReload` activates via `TESTINGPLATFORM_HOTRELOAD_ENABLED=1` (set automatically by
+`dotnet watch`), not a command-line flag, so there's nothing to wire for it beyond the package
+reference. Analyzers are skipped when compiling for `dotnet test`
 (`RocketSurgeryOptimizeTestBuild=true` to enable — it's opt-in). `Microsoft.Testing.Extensions.Retry`
-is opt-in too: set `RocketSurgeryTestingRetry=true` and `RocketSurgeryTestRetryCount` to the
+is opt-in too: set `RsgSdk_Testing_Retry=true` and `RsgSdk_Testing_RetryCount` to the
 number of retries.
 
 ## Properties
@@ -168,16 +172,18 @@ Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSur
 
 | Property | Default | Condition |
 | --- | --- | --- |
-| `RocketSurgeryTestingExtensions` | `true` | master switch for everything below |
-| `RocketSurgeryTestingCodeCoverage` | `true` | - |
-| `RocketSurgeryTestingTrxReport` | `true` | — |
-| `RocketSurgeryTestingCrashDump` | `true` | — |
-| `RocketSurgeryTestingHangDump` | `true` | — |
-| `RocketSurgeryTestingHotReload` | `true` | — |
-| `RocketSurgeryTestingRetry` | `false` | opt-in — enables `Microsoft.Testing.Extensions.Retry` |
-| `RocketSurgeryMinimumExpectedTests` | `0`, raised to `1` | raised to `1` only when `RocketSurgeryTestingExtensions=true`; set to `0` to disable the "zero tests discovered" failure |
-| `RocketSurgeryTestRetryCount` | `0` | only used when `RocketSurgeryTestingRetry=true` |
-| `RocketSurgeryHangDumpTimeout` | `10m` | only when `RocketSurgeryTestingExtensions=true` |
+| `RsgSdk_Testing_Extensions` | `true` | master switch for everything below |
+| `RsgSdk_Testing_CodeCoverage` | `true` | - |
+| `RsgSdk_Testing_TrxReport` | `true` | — |
+| `RsgSdk_Testing_CrashDump` | `true` | — |
+| `RsgSdk_Testing_HangDump` | `true` | — |
+| `RsgSdk_Testing_HotReload` | `true` | — |
+| `RsgSdk_Testing_AzureDevOpsReport` | `true` | enables `Microsoft.Testing.Extensions.AzureDevOpsReport` + `--report-azdo` (no-op outside Azure Pipelines) |
+| `RsgSdk_Testing_GitHubActionsReport` | `true` | enables `Microsoft.Testing.Extensions.GitHubActionsReport` + `--report-gh` (no-op outside GitHub Actions) |
+| `RsgSdk_Testing_Retry` | `false` | opt-in — enables `Microsoft.Testing.Extensions.Retry` |
+| `RsgSdk_Testing_MinimumExpectedTests` | `0`, raised to `1` | raised to `1` only when `RsgSdk_Testing_Extensions=true`; set to `0` to disable the "zero tests discovered" failure |
+| `RsgSdk_Testing_RetryCount` | `0` | only used when `RsgSdk_Testing_Retry=true` |
+| `RsgSdk_Testing_HangDumpTimeout` | `1h` | only when `RsgSdk_Testing_Extensions=true` |
 | `RocketSurgeryOptimizeTestBuild` | *(unset/off)* | opt-in — set to `true` to skip analyzers when compiling for `dotnet test` |
 | `TestingPlatformDotnetTestSupport` | `true` | — |
 | `MergeCoverage` | `true` | — |
@@ -186,24 +192,36 @@ Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSur
 
 Framework adapters (`Rocket.Surgery.Extensions.Testing.TUnit`) are added automatically
 by inspecting your `PackageReference`s (`TUnit`) — there is no property to force them
-on or off independently of `RocketSurgeryTestingExtensions`.
+on or off independently of `RsgSdk_Testing_Extensions`.
 
-### Injected package versions (`src/common/Packages.props`)
+### Injected package versions
 
-All overridable by setting the property anywhere before the SDK evaluates it:
+There's no checked-in `Packages.props` to hand-maintain — `common/Packages.props` is generated at
+pack time (see `src/Directory.Build.targets`) from this repo's own `Directory.Packages.props`.
+Every `PackageVersion` / `GlobalPackageReference` whose package id starts with one of these
+prefixes is picked up automatically:
 
-| Property | Current default |
+- `Rocket.Surgery.Extensions.`
+- `Microsoft.Testing.Extensions.`
+- `Roslynator`
+- `Microsoft.CodeAnalysis.`
+- `Microsoft.Sbom.Targets` (exact match)
+
+Adding a new package to that list is enough to make the SDK inject a version default for it — no
+manual property to add or keep in sync. The generated property name follows a fixed pattern: strip
+the dots from the package id and wrap it as `RsgSdk_<PackageIdNoDots>_Version`. For example:
+
+| Package | Generated property |
 | --- | --- |
-| `RoslynatorVersion` | `4.15.0` |
-| `MicrosoftCodeAnalysisAnalyzersVersion` | `5.3.0` |
-| `MicrosoftCodeAnalysisBannedApiAnalyzersVersion` | `4.14.0` |
-| `MicrosoftCodeAnalysisPublicApiAnalyzersVersion` | `4.14.0` |
-| `MicrosoftSbomTargetsVersion` | `4.1.5` |
-| `TUnitVersion` | `1.58.0` |
-| `XunitV3Version` | `3.2.2` |
-| `RocketSurgeryExtensionsTestingVersion` | `10.0.5` |
-| `MicrosoftTestingExtensionsVersion` | `2.2.3` |
-| `MicrosoftTestingExtensionsCodeCoverageVersion` | `18.8.0` |
+| `Roslynator.Analyzers` | `RsgSdk_RoslynatorAnalyzers_Version` |
+| `Microsoft.CodeAnalysis.PublicApiAnalyzers` | `RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version` |
+| `Microsoft.Testing.Extensions.CrashDump` | `RsgSdk_MicrosoftTestingExtensionsCrashDump_Version` |
+| `Rocket.Surgery.Extensions.Testing.TUnit` | `RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version` |
+
+Every one of these is overridable the same way as any other SDK default — set the property in your
+project, `Directory.Build.props`, or on the command line before the SDK evaluates it. To see the
+full current list, either inspect `common/Packages.props` inside a packed nupkg, or run
+`dotnet build -getProperty:RsgSdk_RoslynatorAnalyzers_Version` (etc.) against a consumer project.
 
 ### Continuous integration detection (`src/common/ContinuousIntegration.props`)
 

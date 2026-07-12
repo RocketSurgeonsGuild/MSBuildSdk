@@ -18,5 +18,96 @@
     <None Include="Sdk.props;Sdk.targets" Pack="true" PackagePath="Sdk" />
     <None Include="$(MSBuildThisFileDirectory)common/**" Pack="true" PackagePath="common" />
   </ItemGroup>
+
+  <!--
+      common/Packages.props no longer exists as a checked-in file. Every package the SDK injects
+      into consumer builds whose id starts with one of the prefixes below gets its version tracked
+      centrally in Directory.Packages.props; the packed props file is generated from those versions
+      at pack time, so adding a new package only means adding it to Directory.Packages.props — no
+      manual property to keep in sync.
+
+      Property naming: "Rocket.Surgery.Extensions.Testing.TUnit" becomes
+      $(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version).
+  -->
+  <UsingTask
+    TaskName="GenerateRocketSurgeryPackagesProps"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll"
+  >
+    <ParameterGroup>
+      <DestinationFile ParameterType="System.String" Required="true" />
+      <Prefixes ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <PackageVersions ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <GlobalPackageReferences ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var versionsById = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in GlobalPackageReferences.Concat(PackageVersions))
+        {
+            var version = item.GetMetadata("Version");
+            if (!string.IsNullOrEmpty(version))
+                versionsById[item.ItemSpec] = version;
+        }
+
+        var prefixes = Prefixes.Select(p => p.ItemSpec).ToArray();
+        var matched =
+            versionsById
+                .Where(kv => prefixes.Any(prefix => kv.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+                .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase);
+
+        // Built via concatenation (not a literal "$(" substring) so MSBuild's own property
+        // expansion doesn't try to evaluate it while parsing this inline task's source text.
+        var dollar = "$";
+
+        var content = new StringBuilder();
+        content.AppendLine("<Project>");
+        content.AppendLine("    <!--");
+        content.AppendLine("        Generated from Directory.Packages.props at pack time — do not edit directly.");
+        content.AppendLine("        Each property is only set when the consumer has not already defined it, so any");
+        content.AppendLine("        of these can be overridden from Directory.Build.props, the project file, or the");
+        content.AppendLine("        command line.");
+        content.AppendLine("    -->");
+        content.AppendLine("    <PropertyGroup>");
+        foreach (var kv in matched)
+        {
+            var propertyName = "RsgSdk_" + kv.Key.Replace(".", "") + "_Version";
+            var reference = dollar + "(" + propertyName + ")";
+            content.AppendLine($"        <{propertyName} Condition=\"'{reference}' == ''\">{kv.Value}</{propertyName}>");
+        }
+        content.AppendLine("    </PropertyGroup>");
+        content.AppendLine("</Project>");
+
+        Directory.CreateDirectory(Path.GetDirectoryName(DestinationFile));
+        File.WriteAllText(DestinationFile, content.ToString());
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="_RocketSurgeryGeneratePackagesProps" BeforeTargets="_GetPackageFiles;Pack">
+    <ItemGroup>
+      <_RocketSurgeryPackagesPropsPrefix Include="Rocket.Surgery.Extensions." />
+      <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.Testing.Extensions." />
+      <_RocketSurgeryPackagesPropsPrefix Include="Roslynator" />
+      <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.CodeAnalysis." />
+      <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.Sbom.Targets" />
+    </ItemGroup>
+
+    <GenerateRocketSurgeryPackagesProps
+      DestinationFile="$(IntermediateOutputPath)common/Packages.props"
+      Prefixes="@(_RocketSurgeryPackagesPropsPrefix)"
+      PackageVersions="@(PackageVersion)"
+      GlobalPackageReferences="@(GlobalPackageReference)"
+    />
+
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)common/Packages.props" Pack="true" PackagePath="common" />
+    </ItemGroup>
+  </Target>
+
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 </Project>

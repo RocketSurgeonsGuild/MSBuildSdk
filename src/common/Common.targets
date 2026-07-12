@@ -19,14 +19,16 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <!-- SBOM generation on pack during CI builds. Opt out with GenerateSBOM=false. -->
+  <!--
+      SBOM generation on pack during CI builds. Opt out with GenerateSBOM=false.
+      Microsoft.Sbom.Targets doesn't match any of the wildcard prefixes the SDK auto-syncs from
+      Directory.Packages.props (see Directory.Build.targets), so its default lives here directly.
+  -->
   <PropertyGroup>
     <GenerateSBOM Condition="'$(GenerateSBOM)' == '' and '$(ContinuousIntegrationBuild)' == 'true' and '$(IsPackable)' == 'true'">true</GenerateSBOM>
   </PropertyGroup>
   <ItemGroup Condition="'$(GenerateSBOM)' == 'true'">
-    <PackageReference Include="Microsoft.Sbom.Targets" Version="$(MicrosoftSbomTargetsVersion)"
-                      Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Sbom.Targets')) != 'true'"
-                      IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
+    <RsgSdkImplicitPackageReference Include="Microsoft.Sbom.Targets" Version="$(RsgSdk_MicrosoftSbomTargets_Version)" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
 
   <!-- Package validation: set PackageValidationBaselineVersion to the last released version. -->
@@ -62,4 +64,7 @@
   <Import Project="$(MSBuildThisFileDirectory)Analyzers.targets"/>
   <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.targets"/>
   <Import Project="$(MSBuildThisFileDirectory)Testing.targets" Condition="'$(IsTestProject)' == 'true'"/>
+  <!-- Imported last: expands every RsgSdkImplicitPackageReference declared above (and in this
+       file's own SBOM ItemGroup) into a real PackageReference. -->
+  <Import Project="$(MSBuildThisFileDirectory)ImplicitPackageReferences.targets" />
 </Project>
