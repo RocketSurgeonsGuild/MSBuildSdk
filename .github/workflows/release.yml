@@ -26,11 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # tags are needed to compute the build number
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
+          fetch-depth: 0
 
       - name: Compute version
         id: version
@@ -58,36 +54,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION (skip=$SKIP)"
-
-      - name: Pack SDKs
-        if: steps.version.outputs.skip != 'true'
-        run: ./build.sh '${{ steps.version.outputs.version }}'
-
-      - name: Integration tests
-        if: steps.version.outputs.skip != 'true'
-        env:
-          RSG_SDK_VERSION: ${{ steps.version.outputs.version }}
-        run: dotnet test tests/Rocket.Surgery.Sdk.Tests
-
-      # Trusted publishing: exchanges the workflow's OIDC token for a short-lived API key.
-      # One-time setup on nuget.org: Trusted Publishing policy for RocketSurgeonsGuild/rsg-sdk,
-      # workflow release.yml. Set the NUGET_USER repository variable to the nuget.org
-      # user/organization that owns the packages.
-      - name: NuGet login (OIDC)
-        if: steps.version.outputs.skip != 'true'
-        id: nuget-login
-        uses: NuGet/login@v1
-        with:
-          user: ${{ vars.NUGET_USER }}
-
-      - name: Publish to nuget.org
-        if: steps.version.outputs.skip != 'true'
-        run: |
-          dotnet nuget push 'artifacts/*.nupkg' \
-            --api-key '${{ steps.nuget-login.outputs.NUGET_API_KEY }}' \
-            --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate
-
       - name: Tag and create GitHub release
         if: steps.version.outputs.skip != 'true'
         env:

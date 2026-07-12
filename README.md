@@ -65,7 +65,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 
 ### Test projects
 
-Use `Rocket.Surgery.Sdk.Test`, then just reference your framework. Detection is automatic:
+Use `Rocket.Surgery.Sdk`, then just reference your framework. Detection is automatic:
 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
 - `xunit.v3` → `Rocket.Surgery.Extensions.Testing.XUnit3`

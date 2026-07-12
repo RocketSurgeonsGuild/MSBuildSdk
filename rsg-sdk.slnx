@@ -1,4 +1,37 @@
 <Solution>
+  <Folder Name="/common/">
+    <File Path="src\common\Analyzers.props" />
+    <File Path="src\common\Analyzers.targets" />
+    <File Path="src\common\BannedSymbols.NewtonsoftJson.txt" />
+    <File Path="src\common\BannedSymbols.txt" />
+    <File Path="src\common\Common.props" />
+    <File Path="src\common\Common.targets" />
+    <File Path="src\common\ContinuousIntegration.props" />
+    <File Path="src\common\ContinuousIntegration.targets" />
+    <File Path="src\common\coverage.runsettings" />
+    <File Path="src\common\Packages.props" />
+    <File Path="src\common\SourceLink.targets" />
+    <File Path="src\common\Testing.props" />
+    <File Path="src\common\Testing.targets" />
+  </Folder>
+  <Folder Name="/common/ci/">
+    <File Path="src\common\ci\azuredevops.props" />
+    <File Path="src\common\ci\azuredevops.targets" />
+    <File Path="src\common\ci\github-actions.props" />
+    <File Path="src\common\ci\github-actions.targets" />
+    <File Path="src\common\ci\gitlab.props" />
+    <File Path="src\common\ci\gitlab.targets" />
+  </Folder>
+  <Folder Name="/common/editorconfig/">
+    <File Path="src\common\editorconfig\CodeAnalysis.editorconfig" />
+    <File Path="src\common\editorconfig\CodingStyle.editorconfig" />
+    <File Path="src\common\editorconfig\JetBrains.editorconfig" />
+    <File Path="src\common\editorconfig\Rocket.Surgery.Sdk.Web.editorconfig" />
+    <File Path="src\common\editorconfig\Roslynator.editorconfig" />
+    <File Path="src\common\editorconfig\Samples.editorconfig" />
+    <File Path="src\common\editorconfig\SingleFileApp.editorconfig" />
+    <File Path="src\common\editorconfig\Tests.editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Rocket.Surgery.Sdk.BlazorWebAssembly/Rocket.Surgery.Sdk.BlazorWebAssembly.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Razor/Rocket.Surgery.Sdk.Razor.csproj" />

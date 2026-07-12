@@ -2,7 +2,6 @@
     <PropertyGroup Condition="'$(RocketSurgerySourceLink)' == 'true'">
         <EmbedUntrackedSources Condition="'$(EmbedUntrackedSources)' == ''">true</EmbedUntrackedSources>
         <IncludeSymbols Condition="'$(IncludeSymbols)' == ''">true</IncludeSymbols>
-        <SymbolPackageFormat Condition="'$(SymbolPackageFormat)' == ''">snupkg</SymbolPackageFormat>
         <DebugType Condition="'$(DebugType)' == ''">portable</DebugType>
     </PropertyGroup>
 </Project>

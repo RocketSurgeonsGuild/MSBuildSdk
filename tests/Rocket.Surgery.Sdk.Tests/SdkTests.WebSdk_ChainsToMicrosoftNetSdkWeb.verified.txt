@@ -20,6 +20,7 @@
       EnableNETAnalyzers: true,
       Features: use-roslyn-tokenizer=true;strict,
       GenerateDocumentationFile: true,
+      GeneratePackageOnBuild: false,
       ImplicitUsings: enable,
       IncludeBuildOutput: true,
       IncludeSymbols: true,
@@ -36,6 +37,7 @@
       NuGetAuditLevel: moderate,
       NuGetAuditMode: all,
       Nullable: enable,
+      PackageOutputPath: bin\Debug/,
       ProduceReferenceAssembly: true,
       PublishDocumentationFile: true,
       PublishReferencesDocumentationFiles: true,
@@ -57,7 +59,6 @@
       RocketSurgeryWarningsAsErrors: true,
       RollForward: LatestMajor,
       RoslynatorVersion: 4.15.0,
-      SymbolPackageFormat: snupkg,
       TargetFramework: net10.0,
       TreatWarningsAsErrors: false,
       TUnitVersion: 1.58.0,
@@ -67,13 +68,13 @@
     },
     AdditionalFiles: [
       {
-        Name: /private{project-root}/webBannedSymbols.txt,
-        Link: webBannedSymbols.txt,
+        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
+        Link: BannedSymbols.NewtonsoftJson.txt,
         Visible: false
       },
       {
-        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
-        Link: BannedSymbols.NewtonsoftJson.txt,
+        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.txt,
+        Link: BannedSymbols.txt,
         Visible: false
       }
     ],

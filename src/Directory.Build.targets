@@ -1,17 +1,22 @@
 <Project>
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageType>MSBuildSdk</PackageType>
+    <NoBuildOutput>true</NoBuildOutput>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <ImplicitUsings>disable</ImplicitUsings>
     <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
+    <PackageOutputPath>$(SolutionDir)artifacts/nuget-local</PackageOutputPath>
+    <PackageOutputPath Condition="'$(Configuration)' == 'Release'">$(SolutionDir)artifacts/nuget</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Remove="*" />
     <None Include="Sdk.props;Sdk.targets" Pack="true" PackagePath="Sdk" />
     <None Include="$(MSBuildThisFileDirectory)common/**" Pack="true" PackagePath="common" />
   </ItemGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 </Project>

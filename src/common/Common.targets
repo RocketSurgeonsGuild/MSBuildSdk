@@ -1,67 +1,65 @@
 <Project>
-    <PropertyGroup>
-        <_RocketSurgeryCommonTargetsImported>true</_RocketSurgeryCommonTargetsImported>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_RocketSurgeryCommonTargetsImported>true</_RocketSurgeryCommonTargetsImported>
+  </PropertyGroup>
 
-    <!-- A csproj can omit TargetFramework entirely; default to the newest framework of the current SDK. -->
-    <PropertyGroup>
-        <!-- <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''
+  <!-- A csproj can omit TargetFramework entirely; default to the newest framework of the current SDK. -->
+  <PropertyGroup>
+    <!-- <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''
         and '$(NETCoreAppMaximumVersion)' != ''">net$(NETCoreAppMaximumVersion)</TargetFramework> -->
-        <!-- Applications keep running on newer installed runtimes. -->
-        <RollForward Condition="'$(RollForward)' == '' and '$(OutputType)' == 'Exe' and '$(IsTestProject)' != 'true'">LatestMajor</RollForward>
-    </PropertyGroup>
+    <!-- Applications keep running on newer installed runtimes. -->
+    <RollForward Condition="'$(RollForward)' == '' and '$(OutputType)' == 'Exe' and '$(IsTestProject)' != 'true'">LatestMajor</RollForward>
+  </PropertyGroup>
 
-    <!-- Provenance: record which SDK variant produced the assembly. -->
-    <ItemGroup Condition="'$(RocketSurgerySdkName)' != '' and '$(GenerateAssemblyInfo)' == 'true'">
-        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-            <_Parameter1>RocketSurgery.Sdk.Name</_Parameter1>
-            <_Parameter2>$(RocketSurgerySdkName)</_Parameter2>
-        </AssemblyAttribute>
-    </ItemGroup>
+  <!-- Provenance: record which SDK variant produced the assembly. -->
+  <ItemGroup Condition="'$(RocketSurgerySdkName)' != '' and '$(GenerateAssemblyInfo)' == 'true'">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RocketSurgery.Sdk.Name</_Parameter1>
+      <_Parameter2>$(RocketSurgerySdkName)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 
-    <!-- SBOM generation on pack during CI builds. Opt out with GenerateSBOM=false. -->
-    <PropertyGroup>
-        <GenerateSBOM
-            Condition="'$(GenerateSBOM)' == '' and '$(ContinuousIntegrationBuild)' == 'true' and '$(IsPackable)' == 'true'">
-            true</GenerateSBOM>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(GenerateSBOM)' == 'true'">
-        <PackageReference Include="Microsoft.Sbom.Targets" Version="$(MicrosoftSbomTargetsVersion)"
-            Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Sbom.Targets')) != 'true'"
-            IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    </ItemGroup>
+  <!-- SBOM generation on pack during CI builds. Opt out with GenerateSBOM=false. -->
+  <PropertyGroup>
+    <GenerateSBOM Condition="'$(GenerateSBOM)' == '' and '$(ContinuousIntegrationBuild)' == 'true' and '$(IsPackable)' == 'true'">true</GenerateSBOM>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(GenerateSBOM)' == 'true'">
+    <PackageReference Include="Microsoft.Sbom.Targets" Version="$(MicrosoftSbomTargetsVersion)"
+                      Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.Sbom.Targets')) != 'true'"
+                      IsImplicitlyDefined="true" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
+  </ItemGroup>
 
-    <!-- Package validation: set PackageValidationBaselineVersion to the last released version. -->
-    <PropertyGroup Condition="'$(PackageValidationBaselineVersion)' != ''">
-        <EnablePackageValidation Condition="'$(EnablePackageValidation)' == ''">true</EnablePackageValidation>
-    </PropertyGroup>
+  <!-- Package validation: set PackageValidationBaselineVersion to the last released version. -->
+  <PropertyGroup Condition="'$(PackageValidationBaselineVersion)' != ''">
+    <EnablePackageValidation Condition="'$(EnablePackageValidation)' == ''">true</EnablePackageValidation>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
-        <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
-        <!-- Only flip the doc default when it is still the value this SDK defaulted in Common.props. -->
-        <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+    <!-- Only flip the doc default when it is still the value this SDK defaulted in Common.props. -->
+    <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
+  </PropertyGroup>
 
-    <!--
+  <!--
         Sample projects: relax public API tracking, packing and documentation requirements.
         Handled here (not Common.props) because IsSampleProject is usually set in the
         project body or a Directory.Build.props, both of which evaluate after Common.props.
     -->
-    <PropertyGroup Condition="'$(IsSampleProject)' == 'true'">
-        <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
-        <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
-        <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(IsSampleProject)' == 'true'">
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+    <GenerateDocumentationFile Condition="'$(_RocketSurgeryDefaultedGenerateDocumentationFile)' == 'true' and '$(GenerateDocumentationFile)' == 'true'">false</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
+  </PropertyGroup>
 
-    <!-- Embed the applied analyzer configs and banned-symbol lists into binary logs for diagnosability. -->
-    <Target Name="RocketSurgeryEmbedConfigurationInBinLog" AfterTargets="CoreCompile">
-        <ItemGroup>
-            <EmbedInBinlog Include="@(EditorConfigFiles)" />
-            <EmbedInBinlog Include="@(AdditionalFiles)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)%(Extension)', '^BannedSymbols(\..+)?\.txt$'))" />
-        </ItemGroup>
-    </Target>
+  <!-- Embed the applied analyzer configs and banned-symbol lists into binary logs for diagnosability. -->
+  <Target Name="RocketSurgeryEmbedConfigurationInBinLog" AfterTargets="CoreCompile">
+    <ItemGroup>
+      <EmbedInBinlog Include="@(EditorConfigFiles)"/>
+      <EmbedInBinlog Include="@(AdditionalFiles)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)%(Extension)', '^BannedSymbols(\..+)?\.txt$'))"/>
+    </ItemGroup>
+  </Target>
 
-    <Import Project="$(MSBuildThisFileDirectory)Analyzers.targets" />
-    <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.targets" />
-    <Import Project="$(MSBuildThisFileDirectory)Testing.targets" Condition="'$(IsTestProject)' == 'true'" />
+  <Import Project="$(MSBuildThisFileDirectory)Analyzers.targets"/>
+  <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.targets"/>
+  <Import Project="$(MSBuildThisFileDirectory)Testing.targets" Condition="'$(IsTestProject)' == 'true'"/>
 </Project>

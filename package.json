@@ -1,0 +1,13 @@
+{
+  "name": "indago",
+  "version": "1.0.0",
+  "private": true,
+  "directories": {
+    "test": "tests"
+  },
+  "workspaces": [
+    "docs"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
+}

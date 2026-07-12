@@ -176,7 +176,7 @@ static class Config
         .ToFrozenSet();
 
     public static string RootDirectory => field ??= FindRootDirectory();
-    public static string NugetArtifactsDirectory => field ??= Path.Combine(FindRootDirectory(), "artifacts");
+    public static string NugetArtifactsDirectory => field ??= Path.Combine(FindRootDirectory(), "artifacts", "nuget-local");
 
     private static string FindRootDirectory()
     {

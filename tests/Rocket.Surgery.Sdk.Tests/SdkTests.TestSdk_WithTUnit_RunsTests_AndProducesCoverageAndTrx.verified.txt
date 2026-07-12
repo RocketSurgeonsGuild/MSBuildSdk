@@ -19,6 +19,7 @@
       EnableNETAnalyzers: true,
       Features: strict,
       GenerateDocumentationFile: false,
+      GeneratePackageOnBuild: false,
       ImplicitUsings: enable,
       IncludeBuildOutput: true,
       IncludeSymbols: true,
@@ -38,6 +39,7 @@
       NuGetAuditLevel: moderate,
       NuGetAuditMode: all,
       Nullable: enable,
+      PackageOutputPath: bin/Debug/,
       ProduceReferenceAssembly: true,
       PublishDocumentationFile: true,
       PublishReferencesDocumentationFiles: true,
@@ -69,7 +71,6 @@
       RocketSurgeryWarningsAsErrors: true,
       RoslynatorVersion: 4.15.0,
       RunSettingsFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings,
-      SymbolPackageFormat: snupkg,
       TargetFramework: net10.0,
       TestingPlatformCommandLineArguments:  --coverage --coverage-settings "{project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings" --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 10m --hangdump-type mini,
       TestingPlatformDotnetTestSupport: true,
@@ -82,13 +83,13 @@
     },
     AdditionalFiles: [
       {
-        Name: /private{project-root}/testsBannedSymbols.txt,
-        Link: testsBannedSymbols.txt,
+        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
+        Link: BannedSymbols.NewtonsoftJson.txt,
         Visible: false
       },
       {
-        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
-        Link: BannedSymbols.NewtonsoftJson.txt,
+        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/BannedSymbols.txt,
+        Link: BannedSymbols.txt,
         Visible: false
       }
     ],

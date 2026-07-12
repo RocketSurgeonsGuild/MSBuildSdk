@@ -1,22 +1,21 @@
 <Project>
-    <!--
-        Imported before the consumer's Directory.Build.props (via CustomBeforeDirectoryBuildProps),
-        or directly from Sdk.props when Microsoft.NET.Sdk was already imported.
-        Every default is guarded so the consumer always wins.
-    -->
-    <PropertyGroup>
-        <_RocketSurgeryCommonPropsImported>true</_RocketSurgeryCommonPropsImported>
-        <RocketSurgeryDefaultWarningsAsErrors
-            Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == ''">true</RocketSurgeryDefaultWarningsAsErrors>
-        <RocketSurgeryWarningsAsErrors Condition="'$(RocketSurgeryWarningsAsErrors)' == ''">true</RocketSurgeryWarningsAsErrors>
-        <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
-        <RocketSurgerySourceLink Condition="'$(RocketSurgerySourceLink)' == ''">true</RocketSurgerySourceLink>
-    </PropertyGroup>
+  <!--
+      Imported before the consumer's Directory.Build.props (via CustomBeforeDirectoryBuildProps),
+      or directly from Sdk.props when Microsoft.NET.Sdk was already imported.
+      Every default is guarded so the consumer always wins.
+  -->
+  <PropertyGroup>
+    <_RocketSurgeryCommonPropsImported>true</_RocketSurgeryCommonPropsImported>
+    <RocketSurgeryDefaultWarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == ''">true</RocketSurgeryDefaultWarningsAsErrors>
+    <RocketSurgeryWarningsAsErrors Condition="'$(RocketSurgeryWarningsAsErrors)' == ''">true</RocketSurgeryWarningsAsErrors>
+    <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
+    <RocketSurgerySourceLink Condition="'$(RocketSurgerySourceLink)' == ''">true</RocketSurgerySourceLink>
+  </PropertyGroup>
 
-    <!-- File-based C# app detection (`dotnet run app.cs`, .NET 10+). -->
-    <PropertyGroup>
-        <RocketSurgerySingleFileApp Condition="'$(RocketSurgerySingleFileApp)' == '' and '$(FileBasedProgram)' == 'true'">true</RocketSurgerySingleFileApp>
-    </PropertyGroup>
+  <!-- File-based C# app detection (`dotnet run app.cs`, .NET 10+). -->
+  <PropertyGroup>
+    <RocketSurgerySingleFileApp Condition="'$(RocketSurgerySingleFileApp)' == '' and '$(FileBasedProgram)' == 'true'">true</RocketSurgerySingleFileApp>
+  </PropertyGroup>
 
     <!-- Rocket.Surgery.Sdk.Test marks projects as test projects up front. -->
     <PropertyGroup Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Test'">
@@ -24,15 +23,14 @@
         <UseMicrosoftTestingPlatformRunner Condition="'$(UseMicrosoftTestingPlatformRunner)' == ''">true</UseMicrosoftTestingPlatformRunner>
     </PropertyGroup>
 
-    <PropertyGroup Label="SingleFileApp"
-        Condition="'$(RocketSurgerySingleFileApp)' == 'true'">
-        <ExperimentalFileBasedProgramEnableTransitiveDirectives>true</ExperimentalFileBasedProgramEnableTransitiveDirectives>
-    </PropertyGroup>
+  <PropertyGroup Label="SingleFileApp" Condition="'$(RocketSurgerySingleFileApp)' == 'true'">
+    <ExperimentalFileBasedProgramEnableTransitiveDirectives>true</ExperimentalFileBasedProgramEnableTransitiveDirectives>
+  </PropertyGroup>
 
-    <PropertyGroup Label="SingleFileScript" Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Script'">
-        <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
-        <PublishAot>false</PublishAot>
-    </PropertyGroup>
+  <PropertyGroup Label="SingleFileScript" Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Script'">
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <PublishAot>false</PublishAot>
+  </PropertyGroup>
 
     <PropertyGroup>
         <PublishRepositoryUrl Condition="'$(PublishRepositoryUrl)' == ''">true</PublishRepositoryUrl>

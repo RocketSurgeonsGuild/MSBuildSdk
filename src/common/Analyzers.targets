@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
     <!--
         Shared analyzer configuration. Files are global analyzer configs (is_global = true) at a low
@@ -7,20 +8,20 @@
         consumer's project body (IsTestProject, IsSampleProject, RocketSurgerySingleFileApp).
     -->
     <ItemGroup Condition="'$(RocketSurgeryEditorConfig)' == 'true'">
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodeAnalysis.editorconfig"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodingStyle.editorconfig"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/JetBrains.editorconfig" Condition="'$(RocketSurgeryEditorConfigJetBrains)' == 'true'"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Roslynator.editorconfig" Condition="'$(RocketSurgeryEditorConfigRoslynator)' == 'true'"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig" Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig')"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/SingleFileApp.editorconfig" Condition="'$(RocketSurgerySingleFileApp)' == 'true'"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Samples.editorconfig" Condition="'$(IsSampleProject)' == 'true'"/>
-        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Tests.editorconfig" Condition="'$(IsTestProject)' == 'true'"/>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodeAnalysis.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/CodingStyle.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/JetBrains.editorconfig" Condition="'$(RocketSurgeryEditorConfigJetBrains)' == 'true'" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Roslynator.editorconfig" Condition="'$(RocketSurgeryEditorConfigRoslynator)' == 'true'" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig" Condition="'$(RocketSurgerySdkName)' != '' and Exists('$(MSBuildThisFileDirectory)editorconfig/$(RocketSurgerySdkName).editorconfig')" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/SingleFileApp.editorconfig" Condition="'$(RocketSurgerySingleFileApp)' == 'true'" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Samples.editorconfig" Condition="'$(IsSampleProject)' == 'true'" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)editorconfig/Tests.editorconfig" Condition="'$(IsTestProject)' == 'true'" />
     </ItemGroup>
 
     <!-- BannedSymbols.txt discovered from the project directory upward (nearest wins). -->
     <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' == 'true' and '$(RocketSurgeryBannedApiAnalyzers)' == 'true'">
-        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Visible="false"/>
-        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.NewtonsoftJson.txt" Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == 'true'" Visible="false"/>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" Visible="false" />
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.NewtonsoftJson.txt" Condition="'$(RocketSurgeryBannedNewtonsoftJson)' == 'true'" Visible="false" />
     </ItemGroup>
 
     <!--

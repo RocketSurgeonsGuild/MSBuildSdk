@@ -51,7 +51,6 @@
     <ItemGroup Condition="'$(RocketSurgeryTestingExtensions)' == 'true'">
         <!-- TUnit detected -> Rocket Surgery TUnit extensions. -->
         <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="$(RocketSurgeryExtensionsTestingVersion)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit'))" IsImplicitlyDefined="true" />
-
         <!-- xunit.v3 detected -> Rocket Surgery xUnit v3 extensions. -->
         <PackageReference Include="Rocket.Surgery.Extensions.Testing.XUnit3" Version="$(RocketSurgeryExtensionsTestingVersion)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'xunit.v3'))" IsImplicitlyDefined="true" />
 
