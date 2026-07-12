@@ -2,7 +2,7 @@
 <!--
     Rocket.Surgery.Sdk default code coverage settings (Microsoft.Testing.Extensions.CodeCoverage).
     Used automatically for test projects unless RunSettingsFilePath or
-    RocketSurgeryCoverageRunSettings points at your own file, or RocketSurgeryCodeCoverage=false.
+    RocketSurgeryCoverageRunSettings points at your own file, or RocketSurgeryTestingCodeCoverage=false.
 -->
 <RunSettings>
     <DataCollectionRunSettings>
