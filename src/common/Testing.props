@@ -1,15 +1,27 @@
 <Project>
     <!-- Every default is guarded so the consumer always wins. Coverage collection is CI-only
-         by default (it slows local runs); set RocketSurgeryCodeCoverage=true to always collect. -->
+       by default (it slows local runs); set RsgSdk_Testing_CodeCoverage=true to always collect. -->
     <PropertyGroup>
-        <RocketSurgeryTestingExtensions Condition="'$(RocketSurgeryTestingExtensions)' == ''">true</RocketSurgeryTestingExtensions>
-        <RocketSurgeryCodeCoverage Condition="'$(RocketSurgeryCodeCoverage)' == '' and '$(ContinuousIntegrationBuild)' == 'true'">true</RocketSurgeryCodeCoverage>
-        <RocketSurgeryTestingTrxReport Condition="'$(RocketSurgeryTestingTrxReport)' == ''">true</RocketSurgeryTestingTrxReport>
-        <RocketSurgeryTestingCrashDump Condition="'$(RocketSurgeryTestingCrashDump)' == ''">true</RocketSurgeryTestingCrashDump>
-        <RocketSurgeryTestingHangDump Condition="'$(RocketSurgeryTestingHangDump)' == ''">true</RocketSurgeryTestingHangDump>
-        <RocketSurgeryTestingHotReload Condition="'$(RocketSurgeryTestingHotReload)' == ''">true</RocketSurgeryTestingHotReload>
-        <RocketSurgeryMinimumExpectedTests Condition="'$(RocketSurgeryMinimumExpectedTests)' == ''">0</RocketSurgeryMinimumExpectedTests>
-        <RocketSurgeryTestingRetry Condition="'$(RocketSurgeryTestingRetry)' == ''">false</RocketSurgeryTestingRetry>
-        <RocketSurgeryTestRetryCount Condition="'$(RocketSurgeryTestRetryCount)' == ''">0</RocketSurgeryTestRetryCount>
+        <!--
+
+    <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit'))" IsImplicitlyDefined="true" />
+    <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.AspNetCore" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.AspNetCore'))" IsImplicitlyDefined="true" />
+    <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.Aspire" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.Aspire'))" IsImplicitlyDefined="true" />
+
+    -->
+        <RsgSdk_Testing_Extensions Condition="'$(RsgSdk_Testing_Extensions)' == ''">true</RsgSdk_Testing_Extensions>
+        <RsgSdk_Testing_HangDumpTimeout Condition="'$(RsgSdk_Testing_HangDumpTimeout)' == ''">1h</RsgSdk_Testing_HangDumpTimeout>
+        <RsgSdk_Testing_MinimumExpectedTests Condition="'$(RsgSdk_Testing_MinimumExpectedTests)' == ''">0</RsgSdk_Testing_MinimumExpectedTests>
+        <RsgSdk_Testing_AzureDevOpsReport Condition="'$(RsgSdk_Testing_AzureDevOpsReport)' == ''">true</RsgSdk_Testing_AzureDevOpsReport>
+        <RsgSdk_Testing_GitHubActionsReport Condition="'$(RsgSdk_Testing_GitHubActionsReport)' == ''">true</RsgSdk_Testing_GitHubActionsReport>
+        <RsgSdk_Testing_HangDump Condition="'$(RsgSdk_Testing_HangDump)' == ''">true</RsgSdk_Testing_HangDump>
+        <RsgSdk_Testing_HotReload Condition="'$(RsgSdk_Testing_HotReload)' == ''">true</RsgSdk_Testing_HotReload>
+        <RsgSdk_Testing_Retry Condition="'$(RsgSdk_Testing_Retry)' == ''">false</RsgSdk_Testing_Retry>
+        <RsgSdk_Testing_CrashDump Condition="'$(RsgSdk_Testing_CrashDump)' == ''">true</RsgSdk_Testing_CrashDump>
+        <RsgSdk_Testing_TrxReport Condition="'$(RsgSdk_Testing_TrxReport)' == ''">true</RsgSdk_Testing_TrxReport>
+        <RsgSdk_Testing_CodeCoverage Condition="'$(RsgSdk_Testing_CodeCoverage)' == ''">true</RsgSdk_Testing_CodeCoverage>
+        <RsgSdk_Testing_HotReload Condition="'$(RsgSdk_Testing_HotReload)' == ''">true</RsgSdk_Testing_HotReload>
+        <RsgSdk_Testing_MinimumExpectedTests Condition="'$(RsgSdk_Testing_MinimumExpectedTests)' == ''">0</RsgSdk_Testing_MinimumExpectedTests>
+        <RsgSdk_Testing_RetryCount Condition="'$(RsgSdk_Testing_RetryCount)' == ''">0</RsgSdk_Testing_RetryCount>
     </PropertyGroup>
 </Project>

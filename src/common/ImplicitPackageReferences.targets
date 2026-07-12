@@ -1,0 +1,32 @@
+<Project>
+    <!--
+        A lighter-weight way to declare a package the SDK injects into a consumer's build.
+        Add one item instead of a full PackageReference block:
+
+            <RsgSdkImplicitPackageReference Include="Some.Package"
+                                             Version="$(SomePackageVersion)"
+                                             Condition="'$(SomeSwitch)' == 'true'"
+                                             PrivateAssets="all"
+                                             IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+
+        Condition is the only attribute handled specially (it controls whether the item is even
+        added, same as on any MSBuild item). Every other attribute — PrivateAssets, IncludeAssets,
+        ExcludeAssets, NoWarn, Aliases, GeneratePathProperty, whatever PackageReference supports —
+        is carried over automatically: `Include="@(RsgSdkImplicitPackageReference)"` below copies
+        every metadata key from the source items onto the new PackageReference items, so there is
+        nothing to special-case here as new metadata needs come up.
+
+        Expanded into real PackageReference items below — eagerly, at evaluation time, not from a
+        Target, because NuGet restore only ever sees items that exist by the time evaluation
+        finishes; anything added later by a Target's execution is invisible to it. This file must
+        therefore be imported LAST (see Common.targets) so every RsgSdkImplicitPackageReference
+        declared anywhere above it — in this file's siblings — has already been added by the time
+        this ItemGroup runs. A package the consumer already references directly is left alone
+        rather than duplicated.
+    -->
+    <ItemGroup>
+        <PackageReference Include="@(RsgSdkImplicitPackageReference)"
+                          Condition="@(PackageReference->AnyHaveMetadataValue('Identity', '%(RsgSdkImplicitPackageReference.Identity)')) != 'true'"
+                          IsImplicitlyDefined="true" />
+    </ItemGroup>
+</Project>

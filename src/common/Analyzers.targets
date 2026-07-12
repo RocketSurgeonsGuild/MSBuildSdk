@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
     <!--
         Shared analyzer configuration. Files are global analyzer configs (is_global = true) at a low
@@ -30,35 +30,13 @@
         Override a version by setting the corresponding *Version property (see Packages.props).
     -->
     <ItemGroup Condition="'$(RocketSurgeryAnalyzers)' == 'true'">
-        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"
-                          Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)"
-                          Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.PublicApiAnalyzers')) != 'true'"
-                          IsImplicitlyDefined="true"
-                          PrivateAssets="all"
-                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
-        <PackageReference Include="Roslynator.Analyzers"
-                          Version="$(RoslynatorVersion)"
-                          Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Analyzers')) != 'true'"
-                          IsImplicitlyDefined="true"
-                          PrivateAssets="all"
-                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
-        <PackageReference Include="Roslynator.Formatting.Analyzers"
-                          Version="$(RoslynatorVersion)"
-                          Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Roslynator.Formatting.Analyzers')) != 'true'"
-                          IsImplicitlyDefined="true"
-                          PrivateAssets="all"
-                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers"
-                          Version="$(MicrosoftCodeAnalysisBannedApiAnalyzersVersion)"
-                          Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.BannedApiAnalyzers')) != 'true'"
-                          IsImplicitlyDefined="true"
-                          PrivateAssets="all"
-                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers"
-                          Version="$(MicrosoftCodeAnalysisAnalyzersVersion)"
-                          Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true' and @(PackageReference->AnyHaveMetadataValue('Identity', 'Microsoft.CodeAnalysis.Analyzers')) != 'true'"
-                          IsImplicitlyDefined="true"
-                          PrivateAssets="all"
-                          IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
+        <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version)" Condition="'$(RocketSurgeryPublicApiAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Roslynator.Analyzers" Version="$(RsgSdk_RoslynatorAnalyzers_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Roslynator.Formatting.Analyzers" Version="$(RsgSdk_RoslynatorFormattingAnalyzers_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="$(RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Roslynator.CodeFixes" Version="$(RsgSdk_RoslynatorCodeFixes_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Roslynator.Refactorings" Version="$(RsgSdk_RoslynatorRefactorings_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version)" Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version)" Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     </ItemGroup>
 </Project>

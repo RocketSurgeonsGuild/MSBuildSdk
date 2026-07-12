@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Reflection;
 using System.Xml.Linq;
 using DiffEngine;
 using Microsoft.Build.Logging.StructuredLogger;
@@ -6,9 +7,9 @@ using Microsoft.Build.Utilities.ProjectCreation;
 
 namespace Rocket.Surgery.Sdk.Tests;
 
-static class Config
+internal static class Config
 {
-    [Before(Assembly)]
+    [Before(HookType.Assembly)]
     public static void Setup(AssemblyHookContext context)
     {
         MSBuildAssemblyResolver.Register();
@@ -17,7 +18,11 @@ static class Config
         VerifierSettings.AddExtraSettings(z => z.Converters.Add(new ProjectEvaluationSerializer()));
     }
 
-    class ProjectEvaluationSerializer : WriteOnlyJsonConverter<ProjectEvaluation>
+    public static string TUnitVersion => field ??= typeof(TestAttribute).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split('+')[0];
+
+    private static readonly OrderedDictionary<string, string> _namedVersions = [];
+
+    private class ProjectEvaluationSerializer : WriteOnlyJsonConverter<ProjectEvaluation>
     {
         private static readonly IReadOnlyCollection<string> PropertiesToWrite =
         [
@@ -45,6 +50,19 @@ static class Config
                     )
             {
                 writer.WritePropertyName(property.Key);
+                if (property.Key.StartsWith("RsgSdk_") && property.Key.EndsWith("_Version"))
+                {
+                    if (_namedVersions.TryGetValue(property.Value, out _, out var index))
+                    {
+                        writer.WriteValue($"Version_{index}");
+                    }
+                    else
+                    {
+                        _namedVersions.TryAdd(property.Value, $"Version_{_namedVersions.Count + 1}", out index);
+                        writer.WriteValue($"Version_{index}");
+                    }
+                    continue;
+                }
                 writer.WriteValue(property.Value);
             }
 
@@ -58,7 +76,7 @@ static class Config
             writer.WriteEndObject();
         }
 
-        static void WriteAdditionalFiles(VerifyJsonWriter writer, ProjectEvaluation project, string name)
+        private static void WriteAdditionalFiles(VerifyJsonWriter writer, ProjectEvaluation project, string name)
         {
             writer.WritePropertyName(name);
             writer.WriteStartArray();
@@ -70,6 +88,20 @@ static class Config
                 foreach (var value in item.Children.OfType<Metadata>().OrderBy(z => z.Name))
                 {
                     writer.WritePropertyName(value.Name);
+                    if (value.Name == "Version")
+                    {
+                        if (_namedVersions.TryGetValue(value.Value, out _, out var index))
+                        {
+                            writer.WriteValue($"Version_{index}");
+                        }
+                        else
+                        {
+                            _namedVersions.TryAdd(value.Value, $"Version_{_namedVersions.Count + 1}", out index);
+                            writer.WriteValue($"Version_{index}");
+                        }
+                        continue;
+                    }
+
                     writer.WriteValue(value.Name == "Version" ? "{version}" : value.Value);
                 }
 
@@ -79,7 +111,7 @@ static class Config
             writer.WriteEndArray();
         }
 
-        static void WriteImports(VerifyJsonWriter writer, ProjectEvaluation project, string name)
+        private static void WriteImports(VerifyJsonWriter writer, ProjectEvaluation project, string name)
         {
             var (imports, noImports) = GetImportGroup(project);
             writer.WritePropertyName("Imports");
@@ -116,7 +148,7 @@ static class Config
             writer.WriteEndArray();
         }
 
-        static void WriteUsings(VerifyJsonWriter writer, ProjectEvaluation project, string name)
+        private static void WriteUsings(VerifyJsonWriter writer, ProjectEvaluation project, string name)
         {
             writer.WritePropertyName(name);
             writer.WriteStartArray();
@@ -127,7 +159,7 @@ static class Config
             writer.WriteEndArray();
         }
 
-        static void WriteItems(VerifyJsonWriter writer, ProjectEvaluation project, string name)
+        private static void WriteItems(VerifyJsonWriter writer, ProjectEvaluation project, string name)
         {
             writer.WritePropertyName(name);
             writer.WriteStartObject();
