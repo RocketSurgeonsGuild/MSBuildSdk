@@ -1,0 +1,211 @@
+﻿[
+  {
+    Name: lib.csproj,
+    Configuration: Debug,
+    Platform: AnyCPU,
+    TargetFramework: net10.0,
+    Properties: {
+      _RocketSurgeryCommonPropsImported: true,
+      _RocketSurgeryCommonTargetsImported: true,
+      _RocketSurgeryDefaultedGenerateDocumentationFile: true,
+      AnalysisLevel: latest,
+      AnalysisMode: AllEnabledByDefault,
+      BeforeMicrosoftNETSdkTargets: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.targets,
+      CopyDebugSymbolFilesFromPackages: true,
+      CopyDocumentationFilesFromPackages: true,
+      CustomBeforeDirectoryBuildProps: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.props,
+      DebugType: portable,
+      EmbedUntrackedSources: true,
+      EnableNETAnalyzers: true,
+      Features: strict,
+      GenerateDocumentationFile: true,
+      GeneratePackageOnBuild: false,
+      ImplicitUsings: enable,
+      IncludeBuildOutput: true,
+      IncludeSymbols: true,
+      IsPackable: true,
+      LangVersion: preview,
+      NoWarn: 1701;1702,
+      NuGetAudit: true,
+      NuGetAuditLevel: moderate,
+      NuGetAuditMode: all,
+      Nullable: enable,
+      PackageOutputPath: bin\Debug/,
+      ProduceReferenceAssembly: true,
+      PublishDocumentationFile: true,
+      PublishReferencesDocumentationFiles: true,
+      PublishReferencesSymbols: true,
+      PublishRepositoryUrl: true,
+      RocketSurgeryAnalyzers: true,
+      RocketSurgeryBannedApiAnalyzers: true,
+      RocketSurgeryBannedNewtonsoftJson: true,
+      RocketSurgeryCodeAnalysisAnalyzers: true,
+      RocketSurgeryDefaultWarningsAsErrors: true,
+      RocketSurgeryEditorConfig: true,
+      RocketSurgeryEditorConfigJetBrains: true,
+      RocketSurgeryEditorConfigRoslynator: true,
+      RocketSurgeryPublicApiAnalyzers: true,
+      RocketSurgeryRoslynatorAnalyzers: true,
+      RocketSurgerySdkName: Rocket.Surgery.Sdk,
+      RocketSurgerySourceLink: true,
+      RocketSurgeryWarningsAsErrors: true,
+      RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version: Version_0,
+      RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_0,
+      RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_0,
+      RsgSdk_MicrosoftSbomTargets_Version: Version_1,
+      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_3,
+      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_2,
+      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_5,
+      RsgSdk_RoslynatorAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorCodeFixes_Version: Version_6,
+      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorRefactorings_Version: Version_6,
+      TargetFramework: net10.0,
+      TreatWarningsAsErrors: false,
+      Version: 1.0.0,
+      WarningsAsErrors: ;RS0017;NU1605;SYSLIB0011
+    },
+    AdditionalFiles: [
+      {
+        Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
+        Visible: false
+      },
+      {
+        Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/BannedSymbols.txt,
+        Visible: false
+      }
+    ],
+    PackageReference: {
+      Microsoft.CodeAnalysis.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_0
+      },
+      Microsoft.CodeAnalysis.BannedApiAnalyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_0
+      },
+      Microsoft.CodeAnalysis.PublicApiAnalyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_0
+      },
+      Polyfill: {},
+      Roslynator.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_6
+      },
+      Roslynator.CodeAnalysis.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_6
+      },
+      Roslynator.CodeFixes: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_6
+      },
+      Roslynator.Formatting.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_6
+      },
+      Roslynator.Refactorings: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_6
+      }
+    },
+    Using: [
+      System,
+      System.Collections.Generic,
+      System.IO,
+      System.Linq,
+      System.Net.Http,
+      System.Threading,
+      System.Threading.Tasks
+    ],
+    Imports: [
+      {TempPath}sdk-tests/{id}/lib/lib.csproj,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
+      {TempPath}sdk-tests/{id}/Directory.Build.props
+    ],
+    NoImports: [
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.props,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)ci/appveyor.props,
+            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.targets,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)ci/appveyor.targets,
+            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)Testing.props,
+            Reason: false condition; ('$(IsTestProject)' == 'true' was evaluated as '' == 'true').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
+        Imports: [
+          {
+            Path: $(MSBuildThisFileDirectory)Testing.targets,
+            Reason: false condition; ('$(IsTestProject)' == 'true' was evaluated as '' == 'true').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
+        Imports: [
+          {
+            Path: Sdk.props,
+            Reason: false condition; ('$(_RocketSurgeryMustImportMicrosoftNETSdk)' == 'true' was evaluated as '' == 'true').
+          }
+        ]
+      },
+      {
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.targets,
+        Imports: [
+          {
+            Path: Sdk.targets,
+            Reason: false condition; ('$(_RocketSurgeryMustImportMicrosoftNETSdk)' == 'true' was evaluated as '' == 'true').
+          }
+        ]
+      }
+    ]
+  }
+]
