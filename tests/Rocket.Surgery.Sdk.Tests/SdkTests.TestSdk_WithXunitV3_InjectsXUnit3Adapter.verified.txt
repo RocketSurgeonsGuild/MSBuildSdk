@@ -161,7 +161,7 @@
       {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.targets,
       {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.props,
       {project-root}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.targets,
-      /private{project-root}/tests/tests.csproj
+      {project-root}/tests/tests.csproj
     ],
     NoImports: [
       {

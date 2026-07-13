@@ -11,10 +11,10 @@
       _RocketSurgeryMustImportMicrosoftNETSdk: true,
       AnalysisLevel: latest,
       AnalysisMode: AllEnabledByDefault,
-      BeforeMicrosoftNETSdkTargets: ;{project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/../common/Common.targets,
+      BeforeMicrosoftNETSdkTargets: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/../common/Common.targets,
       CopyDebugSymbolFilesFromPackages: true,
       CopyDocumentationFilesFromPackages: true,
-      CustomBeforeDirectoryBuildProps: ;{project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/../common/Common.props,
+      CustomBeforeDirectoryBuildProps: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/../common/Common.props,
       DebugType: portable,
       EmbedUntrackedSources: true,
       EnableNETAnalyzers: true,
@@ -78,12 +78,12 @@
     },
     AdditionalFiles: [
       {
-        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
+        Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
         Link: BannedSymbols.NewtonsoftJson.txt,
         Visible: false
       },
       {
-        Name: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.txt,
+        Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/BannedSymbols.txt,
         Link: BannedSymbols.txt,
         Visible: false
       }
@@ -93,31 +93,49 @@
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: {version}
+        Version: Version_0
       },
       Microsoft.CodeAnalysis.BannedApiAnalyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: {version}
+        Version: Version_1
       },
       Microsoft.CodeAnalysis.PublicApiAnalyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: {version}
+        Version: Version_1
       },
       Roslynator.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: {version}
+        Version: Version_7
+      },
+      Roslynator.CodeAnalysis.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_7
+      },
+      Roslynator.CodeFixes: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_7
       },
       Roslynator.Formatting.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: {version}
+        Version: Version_7
+      },
+      Roslynator.Refactorings: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_7
       }
     },
     Using: [
@@ -139,15 +157,15 @@
       System.Threading.Tasks
     ],
     Imports: [
-      {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.props,
-      {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.targets,
-      {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.props,
-      {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.targets,
-      /private{project-root}/web/web.csproj
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.props,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.targets,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.props,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.targets,
+      /private/var/folders/1_/t7jfzt7d76bgcrkcfk_g0fkc0000gn/T/sdk-tests/{id}/web/web.csproj
     ],
     NoImports: [
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/Sdk/Sdk.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)../common/Common.props,
@@ -156,7 +174,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/ContinuousIntegration.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/ContinuousIntegration.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)ci/appveyor.props,
@@ -165,7 +183,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/ContinuousIntegration.targets,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/ContinuousIntegration.targets,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)ci/appveyor.targets,
@@ -174,7 +192,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)Testing.props,
@@ -183,7 +201,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.targets,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.web/{sdk-version}/common/Common.targets,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)Testing.targets,

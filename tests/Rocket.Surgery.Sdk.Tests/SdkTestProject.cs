@@ -29,7 +29,8 @@ public sealed class SdkTestProject : IDisposable
     {
         NugetArtifactsDirectory = nugetArtifactsDirectory ?? Config.NugetArtifactsDirectory;
 
-        Directory = Path.Combine(Path.GetTempPath(), "rsg-sdk-tests", Guid.NewGuid().ToString("N"));
+        var id = Guid.NewGuid().ToString("N");
+        Directory = Path.Combine(Path.GetTempPath(), "sdk-tests", id);
         System.IO.Directory.CreateDirectory(Directory);
 
         var repository = PackageRepository.Create(Directory, feeds: [new("https://api.nuget.org/v3/index.json"), new(NugetArtifactsDirectory)]);
@@ -38,12 +39,7 @@ public sealed class SdkTestProject : IDisposable
             repository.Package(new(package), out _);
         }
         _settings = new VerifySettings();
-        // macOS resolves Path.GetTempPath() (under /var or /tmp) to its /private-prefixed
-        // real path for some MSBuild-reported paths; scrub that form first (before the plain
-        // Directory scrub below consumes the substring) so snapshots recorded on macOS match
-        // Linux CI, which has no such symlink.
-        _settings.ScrubLinesWithReplace(z => z.Replace("/private" + Directory, "{project-root}"));
-        _settings.ScrubLinesWithReplace(z => z.Replace(Directory, "{project-root}"));
+        _settings.ScrubLinesWithReplace(z => z.Replace(id, "{id}"));
 
         var currentGlobalJson = JsonDocument.Parse(File.ReadAllText(Path.Combine(Config.RootDirectory, "global.json")));
         var version = currentGlobalJson.RootElement.GetProperty("sdk").GetProperty("version").GetString();

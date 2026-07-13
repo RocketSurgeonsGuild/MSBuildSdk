@@ -170,7 +170,21 @@ internal static class Config
                 foreach (var value in item.Children.OfType<Metadata>().OrderBy(z => z.Name))
                 {
                     writer.WritePropertyName(value.Name);
-                    writer.WriteValue(value.Name == "Version" ? "{version}" : value.Value);
+                    if (value.Name == "Version")
+                    {
+                        if (_namedVersions.TryGetValue(value.Value, out _, out var index))
+                        {
+                            writer.WriteValue($"Version_{index}");
+                        }
+                        else
+                        {
+                            _namedVersions.TryAdd(value.Value, $"Version_{_namedVersions.Count + 1}", out index);
+                            writer.WriteValue($"Version_{index}");
+                        }
+                        continue;
+                    }
+
+                    writer.WriteValue(value.Value);
                 }
 
                 writer.WriteEndObject();

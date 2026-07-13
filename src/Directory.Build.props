@@ -9,9 +9,4 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="Sdk.props;Sdk.targets" Pack="true" PackagePath="Sdk" />
-    <None Include="$(MSBuildThisFileDirectory)common/**" Pack="true" PackagePath="common" />
-  </ItemGroup>
 </Project>

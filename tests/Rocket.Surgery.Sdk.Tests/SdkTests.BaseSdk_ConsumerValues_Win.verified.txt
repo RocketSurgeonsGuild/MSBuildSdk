@@ -11,10 +11,10 @@
       _RocketSurgeryMustImportMicrosoftNETSdk: true,
       AnalysisLevel: latest,
       AnalysisMode: AllEnabledByDefault,
-      BeforeMicrosoftNETSdkTargets: ;{project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.targets,
+      BeforeMicrosoftNETSdkTargets: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.targets,
       CopyDebugSymbolFilesFromPackages: true,
       CopyDocumentationFilesFromPackages: true,
-      CustomBeforeDirectoryBuildProps: ;{project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.props,
+      CustomBeforeDirectoryBuildProps: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.props,
       DebugType: portable,
       EmbedUntrackedSources: true,
       EnableNETAnalyzers: true,
@@ -87,15 +87,15 @@
       System.Threading.Tasks
     ],
     Imports: [
-      {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
-      {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.targets,
-      {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
-      {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
-      /private{project-root}/lib/lib.csproj
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.targets,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
+      /private/var/folders/1_/t7jfzt7d76bgcrkcfk_g0fkc0000gn/T/sdk-tests/{id}/lib/lib.csproj
     ],
     NoImports: [
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/Sdk.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)../common/Common.props,
@@ -104,7 +104,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)ci/appveyor.props,
@@ -113,7 +113,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.targets,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.targets,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)ci/appveyor.targets,
@@ -122,7 +122,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.props,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)Testing.props,
@@ -131,7 +131,7 @@
         ]
       },
       {
-        ProjectFilePath: {project-root}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
+        ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/Common.targets,
         Imports: [
           {
             Path: $(MSBuildThisFileDirectory)Testing.targets,

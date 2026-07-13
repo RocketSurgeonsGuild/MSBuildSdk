@@ -1,6 +1,5 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageType>MSBuildSdk</PackageType>
