@@ -38,6 +38,11 @@ public sealed class SdkTestProject : IDisposable
             repository.Package(new(package), out _);
         }
         _settings = new VerifySettings();
+        // macOS resolves Path.GetTempPath() (under /var or /tmp) to its /private-prefixed
+        // real path for some MSBuild-reported paths; scrub that form first (before the plain
+        // Directory scrub below consumes the substring) so snapshots recorded on macOS match
+        // Linux CI, which has no such symlink.
+        _settings.ScrubLinesWithReplace(z => z.Replace("/private" + Directory, "{project-root}"));
         _settings.ScrubLinesWithReplace(z => z.Replace(Directory, "{project-root}"));
 
         var currentGlobalJson = JsonDocument.Parse(File.ReadAllText(Path.Combine(Config.RootDirectory, "global.json")));
@@ -82,15 +87,15 @@ public sealed class SdkTestProject : IDisposable
         {
             var relativePath = Path.GetDirectoryName(project.FullPath)!;
 
-            // for some reason... this works... I really don't understand why.
-            // Is it a local machine issue? or just an issual overall??
-
-            var (process, output, error) = ProcessX.GetDualAsyncEnumerable($"dotnet build -bl", workingDirectory: relativePath);
-            await process.WaitForExitAsync();
-            if (process.ExitCode != 0)
+            var psi = CreateHermeticStartInfo("build -bl");
+            psi.WorkingDirectory = relativePath;
+            using var proc = Process.Start(psi)!;
+            var stdout = await proc.StandardOutput.ReadToEndAsync();
+            var stderr = await proc.StandardError.ReadToEndAsync();
+            await proc.WaitForExitAsync();
+            if (proc.ExitCode != 0)
             {
-                var errorOutput = ( await error.ToListAsync() ).Concat(await output.ToListAsync());
-                throw new TUnitException($"dotnet build failed for {relativePath}:\n{string.Join("\n", errorOutput)}");
+                throw new TUnitException($"dotnet build failed for {relativePath}:\n{stdout}\n{stderr}");
             }
 
             var binlog = Path.Combine(relativePath, "msbuild.binlog");
@@ -103,7 +108,12 @@ public sealed class SdkTestProject : IDisposable
         await Verify(results, settings: _settings);
     }
 
-    public async Task DotnetTest(string projectPath) => await ProcessX.StartAsync($"dotnet test -bl", workingDirectory: Path.Combine(Directory, projectPath)).ToTask();
+    public async Task DotnetTest(string projectPath)
+    {
+        var psi = CreateHermeticStartInfo("test -bl");
+        psi.WorkingDirectory = Path.Combine(Directory, projectPath);
+        await ProcessX.StartAsync(psi).ToTask();
+    }
 
     /// <summary>
     /// Evaluates a file-based app (<c>dotnet run app.cs</c>) in-proc with the MSBuild runtime.
@@ -161,7 +171,7 @@ public sealed class SdkTestProject : IDisposable
         }
 
         var diagnostics = response.RootElement.GetProperty("Diagnostics");
-        return  diagnostics.GetArrayLength() > 0 
+        return diagnostics.GetArrayLength() > 0
             ? throw new TUnitException($"Invalid #: directives in {entryPointPath}:\n{diagnostics}")
             : ((string Content, string ProjectPath))(
             response.RootElement.GetProperty("Content").GetString()!,
@@ -181,6 +191,26 @@ public sealed class SdkTestProject : IDisposable
         psi.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
         psi.Environment.Remove("MSBuildSDKsPath");
         psi.Environment.Remove("TESTINGPLATFORM_UI_LANGUAGE");
+        return psi;
+    }
+
+    /// <summary>
+    /// Like <see cref="CreateDotnetStartInfo"/>, but only strips CI-detection env vars so the
+    /// scaffolded build's evaluated properties (e.g. <c>ContinuousIntegrationBuild</c>) don't
+    /// differ between a local run and a CI runner. Deliberately leaves MSBuildSDKsPath/
+    /// TESTINGPLATFORM_UI_LANGUAGE untouched: stripping those breaks apphost/SDK resolution for
+    /// real (non-evaluation-only) builds on at least one dev machine.
+    /// </summary>
+    private ProcessStartInfo CreateHermeticStartInfo(string arguments)
+    {
+        var psi = new ProcessStartInfo("dotnet", arguments)
+        {
+            WorkingDirectory = Directory,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        psi.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
         // Keep scaffolded builds hermetic: CI env vars would flip ContinuousIntegrationBuild
         // (warnings-as-errors, coverage) and make results differ between local and CI runs.
         psi.Environment.Remove("GITHUB_ACTIONS");

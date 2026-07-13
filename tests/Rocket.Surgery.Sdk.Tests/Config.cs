@@ -58,7 +58,7 @@ internal static class Config
                     }
                     else
                     {
-                        _namedVersions.TryAdd(property.Value, $"Version_{_namedVersions.Count + 1}", out index);
+                        _namedVersions.TryAdd(property.Value, property.Value, out index);
                         writer.WriteValue($"Version_{index}");
                     }
                     continue;
@@ -102,7 +102,7 @@ internal static class Config
                         continue;
                     }
 
-                    writer.WriteValue(value.Name == "Version" ? "{version}" : value.Value);
+                    writer.WriteValue(value.Value);
                 }
 
                 writer.WriteEndObject();
