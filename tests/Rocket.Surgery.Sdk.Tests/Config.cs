@@ -87,6 +87,16 @@ internal static class Config
                 writer.WriteValue(item.Name);
                 foreach (var value in item.Children.OfType<Metadata>().OrderBy(z => z.Name))
                 {
+                    // MSBuild synthesizes %(Link) for out-of-cone items based on a string-prefix
+                    // comparison between the item's full path and the project directory; macOS's
+                    // /var,/tmp -> /private/var,/private/tmp symlink makes that comparison behave
+                    // differently than on Linux, so the same evaluation yields Link on one platform
+                    // and not the other. Not meaningful test signal - skip it.
+                    if (value.Name == "Link")
+                    {
+                        continue;
+                    }
+
                     writer.WritePropertyName(value.Name);
                     if (value.Name == "Version")
                     {
@@ -169,6 +179,16 @@ internal static class Config
                 writer.WriteStartObject();
                 foreach (var value in item.Children.OfType<Metadata>().OrderBy(z => z.Name))
                 {
+                    // MSBuild synthesizes %(Link) for out-of-cone items based on a string-prefix
+                    // comparison between the item's full path and the project directory; macOS's
+                    // /var,/tmp -> /private/var,/private/tmp symlink makes that comparison behave
+                    // differently than on Linux, so the same evaluation yields Link on one platform
+                    // and not the other. Not meaningful test signal - skip it.
+                    if (value.Name == "Link")
+                    {
+                        continue;
+                    }
+
                     writer.WritePropertyName(value.Name);
                     if (value.Name == "Version")
                     {

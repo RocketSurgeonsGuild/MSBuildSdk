@@ -82,12 +82,10 @@
     AdditionalFiles: [
       {
         Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/BannedSymbols.NewtonsoftJson.txt,
-        Link: BannedSymbols.NewtonsoftJson.txt,
         Visible: false
       },
       {
         Name: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/BannedSymbols.txt,
-        Link: BannedSymbols.txt,
         Visible: false
       }
     ],
