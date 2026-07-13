@@ -73,11 +73,9 @@
       RsgSdk_RoslynatorCodeFixes_Version: Version_7,
       RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_7,
       RsgSdk_RoslynatorRefactorings_Version: Version_7,
-      RsgSdk_Testing_AzureDevOpsReport: true,
       RsgSdk_Testing_CodeCoverage: true,
       RsgSdk_Testing_CrashDump: true,
       RsgSdk_Testing_Extensions: true,
-      RsgSdk_Testing_GitHubActionsReport: true,
       RsgSdk_Testing_HangDump: true,
       RsgSdk_Testing_HangDumpTimeout: 1h,
       RsgSdk_Testing_HotReload: true,
@@ -87,7 +85,7 @@
       RsgSdk_Testing_TrxReport: true,
       RunSettingsFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings,
       TargetFramework: net10.0,
-      TestingPlatformCommandLineArguments:  --coverage --coverage-settings "{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings" --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 1h --hangdump-type mini --report-azdo --report-gh,
+      TestingPlatformCommandLineArguments:  --coverage --coverage-settings "{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/coverage.runsettings" --report-trx --crashdump --crashdump-type mini --hangdump --hangdump-timeout 1h --hangdump-type mini,
       TestingPlatformDotnetTestSupport: true,
       TreatWarningsAsErrors: false,
       UseMicrosoftTestingPlatformRunner: true,
@@ -123,10 +121,6 @@
         PrivateAssets: all,
         Version: Version_1
       },
-      Microsoft.Testing.Extensions.AzureDevOpsReport: {
-        IsImplicitlyDefined: true,
-        Version: Version_3
-      },
       Microsoft.Testing.Extensions.CodeCoverage: {
         IsImplicitlyDefined: true,
         Version: Version_4
@@ -134,10 +128,6 @@
       Microsoft.Testing.Extensions.CrashDump: {
         IsImplicitlyDefined: true,
         Version: Version_3
-      },
-      Microsoft.Testing.Extensions.GitHubActionsReport: {
-        IsImplicitlyDefined: true,
-        Version: Version_5
       },
       Microsoft.Testing.Extensions.HangDump: {
         IsImplicitlyDefined: true,

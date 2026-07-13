@@ -37,4 +37,28 @@ public class FeatureTests
 
         await project.VerifyProjects();
     }
+
+    [Test]
+    public async Task ContinuousIntegrationBuild_GithubActions()
+    {
+        using var project = new SdkTestProject();
+        project.AddProject("tests/tests.csproj",
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+                .Property("GITHUB_ACTIONS", "true")
+                .ItemPackageReference("TUnit", Config.TUnitVersion));
+
+        await project.VerifyProjects();
+    }
+
+    [Test]
+    public async Task ContinuousIntegrationBuild_AzureDevOps()
+    {
+        using var project = new SdkTestProject();
+        project.AddProject("tests/tests.csproj",
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+                .Property("TF_BUILD", "true")
+                .ItemPackageReference("TUnit", Config.TUnitVersion));
+
+        await project.VerifyProjects();
+    }
 }

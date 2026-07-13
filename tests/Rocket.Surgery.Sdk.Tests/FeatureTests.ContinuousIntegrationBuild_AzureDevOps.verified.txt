@@ -33,7 +33,7 @@
       NuGetAuditLevel: moderate,
       NuGetAuditMode: all,
       Nullable: enable,
-      PackageOutputPath: bin/Debug/,
+      PackageOutputPath: bin\Debug/,
       ProduceReferenceAssembly: true,
       PublishDocumentationFile: true,
       PublishReferencesDocumentationFiles: true,
@@ -192,6 +192,7 @@
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.targets,
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.props,
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.targets,
+      {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/ContinuousIntegration.targets,
       {TempPath}sdk-tests/{id}/tests/tests.csproj
     ],
     NoImports: [
