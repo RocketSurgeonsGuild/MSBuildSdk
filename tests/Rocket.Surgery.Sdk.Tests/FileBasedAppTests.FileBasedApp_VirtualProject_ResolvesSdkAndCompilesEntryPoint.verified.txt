@@ -56,25 +56,25 @@
       RocketSurgeryWarningsAsErrors: true,
       RollForward: LatestMajor,
       RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version: Version_0,
-      RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_1,
-      RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_1,
-      RsgSdk_MicrosoftSbomTargets_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_4,
-      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_3,
-      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_6,
-      RsgSdk_RoslynatorAnalyzers_Version: Version_7,
-      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_7,
-      RsgSdk_RoslynatorCodeFixes_Version: Version_7,
-      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_7,
-      RsgSdk_RoslynatorRefactorings_Version: Version_7,
+      RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_0,
+      RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_0,
+      RsgSdk_MicrosoftSbomTargets_Version: Version_1,
+      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_3,
+      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_2,
+      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_2,
+      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_5,
+      RsgSdk_RoslynatorAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorCodeFixes_Version: Version_6,
+      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_6,
+      RsgSdk_RoslynatorRefactorings_Version: Version_6,
       TargetFramework: net10.0,
       TreatWarningsAsErrors: false,
       Version: 1.0.0,
@@ -101,43 +101,43 @@
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_1
+        Version: Version_0
       },
       Microsoft.CodeAnalysis.PublicApiAnalyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_1
+        Version: Version_0
       },
       Roslynator.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_7
+        Version: Version_6
       },
       Roslynator.CodeAnalysis.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_7
+        Version: Version_6
       },
       Roslynator.CodeFixes: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_7
+        Version: Version_6
       },
       Roslynator.Formatting.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_7
+        Version: Version_6
       },
       Roslynator.Refactorings: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_7
+        Version: Version_6
       }
     },
     Using: [
