@@ -204,7 +204,7 @@
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/Sdk/Sdk.targets,
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.props,
       {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk.test/{sdk-version}/common/Common.targets,
-      /private/var/folders/1_/t7jfzt7d76bgcrkcfk_g0fkc0000gn/T/sdk-tests/{id}/tests/tests.csproj
+      {TempPath}sdk-tests/{id}/tests/tests.csproj
     ],
     NoImports: [
       {

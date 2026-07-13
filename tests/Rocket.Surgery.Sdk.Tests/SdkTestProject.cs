@@ -39,7 +39,14 @@ public sealed class SdkTestProject : IDisposable
             repository.Package(new(package), out _);
         }
         _settings = new VerifySettings();
-        _settings.ScrubLinesWithReplace(z => z.Replace(id, "{id}"));
+        // MSBuild resolves the entry project's own full path via the process's current directory,
+        // which macOS reports through the /var,/tmp -> /private/var,/private/tmp symlink. Verify's
+        // built-in TempPath scrubber only matches the unresolved Path.GetTempPath() form, so every
+        // other (import-chain-derived) path gets normalized to {TempPath} but this one doesn't.
+        // Scrub both forms - and the id - in a single pass, since separate ScrubLinesWithReplace
+        // registrations each run against the original line rather than chaining.
+        var tempPath = Path.GetTempPath();
+        _settings.ScrubLinesWithReplace(z => z.Replace("/private" + tempPath, "{TempPath}").Replace(id, "{id}"));
 
         var currentGlobalJson = JsonDocument.Parse(File.ReadAllText(Path.Combine(Config.RootDirectory, "global.json")));
         var version = currentGlobalJson.RootElement.GetProperty("sdk").GetProperty("version").GetString();
