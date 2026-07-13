@@ -1,5 +1,6 @@
 <Project>
-    <PropertyGroup>
-        <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">true</ContinuousIntegrationBuild>
-    </PropertyGroup>
+  <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">true</ContinuousIntegrationBuild>
+    <IsGithubActions Condition="'$(IsGithubActions)' == ''">true</IsGithubActions>
+  </PropertyGroup>
 </Project>

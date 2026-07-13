@@ -1,5 +1,5 @@
 <Project>
-    <!--
+  <!--
         Test framework detection and Microsoft.Testing.Platform wiring.
 
         Framework adapters are injected by inspecting @(PackageReference) — this must happen in
@@ -8,14 +8,14 @@
 
         Opt out of everything here with RsgSdk_Testing_Extensions=false.
     -->
-    <PropertyGroup>
-        <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == ''">true</TestingPlatformDotnetTestSupport>
-        <MergeCoverage Condition="'$(MergeCoverage)' == ''">true</MergeCoverage>
-        <IncludeTestAssembly Condition="'$(IncludeTestAssembly)' == ''">true</IncludeTestAssembly>
-        <RunSettingsFilePath Condition="'$(RunSettingsFilePath)' == ''">$(MSBuildThisFileDirectory)coverage.runsettings</RunSettingsFilePath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == ''">true</TestingPlatformDotnetTestSupport>
+    <MergeCoverage Condition="'$(MergeCoverage)' == ''">true</MergeCoverage>
+    <IncludeTestAssembly Condition="'$(IncludeTestAssembly)' == ''">true</IncludeTestAssembly>
+    <RunSettingsFilePath Condition="'$(RunSettingsFilePath)' == ''">$(MSBuildThisFileDirectory)coverage.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
 
-    <!--
+  <!--
         The Microsoft.Testing.Extensions packages only act when their command-line options are
         passed. `dotnet test` (Microsoft.Testing.Platform mode) forwards
         $(TestingPlatformCommandLineArguments), so everything is enabled through the same
@@ -24,48 +24,48 @@
         Coverage collection defaults to CI-only (it slows local runs); set
         RsgSdk_Testing_CodeCoverage=true to always collect, or =false to disable entirely.
     -->
-    <PropertyGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_TrxReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-trx</TestingPlatformCommandLineArguments>
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CrashDump)' == 'true'">$(TestingPlatformCommandLineArguments) --crashdump --crashdump-type mini</TestingPlatformCommandLineArguments>
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_HangDump)' == 'true'">$(TestingPlatformCommandLineArguments) --hangdump --hangdump-timeout $(RsgSdk_Testing_HangDumpTimeout) --hangdump-type mini</TestingPlatformCommandLineArguments>
-        <!-- Only activates when running on Azure Pipelines; harmless elsewhere. -->
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_AzureDevOpsReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-azdo</TestingPlatformCommandLineArguments>
-        <!-- Only activates when GITHUB_ACTIONS=true; harmless elsewhere. -->
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_GitHubActionsReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-gh</TestingPlatformCommandLineArguments>
-        <!-- Fail runs that silently discover zero tests. Set RsgSdk_Testing_MinimumExpectedTests=0 to disable. -->
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_MinimumExpectedTests)' != '0'">$(TestingPlatformCommandLineArguments) --minimum-expected-tests $(RsgSdk_Testing_MinimumExpectedTests)</TestingPlatformCommandLineArguments>
-        <!-- Opt-in flaky-test retry: set RsgSdk_Testing_RetryCount to the number of retries. -->
-        <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_Retry)' == 'true' and '$(RsgSdk_Testing_RetryCount)' != '0'">$(TestingPlatformCommandLineArguments) --retry-failed-tests $(RsgSdk_Testing_RetryCount)</TestingPlatformCommandLineArguments>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_TrxReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-trx</TestingPlatformCommandLineArguments>
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CrashDump)' == 'true'">$(TestingPlatformCommandLineArguments) --crashdump --crashdump-type mini</TestingPlatformCommandLineArguments>
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_HangDump)' == 'true'">$(TestingPlatformCommandLineArguments) --hangdump --hangdump-timeout $(RsgSdk_Testing_HangDumpTimeout) --hangdump-type mini</TestingPlatformCommandLineArguments>
+    <!-- Only activates when running on Azure Pipelines; harmless elsewhere. -->
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_AzureDevOpsReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-azdo --report-azdo-severity warning --report-azdo-flaky-history --report-azdo-summary --report-azdo-upload-artifacts all --publish-azdo-test-results</TestingPlatformCommandLineArguments>
+    <!-- Only activates when GITHUB_ACTIONS=true; harmless elsewhere. -->
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_GitHubActionsReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-gh</TestingPlatformCommandLineArguments>
+    <!-- Fail runs that silently discover zero tests. Set RsgSdk_Testing_MinimumExpectedTests=0 to disable. -->
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_MinimumExpectedTests)' != '0'">$(TestingPlatformCommandLineArguments) --minimum-expected-tests $(RsgSdk_Testing_MinimumExpectedTests)</TestingPlatformCommandLineArguments>
+    <!-- Opt-in flaky-test retry: set RsgSdk_Testing_RetryCount to the number of retries. -->
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_Retry)' == 'true' and '$(RsgSdk_Testing_RetryCount)' != '0'">$(TestingPlatformCommandLineArguments) --retry-failed-tests $(RsgSdk_Testing_RetryCount)</TestingPlatformCommandLineArguments>
+  </PropertyGroup>
 
-    <!--
+  <!--
         Analyzers already ran (or will run) in the real build; skip them when compiling for
         `dotnet test` so test feedback arrives faster. Opt out with RocketSurgeryOptimizeTestBuild=false.
     -->
-    <Target Name="RocketSurgeryDisableAnalyzersForTestRun" BeforeTargets="_MTPBuild"
-        Condition="'$(RocketSurgeryOptimizeTestBuild)' == 'true'">
-        <PropertyGroup>
-            <RunAnalyzers>false</RunAnalyzers>
-        </PropertyGroup>
-    </Target>
+  <Target Name="RocketSurgeryDisableAnalyzersForTestRun" BeforeTargets="_MTPBuild"
+    Condition="'$(RocketSurgeryOptimizeTestBuild)' == 'true'">
+    <PropertyGroup>
+      <RunAnalyzers>false</RunAnalyzers>
+    </PropertyGroup>
+  </Target>
 
-    <ItemGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
-        <!-- TUnit detected Rocket Surgery TUnit extensions. -->
-        <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit'))" />
-        <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.AspNetCore" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.AspNetCore'))" />
-        <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.Aspire" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.Aspire'))" />
+  <ItemGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
+    <!-- TUnit detected Rocket Surgery TUnit extensions. -->
+    <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit'))" />
+    <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.AspNetCore" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.AspNetCore'))" />
+    <RsgSdkImplicitPackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit.Aspire" Version="$(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version)" Condition="@(PackageReference->AnyHaveMetadataValue('Identity', 'TUnit.Aspire'))" />
 
-        <!-- Support other test frameworks? -->
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="$(RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version)" Condition="'$(RsgSdk_Testing_AzureDevOpsReport)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="$(RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version)" Condition="'$(RsgSdk_Testing_GitHubActionsReport)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="$(RsgSdk_MicrosoftTestingExtensionsHangDump_Version)" Condition="'$(RsgSdk_Testing_HangDump)' == 'true'" />
-        <!-- Activated by TESTINGPLATFORM_HOTRELOAD_ENABLED=1 (set automatically by `dotnet watch`),
+    <!-- Support other test frameworks? -->
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="$(RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version)" Condition="'$(RsgSdk_Testing_AzureDevOpsReport)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="$(RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version)" Condition="'$(RsgSdk_Testing_GitHubActionsReport)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="$(RsgSdk_MicrosoftTestingExtensionsHangDump_Version)" Condition="'$(RsgSdk_Testing_HangDump)' == 'true'" />
+    <!-- Activated by TESTINGPLATFORM_HOTRELOAD_ENABLED=1 (set automatically by `dotnet watch`),
              not a command-line flag — nothing to forward via TestingPlatformCommandLineArguments. -->
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.HotReload" Version="$(RsgSdk_MicrosoftTestingExtensionsHotReload_Version)" Condition="'$(RsgSdk_Testing_HotReload)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.Retry" Version="$(RsgSdk_MicrosoftTestingExtensionsRetry_Version)" Condition="'$(RsgSdk_Testing_Retry)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="$(RsgSdk_MicrosoftTestingExtensionsCrashDump_Version)" Condition="'$(RsgSdk_Testing_CrashDump)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="$(RsgSdk_MicrosoftTestingExtensionsTrxReport_Version)" Condition="'$(RsgSdk_Testing_TrxReport)' == 'true'" />
-        <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="$(RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version)" Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'" />
-    </ItemGroup>
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.HotReload" Version="$(RsgSdk_MicrosoftTestingExtensionsHotReload_Version)" Condition="'$(RsgSdk_Testing_HotReload)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.Retry" Version="$(RsgSdk_MicrosoftTestingExtensionsRetry_Version)" Condition="'$(RsgSdk_Testing_Retry)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="$(RsgSdk_MicrosoftTestingExtensionsCrashDump_Version)" Condition="'$(RsgSdk_Testing_CrashDump)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="$(RsgSdk_MicrosoftTestingExtensionsTrxReport_Version)" Condition="'$(RsgSdk_Testing_TrxReport)' == 'true'" />
+    <RsgSdkImplicitPackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="$(RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version)" Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'" />
+  </ItemGroup>
 </Project>
