@@ -49,6 +49,7 @@
              conflicts with the pinned System.Text.Json used by the older Roslyn-host support projects). -->
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="10.0.6" />
     <PackageVersion Include="TUnit" Version="1.59.0" />
+    <PackageVersion Include="Verify.DiffPlex" Version="3.3.0" />
     <PackageVersion Include="Verify.TUnit" Version="31.24.1" />
   </ItemGroup>
 </Project>

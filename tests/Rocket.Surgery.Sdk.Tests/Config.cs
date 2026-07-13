@@ -13,6 +13,7 @@ internal static class Config
     public static void Setup(AssemblyHookContext context)
     {
         MSBuildAssemblyResolver.Register();
+        VerifierSettings.InitializePlugins();
 
         DiffRunner.Disabled = true;
         VerifierSettings.AddExtraSettings(z => z.Converters.Add(new ProjectEvaluationSerializer()));
