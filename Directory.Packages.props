@@ -25,15 +25,15 @@
     <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.169" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="1.0.0-alpha.26358.12" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HotReload" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HtmlReport" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.JUnitReport" Version="1.0.0-alpha.26358.12" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.Retry" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CrashDump" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.3.1" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="1.0.0-alpha.26363.8" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HotReload" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HtmlReport" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.JUnitReport" Version="1.0.0-alpha.26363.8" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.Retry" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CrashDump" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.3.2" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" />
     <PackageVersion Include="MSBuild.ProjectCreation" Version="19.1.4" />
