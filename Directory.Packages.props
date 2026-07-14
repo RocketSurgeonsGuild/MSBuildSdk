@@ -42,7 +42,7 @@
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
     <PackageVersion Include="JetBrains.Annotations.Sources" Version="2026.2.0" />
-    <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.204" />
+    <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.213" />
     <PackageVersion Include="ProcessX" Version="1.5.6" />
     <PackageVersion Include="System.Interactive" Version="7.0.1" />
     <!-- Pinned to the last version without a System.Text.Json dependency (2.x+ requires >=10.0.2, which
