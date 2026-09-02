@@ -26,7 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.3.3" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="1.0.0-alpha.26377.5" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="2.4.0" />
     <PackageVersion Include="Microsoft.Testing.Extensions.HotReload" Version="2.3.3" />
     <PackageVersion Include="Microsoft.Testing.Extensions.HtmlReport" Version="2.3.3" />
     <PackageVersion Include="Microsoft.Testing.Extensions.JUnitReport" Version="1.0.0-alpha.26377.5" />
