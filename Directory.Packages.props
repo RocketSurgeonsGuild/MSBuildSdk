@@ -22,7 +22,7 @@
     <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.5" />
     <GlobalPackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1" />
     <GlobalPackageReference Include="xunit.analyzers" Version="2.1.0" />
-    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.169" />
+    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.170" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.3.3" />
