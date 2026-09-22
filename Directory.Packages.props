@@ -19,7 +19,7 @@
     <GlobalPackageReference Include="Roslynator.Refactorings" Version="5.0.0" />
     <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="10.0.302" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
-    <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.12" />
+    <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.13" />
     <GlobalPackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1" />
     <GlobalPackageReference Include="xunit.analyzers" Version="2.1.0" />
     <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.170" />
