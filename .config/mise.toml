@@ -24,7 +24,7 @@ dotnet = [{ version = "10.0.301" }, { version = "8.0.14", runtime = "dotnet" }]
 "npm:@bradygaster/squad-cli" = "0.10.0"
 tombi = "1.1.7"
 oxfmt = "0.57.0"
-"npm:@fission-ai/openspec" = "1.5.0"
+"npm:@fission-ai/openspec" = "1.13.2"
 # dotnet
 
 [tasks]
