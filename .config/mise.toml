@@ -21,7 +21,7 @@ dotnet = [{ version = "10.0.301" }, { version = "8.0.14", runtime = "dotnet" }]
 "dotnet:gitreleasemanager.tool" = "0.20.0"
 "dotnet:NuGet.Mcp.Server" = "1.4.3"
 "pipx:git+https://github.com/github/spec-kit.git" = "latest"
-"npm:@bradygaster/squad-cli" = "0.10.0"
+"npm:@bradygaster/squad-cli" = "0.13.1"
 tombi = "1.1.7"
 oxfmt = "0.57.0"
 "npm:@fission-ai/openspec" = "1.5.0"
