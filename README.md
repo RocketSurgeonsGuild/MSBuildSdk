@@ -284,7 +284,7 @@ Renamed switches:
 Versions follow `<year>.<month>.<build>` (e.g. `2026.7.1`) and a release is published weekly by
 GitHub Actions using [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
 (OIDC — no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
-`RocketSurgeonsGuild/rsg-sdk` with workflow `release.yml`.
+`RocketSurgeonsGuild/MSBuildSdk` with workflow `release.yml`.
 
 ## AssemblyInfo
 
