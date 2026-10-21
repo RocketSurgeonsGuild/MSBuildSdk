@@ -21,6 +21,7 @@ public sealed class SdkTestProject : IDisposable
 {
     private readonly List<ProjectCreator> _projects = [];
     private readonly Dictionary<string, string> _environment = [with(StringComparer.Ordinal)];
+    private readonly Dictionary<string, string> _packageVersions = [with(StringComparer.OrdinalIgnoreCase)];
     private readonly VerifySettings _settings;
 
     public string NugetArtifactsDirectory { get; }
@@ -38,6 +39,11 @@ public sealed class SdkTestProject : IDisposable
         foreach (var package in System.IO.Directory.EnumerateFiles(NugetArtifactsDirectory, "*.nupkg"))
         {
             repository.Package(new(package), out _);
+        }
+
+        foreach (var package in repository.Packages)
+        {
+            _packageVersions[package.Id] = package.Version;
         }
         _settings = new VerifySettings();
         // MSBuild resolves the entry project's own full path via the process's current directory,
@@ -102,6 +108,28 @@ public sealed class SdkTestProject : IDisposable
         return proc.ExitCode != 0
             ? throw new TUnitException($"dotnet msbuild failed for {projectPath}:\n{stdout}\n{stderr}")
             : JsonDocument.Parse(stdout);
+    }
+
+    /// <summary>The version of a package from the repo's artifacts feed (e.g. Rocket.Surgery.AssemblyInfo).</summary>
+    public string PackageVersion(string packageId) =>
+        _packageVersions.TryGetValue(packageId, out var version)
+            ? version
+            : throw new TUnitException($"{packageId} is not in {NugetArtifactsDirectory}; build the solution first.");
+
+    /// <summary>
+    /// Builds a project, then runs it and returns only the program's standard output (building
+    /// separately keeps compiler warnings out of it).
+    /// </summary>
+    public async Task<string> DotnetRun(string projectPath)
+    {
+        var build = CreateHermeticStartInfo("build");
+        build.WorkingDirectory = Path.Combine(Directory, projectPath);
+        await ProcessX.StartAsync(build).ToTask();
+
+        var run = CreateHermeticStartInfo("run --no-build");
+        run.WorkingDirectory = build.WorkingDirectory;
+        var lines = await ProcessX.StartAsync(run).ToTask();
+        return string.Join(Environment.NewLine, lines);
     }
 
     public async Task DotnetPack(string projectPath)

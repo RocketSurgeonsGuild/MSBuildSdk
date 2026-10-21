@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>Rocket.Surgery.AssemblyInfo.Tests</RootNamespace>
+        <AssemblyInfoNamespace>MyNamespace</AssemblyInfoNamespace>
+        <Description>
+            A Description
+      with a newline and
+      * Some "things" with quotes
+      // Some comments too.
+        </Description>
+        <RepositoryUrl>https://github.com/RocketSurgeonsGuild/MSBuildSdk</RepositoryUrl>
+        <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <IsPackable>false</IsPackable>
+        <MergeCoverage>true</MergeCoverage>
+        <IncludeTestAssembly>true</IncludeTestAssembly>
+    </PropertyGroup>
+
+    <Import Project="../../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.props" />
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+        <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj" OutputItemType="Analyzer" />
+        <!-- Built only so PackagedGeneratorTests can inspect the analyzers/dotnet/roslyn4.6 assembly. -->
+        <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.roslyn4.6/Rocket.Surgery.AssemblyInfo.roslyn4.6.csproj" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Verify.SourceGenerators" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" />
+        <AssemblyMetadata Include="Rocket.Surgery.Build" Value="CI" />
+        <PackageReference Include="Scriban" />
+        <EmbeddedResource Include="Rocket.Surgery.AssemblyInfo.Tests.csproj" />
+        <Compile Include="../../src/Rocket.Surgery.AssemblyInfo/Strings/*.cs" />
+        <Compile Remove="**/snapshots/**/*.cs" />
+        <None Remove="**/snapshots/**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.FakeItEasy" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="Shouldly" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" />
+        <PackageReference Include="TUnit" />
+        <PackageReference Include="Verify.TUnit" />
+        <Using Include="Shouldly" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Resources.es.resx" Generator="" CopyToOutputDirectory="PreserveNewest" />
+        <EmbeddedResource Update="Resources.resx" Generator="" CopyToOutputDirectory="PreserveNewest" />
+        <EmbeddedResource Include="Content/Styles/Custom.css" Kind="Text" Comment="Secondary CSS" />
+        <EmbeddedResource Include="Content/Styles/Main.css" Comment="Primary CSS" />
+        <EmbeddedResource Include="Content/Docs/*" />
+        <EmbeddedResource Include="Content/Swagger/*" />
+        <EmbeddedResource Include="webhook-data.json" Kind="text" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <Foo>Bar</Foo>
+        <Roslyn46GeneratorAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.roslyn4.6/bin/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.dll'))</Roslyn46GeneratorAssembly>
+        <Multiline>
+            A Description
+      with a newline and
+      * Some "things" with quotes
+      // Some comments too.
+        </Multiline>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Listed twice on purpose: duplicate ProjectProperty items must not generate duplicate members. -->
+        <ProjectProperty Include="Foo" />
+        <ProjectProperty Include="Foo" />
+        <ProjectProperty Include="Description" />
+        <ProjectProperty Include="Multiline" />
+        <ProjectProperty Include="ProjectFileComment" Comment="Full project contents" />
+        <ProjectProperty Include="RepositoryUrl" />
+        <ProjectProperty Include="ProjectFile" />
+        <ProjectProperty Include="Roslyn46GeneratorAssembly" />
+        <Constant Include="Foo.Raw" Value="$(Multiline)" Comment="$(Multiline)" />
+        <Constant Include="Foo.Bar" Value="Baz" Comment="Yay!" />
+        <Constant Include="Foo.Hello" Value="World" Comment="Comments make everything better 😍" />
+        <Constant Include="WithSemiColon" Value="A;B;C" />
+        <FileConstant Include="@(None)" />
+        <FileConstant Include="Content/Docs/Readme.txt" Link="Included/Readme.txt" />
+        <AssemblyMetadata Include="Foo" Value="Bar" />
+        <AssemblyMetadata Include="Raw" Value="$(Multiline)" />
+        <AssemblyMetadata Include="Root.Foo.Bar" Value="Baz" Comment="Comment" />
+        <Constant Include="TypedInt" Value="123" Type="int" />
+        <Constant Include="TypedInt64" Value="123" Type="Int64" />
+        <Constant Include="TypedLong" Value="123" Type="long" />
+        <Constant Include="TypedDouble" Value="1.23" Type="double" />
+        <Constant Include="TypedBoolean" Value="true" Type="bool" />
+    </ItemGroup>
+
+    <Import Project="../../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.targets" />
+</Project>

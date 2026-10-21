@@ -1,5 +1,0 @@
-<Project>
-    <Import Project="$(MSBuildThisFileDirectory)MyAssembly.Git.props" />
-    <Import Project="$(MSBuildThisFileDirectory)MyAssembly.Project.props" />
-    <Import Project="$(MSBuildThisFileDirectory)MyAssembly.Resources.props" />
-</Project>

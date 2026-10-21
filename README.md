@@ -265,12 +265,8 @@ The SDK replaces `Rocket.Surgery.MSBuild.CI`, `.GitVersion`, `.SourceLink`, `.Gl
 `GlobalPackageReference`s, and `Microsoft.SourceLink.*` too: the .NET SDK bundles Source Link, and
 referencing the package switches the bundled copy off. AppVeyor detection was not carried over.
 
-`Rocket.Surgery.MyAssembly` now ships from this repository (same package id, calendar version). It
-is opt-in, so keep referencing it where you use it:
-
-```xml
-<PackageReference Include="Rocket.Surgery.MyAssembly" PrivateAssets="all" />
-```
+`Rocket.Surgery.MyAssembly` is now `Rocket.Surgery.AssemblyInfo` and ships from this repository
+(see [AssemblyInfo](#assemblyinfo) below). It is opt-in, so reference it where you use it.
 
 Renamed switches:
 
@@ -289,3 +285,33 @@ Versions follow `<year>.<month>.<build>` (e.g. `2026.7.1`) and a release is publ
 GitHub Actions using [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
 (OIDC — no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
 `RocketSurgeonsGuild/rsg-sdk` with workflow `release.yml`.
+
+## AssemblyInfo
+
+`Rocket.Surgery.AssemblyInfo` (formerly `Rocket.Surgery.MyAssembly`) is a source generator that
+exposes build-time information as a generated `AssemblyInfo` class. It is not injected by the SDK:
+
+```xml
+<PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
+```
+
+| Area | Source |
+| --- | --- |
+| `AssemblyInfo.Attributes.*` | assembly attributes (`Title`, `Version`, `Company`, …) |
+| `AssemblyInfo.Metadata.*` | `@(AssemblyMetadata)` items |
+| `AssemblyInfo.Project.*` | `@(ProjectProperty)` items (defaults include `AssemblyName`, `RootNamespace`, target framework and runtime identifiers) |
+| `AssemblyInfo.Git.*` | `Branch`, `Commit`, `Sha`, `Root`, `Url` |
+| `AssemblyInfo.Constants.*` | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes |
+| `AssemblyInfo.Resources.*` | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()` |
+| `AssemblyInfo.Strings.*` | strings from `.resx` files |
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `AssemblyInfoNamespace` | *(none)* | Namespace for the generated class (C# 10+) |
+| `AssemblyInfoVisibility` | `internal` | Set to `public` to expose the class |
+| `AssemblyInfoGitComment` | *(none)* | XML doc comment for the `Git` area |
+
+Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyNamespace` →
+`AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`
+→ `AssemblyInfoGitComment`; the generated class `MyAssembly` → `AssemblyInfo`, and its `Info` area →
+`Attributes`. Code that uses `MyAssembly.*` has to be updated.

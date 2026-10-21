@@ -2,7 +2,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <!--
       src/ holds two kinds of package: the Rocket.Surgery.Sdk* MSBuild project SDKs (props/targets only,
-      no build output) and ordinary compiled packages such as Rocket.Surgery.MyAssembly, which carry
+      no build output) and ordinary compiled packages such as Rocket.Surgery.AssemblyInfo, which carry
       their own settings. Project names decide which applies, because a property set in a csproj body
       is evaluated too late here.
   -->

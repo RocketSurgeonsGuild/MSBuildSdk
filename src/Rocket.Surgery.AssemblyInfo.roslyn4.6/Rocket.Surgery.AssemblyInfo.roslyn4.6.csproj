@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        Builds the same generator sources as Rocket.Surgery.AssemblyInfo; its output is packed by that
+        project into analyzers/dotnet/roslyn4.6/cs.
+    -->
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <DefineConstants>$(DefineConstants);ROSLYN4_6;SCRIBAN_NO_ASYNC</DefineConstants>
+        <IsPackable>false</IsPackable>
+        <AssemblyName>Rocket.Surgery.AssemblyInfo</AssemblyName>
+        <RootNamespace>Rocket.Surgery.AssemblyInfo</RootNamespace>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Polyfill" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="4.14.0" PrivateAssets="all" />
+        <PackageReference Include="Scriban" Pack="false" IncludeAssets="build" />
+    </ItemGroup>
+    <ItemGroup>
+        <Using Remove="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
+        <Compile Include="..\Rocket.Surgery.AssemblyInfo\**\*.cs" Exclude="..\Rocket.Surgery.AssemblyInfo\obj\**;..\Rocket.Surgery.AssemblyInfo\bin\**" />
+        <!-- Templates are looked up by file-name suffix (see EmbeddedResource.cs), so the logical name only needs to end in the file name. -->
+        <EmbeddedResource Include="..\Rocket.Surgery.AssemblyInfo\*.sbntxt" LogicalName="Rocket.Surgery.AssemblyInfo.%(Filename)%(Extension)" />
+    </ItemGroup>
+</Project>
