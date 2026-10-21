@@ -15,6 +15,9 @@ public class ConstantsTests
     [Test]
     public async Task Keeps_Multiline_Values() => await Assert.That(GeneratedInfo.Constants.Foo.Raw).Contains("with a newline and");
 
+    // The generated members are compile-time constants on purpose; asserting on them checks the generator
+    // emitted the right type and value, which TUnitAssertions0005 can't see.
+#pragma warning disable TUnitAssertions0005
     [Test]
     public async Task Supports_Typed_Constants()
     {
@@ -24,6 +27,7 @@ public class ConstantsTests
         await Assert.That(GeneratedInfo.Constants.TypedDouble).IsEqualTo(1.23);
         await Assert.That(GeneratedInfo.Constants.TypedBoolean).IsTrue();
     }
+#pragma warning restore TUnitAssertions0005
 
     [Test]
     public async Task Exposes_File_Constants() =>
