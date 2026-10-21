@@ -175,13 +175,14 @@ or on the command line) to turn on `<Features>runtime-async=on</Features>` for:
 
 - target frameworks compatible with `net11.0`. The flag breaks net10.0 builds (SYSLIB5007, CA2252),
   so a `net10.0;net11.0` project only gets it on its net11.0 build;
-- non-browser targets only. `net11.0-browser` and Blazor WebAssembly (`browser-wasm`) builds never
-  get it, because WebAssembly doesn't support runtime async.
+- non-browser targets only. `net11.0-browser` targets and anything built for the `browser-wasm`
+  runtime identifier (Blazor WebAssembly included) never get it: Mono WebAssembly can't run
+  runtime-async IL and fails with `InvalidProgramException`.
 
 | Property | Default | Purpose |
 | --- | --- | --- |
 | `RocketSurgeryRuntimeAsync` | *(unset/off)* | opt-in: append `runtime-async=on` to `Features` for eligible target frameworks |
-| `UseRuntimeAsync` | *(compiler default)* | set to `false` to opt a single project back out once the switch is on |
+| `UseRuntimeAsync` | *(unset)* | set to `false` to opt a single project back out once the switch is on |
 
 ### Source Link (`src/common/SourceLink.props`, only when `RocketSurgerySourceLink=true`)
 

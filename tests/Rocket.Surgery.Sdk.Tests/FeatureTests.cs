@@ -192,18 +192,26 @@ public class FeatureTests
     }
 
     [Test]
-    [Arguments("Rocket.Surgery.Sdk", "net11.0", null, false)]
-    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", true)]
-    [Arguments("Rocket.Surgery.Sdk", "net10.0", "true", false)]
-    [Arguments("Rocket.Surgery.Sdk", "net11.0-browser", "true", false)]
-    [Arguments("Rocket.Surgery.Sdk.BlazorWebAssembly", "net11.0", "true", false)]
-    public async Task RuntimeAsync_IsOptIn_AndOnlyForNet11NonBrowser(string sdk, string targetFramework, string? runtimeAsync, bool expected)
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", null, null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", null, null, true)]
+    [Arguments("Rocket.Surgery.Sdk", "net10.0", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0-browser", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk.BlazorWebAssembly", "net11.0", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", "RuntimeIdentifier", "browser-wasm", false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", "UseRuntimeAsync", "false", false)]
+    public async Task RuntimeAsync_IsOptIn_AndOnlyForNet11NonBrowser(
+        string sdk, string targetFramework, string? runtimeAsync, string? extraProperty, string? extraValue, bool expected)
     {
         using var project = new SdkTestProject();
         var csproj = ProjectCreator.Templates.SdkCsproj(sdk: sdk, targetFramework: targetFramework);
         if (runtimeAsync is not null)
         {
             csproj.Property("RocketSurgeryRuntimeAsync", runtimeAsync);
+        }
+
+        if (extraProperty is not null)
+        {
+            csproj.Property(extraProperty, extraValue);
         }
 
         project.AddProject("lib/lib.csproj", csproj);
