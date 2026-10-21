@@ -35,7 +35,6 @@
     <File Path="src\common\editorconfig\Tests.editorconfig" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/Rocket.Surgery.AssemblyInfo.roslyn4.6/Rocket.Surgery.AssemblyInfo.roslyn4.6.csproj" />
     <Project Path="src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.BlazorWebAssembly/Rocket.Surgery.Sdk.BlazorWebAssembly.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Razor/Rocket.Surgery.Sdk.Razor.csproj" />
@@ -44,6 +43,11 @@
     <Project Path="src/Rocket.Surgery.Sdk.Web/Rocket.Surgery.Sdk.Web.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.WindowsDesktop/Rocket.Surgery.Sdk.WindowsDesktop.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk/Rocket.Surgery.Sdk.csproj" />
+  </Folder>
+  <Folder Name="/src/Rocket.Surgery.AssemblyInfo.supports/">
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" />
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" />
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.6.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Rocket.Surgery.AssemblyInfo.Tests/Rocket.Surgery.AssemblyInfo.Tests.csproj" />
