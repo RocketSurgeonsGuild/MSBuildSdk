@@ -4,6 +4,11 @@
   "ignorePaths": ["**/node_modules/**", "**/*.csproj", "Directory.Packages.support.props"],
   "packageRules": [
     {
+      "description": "The per-Roslyn-version AssemblyInfo builds pin their dependencies on purpose",
+      "matchFileNames": ["src/*.AssemblyInfo.supports/**"],
+      "enabled": false
+    },
+    {
       "matchCategories": ["js"],
       "automerge": true,
       "labels": [":truck: private-dependencies"]
