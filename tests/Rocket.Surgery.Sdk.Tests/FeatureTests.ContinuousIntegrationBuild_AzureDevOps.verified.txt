@@ -59,27 +59,27 @@
       RsgSdk_JetBrainsAnnotationsSources_Version: Version_0,
       RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version: Version_1,
       RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_2,
-      RsgSdk_MicrosoftCodeAnalysisCSharp_Version: Version_3,
+      RsgSdk_MicrosoftCodeAnalysisCSharp_Version: Version_1,
       RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_2,
-      RsgSdk_MicrosoftSbomTargets_Version: Version_4,
-      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_6,
-      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_7,
-      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_5,
-      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_5,
-      RsgSdk_RocketSurgeryExtensionsTestingFakeItEasy_Version: Version_8,
-      RsgSdk_RocketSurgeryExtensionsTestingSourceGenerators_Version: Version_8,
-      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_8,
-      RsgSdk_RoslynatorAnalyzers_Version: Version_9,
-      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_9,
-      RsgSdk_RoslynatorCodeFixes_Version: Version_9,
-      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_9,
-      RsgSdk_RoslynatorRefactorings_Version: Version_9,
+      RsgSdk_MicrosoftSbomTargets_Version: Version_3,
+      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_5,
+      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_6,
+      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_4,
+      RsgSdk_RocketSurgeryExtensionsTestingFakeItEasy_Version: Version_7,
+      RsgSdk_RocketSurgeryExtensionsTestingSourceGenerators_Version: Version_7,
+      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_7,
+      RsgSdk_RoslynatorAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorCodeFixes_Version: Version_8,
+      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorRefactorings_Version: Version_8,
       RsgSdk_Testing_CodeCoverage: true,
       RsgSdk_Testing_CrashDump: true,
       RsgSdk_Testing_Extensions: true,
@@ -137,60 +137,60 @@
       },
       Microsoft.Testing.Extensions.CodeCoverage: {
         IsImplicitlyDefined: true,
-        Version: Version_6
+        Version: Version_5
       },
       Microsoft.Testing.Extensions.CrashDump: {
         IsImplicitlyDefined: true,
-        Version: Version_5
+        Version: Version_4
       },
       Microsoft.Testing.Extensions.HangDump: {
         IsImplicitlyDefined: true,
-        Version: Version_5
+        Version: Version_4
       },
       Microsoft.Testing.Extensions.HotReload: {
         IsImplicitlyDefined: true,
-        Version: Version_5
+        Version: Version_4
       },
       Microsoft.Testing.Extensions.TrxReport: {
         IsImplicitlyDefined: true,
-        Version: Version_5
+        Version: Version_4
       },
       Rocket.Surgery.Extensions.Testing.TUnit: {
         IsImplicitlyDefined: true,
-        Version: Version_8
+        Version: Version_7
       },
       Roslynator.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_9
+        Version: Version_8
       },
       Roslynator.CodeAnalysis.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_9
+        Version: Version_8
       },
       Roslynator.CodeFixes: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_9
+        Version: Version_8
       },
       Roslynator.Formatting.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_9
+        Version: Version_8
       },
       Roslynator.Refactorings: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_9
+        Version: Version_8
       },
       TUnit: {
-        Version: Version_10
+        Version: Version_9
       }
     },
     Using: [

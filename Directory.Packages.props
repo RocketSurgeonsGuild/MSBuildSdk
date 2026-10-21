@@ -21,10 +21,11 @@
   <ItemGroup>
     <!-- Rocket.Surgery.AssemblyInfo (src/) and its tests -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.9.0" />
+    <!-- Test-only: keeps the Workspaces/Features stack pulled in by the source-generator test helpers on the same Roslyn. -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <PackageVersion Include="Scriban" Version="7.5.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
