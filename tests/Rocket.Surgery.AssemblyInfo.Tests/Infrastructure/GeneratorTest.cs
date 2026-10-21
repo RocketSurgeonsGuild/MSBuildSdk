@@ -22,7 +22,9 @@ public abstract class GeneratorTest() : LoggerTest<TestRecord>(new())
                                                          .AddReferences(
                                                               typeof(ActivatorUtilities).Assembly,
                                                               typeof(IServiceProvider).Assembly,
-                                                              typeof(System.Collections.Concurrent.ConcurrentDictionary<,>).Assembly,
+                                                              // By name: .NET 11 moved ConcurrentDictionary into System.Private.CoreLib, and
+                                                              // typeof() would make the snapshot's reference list differ per framework.
+                                                              System.Reflection.Assembly.Load("System.Collections.Concurrent"),
                                                               // Generated resource accessors use System.Linq.
                                                               typeof(Enumerable).Assembly
                                                           );

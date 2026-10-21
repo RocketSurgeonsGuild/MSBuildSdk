@@ -1,3 +1,7 @@
 <Project>
+    <!-- Runtime async: net11.0+ only (the flag breaks net10.0 builds) and never for browser targets (incompatible with WebAssembly). Opt out per project with UseRuntimeAsync=false. -->
+    <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net11.0')) and '$(TargetPlatformIdentifier)' != 'browser'">
+        <Features>$(Features);runtime-async=on</Features>
+    </PropertyGroup>
     <Import Project="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.targets" />
 </Project>

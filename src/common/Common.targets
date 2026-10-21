@@ -11,6 +11,17 @@
     <RollForward Condition="'$(RollForward)' == '' and '$(OutputType)' == 'Exe' and '$(IsTestProject)' != 'true'">LatestMajor</RollForward>
   </PropertyGroup>
 
+  <!--
+      Runtime async, opt-in with RocketSurgeryRuntimeAsync=true: net11.0+ only (the flag breaks net10.0
+      builds) and never for browser targets (incompatible with WebAssembly). Opt out per project with
+      UseRuntimeAsync=false. TargetPlatformIdentifier isn't inferred yet when this file is imported, so
+      the platform is read from TargetFramework; Blazor WebAssembly projects target plain netX.0 and are
+      recognized by their browser-wasm RuntimeIdentifier instead.
+  -->
+  <PropertyGroup Condition="'$(RocketSurgeryRuntimeAsync)' == 'true' and '$(TargetFramework)' != '' and $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net11.0')) and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'browser' and '$(RuntimeIdentifier)' != 'browser-wasm'">
+    <Features>$(Features);runtime-async=on</Features>
+  </PropertyGroup>
+
   <!-- Provenance: record which SDK variant produced the assembly. -->
   <ItemGroup Condition="'$(RocketSurgerySdkName)' != '' and '$(GenerateAssemblyInfo)' == 'true'">
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">

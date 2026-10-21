@@ -34,7 +34,7 @@ Pin the version once in `global.json`:
 ```xml
 <Project Sdk="Rocket.Surgery.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     </PropertyGroup>
 </Project>
 ```
@@ -54,7 +54,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 ## What you get
 
 - `LangVersion=preview`, `Features=strict`, `Nullable=enable`, `ImplicitUsings=enable`, `ProduceReferenceAssembly=true` (unless it's a single-file app)
-- Default `TargetFramework` (the SDK's newest, e.g. `net10.0`) — a csproj can be a single line
+- No default `TargetFramework`: a csproj sets `TargetFramework` or `TargetFrameworks` itself, as with Microsoft.NET.Sdk
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
 - Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK, individually overridable — see [Injected package versions](#injected-package-versions) below)
@@ -72,6 +72,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - `JetBrains.Annotations.Sources` injected (internal source, never exported) with a global `using JetBrains.Annotations;`
 - Publish/copy defaults: `PublishRepositoryUrl`, `PublishDocumentationFile`, `PublishReferencesDocumentationFiles`, `PublishReferencesSymbols`, `CopyDebugSymbolFilesFromPackages`, `CopyDocumentationFilesFromPackages` all default `true`
 - Applied editorconfigs/BannedSymbols are embedded into `-bl` binary logs for diagnosability
+- Opt-in [runtime async](#runtime-async) for net11.0+ builds (`RocketSurgeryRuntimeAsync=true`)
 
 ### Test projects
 
@@ -161,9 +162,26 @@ documentation, and `RS0017` public-API tracking; see `src/common/Common.targets`
 | `GenerateSBOM` | `true` | CI build **and** `IsPackable=true` (opt out with `GenerateSBOM=false`) |
 | `EnablePackageValidation` | `true` | only once `PackageValidationBaselineVersion` is set to your last released version |
 | `IsPackable` | `false` | test projects and sample projects |
+| `Features` | appends `runtime-async=on` | only when `RocketSurgeryRuntimeAsync=true`, see [Runtime async](#runtime-async) |
 
 Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSurgerySdkName` is set
 (one fixed value per SDK package, e.g. `Rocket.Surgery.Sdk.Web`) and `GenerateAssemblyInfo=true`.
+
+### Runtime async
+
+.NET 11 can run `async` methods on the runtime itself instead of compiler-generated state machines.
+It is off by default; set `RocketSurgeryRuntimeAsync=true` (in the project, `Directory.Build.props`,
+or on the command line) to turn on `<Features>runtime-async=on</Features>` for:
+
+- target frameworks compatible with `net11.0`. The flag breaks net10.0 builds (SYSLIB5007, CA2252),
+  so a `net10.0;net11.0` project only gets it on its net11.0 build;
+- non-browser targets only. `net11.0-browser` and Blazor WebAssembly (`browser-wasm`) builds never
+  get it, because WebAssembly doesn't support runtime async.
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `RocketSurgeryRuntimeAsync` | *(unset/off)* | opt-in: append `runtime-async=on` to `Features` for eligible target frameworks |
+| `UseRuntimeAsync` | *(compiler default)* | set to `false` to opt a single project back out once the switch is on |
 
 ### Source Link (`src/common/SourceLink.props`, only when `RocketSurgerySourceLink=true`)
 
@@ -278,6 +296,17 @@ Renamed switches:
 | `RSGBannedApisEnabled` | `RocketSurgeryBannedApiAnalyzers` |
 | `RSGBannedNewtonsoftJsonEnabled` | `RocketSurgeryBannedNewtonsoftJson` |
 | `RSGSingleFileApp` | `RocketSurgerySingleFileApp` |
+
+## Contributing
+
+The .NET SDK and the extra .NET 10 runtime come from `mise` (`.config/mise.toml`), not `global.json`. Run `mise install` before building.
+
+> [!NOTE]
+> On macOS, the first `mise install` of a new .NET SDK can overwrite the shared `~/.local/share/mise/dotnet-root/dotnet` host in place, and macOS then kills every `dotnet` command (SIGKILL). Replace the host with a fresh copy to fix it:
+>
+> ```bash
+> cd ~/.local/share/mise/dotnet-root && cp -p dotnet dotnet.fresh && mv -f dotnet.fresh dotnet
+> ```
 
 ## Versioning & releases
 

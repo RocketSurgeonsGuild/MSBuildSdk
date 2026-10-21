@@ -6,22 +6,24 @@ namespace Rocket.Surgery.Sdk.Tests;
 public class SdkTests
 {
     [Test]
-    public async Task BaseSdk_AppliesSharedDefaults_AndInjectsAnalyzers()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task BaseSdk_AppliesSharedDefaults_AndInjectsAnalyzers(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("lib/lib.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework)
         );
 
         await project.VerifyProjects();
     }
 
     [Test]
-    public async Task BaseSdk_ConsumerValues_Win()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task BaseSdk_ConsumerValues_Win(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("lib/lib.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework)
                 .Property("LangVersion", "12")
                 .Property("Nullable", "disable")
                 .Property("RocketSurgeryAnalyzers", "false")
@@ -31,22 +33,24 @@ public class SdkTests
     }
 
     [Test]
-    public async Task TestSdk_WithTUnit_InjectsAdapterAndTestingPlatformExtensions()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task TestSdk_WithTUnit_InjectsAdapterAndTestingPlatformExtensions(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: targetFramework)
                 .ItemPackageReference("TUnit", Config.TUnitVersion));
 
         await project.VerifyProjects();
     }
 
     [Test]
-    public async Task TestSdk_WithTUnit_RunsTests_AndProducesCoverageAndTrx()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task TestSdk_WithTUnit_RunsTests_AndProducesCoverageAndTrx(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: targetFramework)
                    .Property("RsgSdk_Testing_CodeCoverage", "true")
                    .ItemPackageReference("TUnit", Config.TUnitVersion)
             )
@@ -72,11 +76,12 @@ public class SdkTests
     }
 
     [Test]
-    public async Task WebSdk_ChainsToMicrosoftNetSdkWeb()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task WebSdk_ChainsToMicrosoftNetSdkWeb(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("web/web.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Web", targetFramework: "net10.0"));
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Web", targetFramework: targetFramework));
         project.AddFile("web/Program.cs", """
                                              var builder = WebApplication.CreateBuilder(args);
                                              var app = builder.Build();
@@ -88,11 +93,12 @@ public class SdkTests
     }
 
     [Test]
-    public async Task SampleProfile_RelaxesPublicApiTracking()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task SampleProfile_RelaxesPublicApiTracking(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("sample/sample.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework)
                .Property("IsSampleProject", "true"));
 
         await project.VerifyProjects();

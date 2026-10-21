@@ -1,6 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        net11.0 only: these tests host MSBuild in-proc (MSBuildAssemblyResolver), which needs an SDK whose
+        MSBuild runs on the test runtime, and the repo installs only the .NET 11 SDK (a net10.0 host would
+        load an SDK 10 MSBuild if one happens to be installed and leak its MSBuildSDKsPath into the
+        scaffolded builds). Consumer frameworks are covered by the TargetFrameworks test parameter: every
+        scaffolded project is built for net10.0 and net11.0.
+    -->
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
@@ -14,7 +21,10 @@
         along. Compile against them, but never copy them to bin: MSBuildAssemblyResolver must load
         every Microsoft.Build* assembly from the running .NET SDK, or a newer SDK's Microsoft.Build.dll
         binds to an older Framework.dll and fails with TypeLoadException.
+        Microsoft.Build itself is pinned too: MSBuild.ProjectCreation's net11.0 dependency (18.10.x)
+        wants an exact, older Microsoft.Build.Framework (NU1608).
     -->
+    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" ExcludeAssets="runtime" />
     <PackageReference Include="MSBuild.ProjectCreation" />
