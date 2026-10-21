@@ -62,7 +62,7 @@
         </PropertyGroup>
 
         <Warning
-            Code="TA001"
+            Code="RSAI001"
             Text="A valid SourceLink provider does not seem to be installed for the current repository/project. Some values may be empty."
             Condition="'$(SourceLinkUrl)' == ''"
         />

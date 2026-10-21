@@ -132,6 +132,20 @@ public sealed class SdkTestProject : IDisposable
         return string.Join(Environment.NewLine, lines);
     }
 
+    /// <summary>
+    /// Builds and runs a file-based app (<c>dotnet run app.cs</c>) for real, without saving its
+    /// virtual project to disk, and returns only the program's standard output.
+    /// </summary>
+    public async Task<string> DotnetRunFile(string entryPointRelativePath)
+    {
+        var build = CreateHermeticStartInfo($"build \"{entryPointRelativePath}\"");
+        await ProcessX.StartAsync(build).ToTask();
+
+        var run = CreateHermeticStartInfo($"run --no-build --file \"{entryPointRelativePath}\"");
+        var lines = await ProcessX.StartAsync(run).ToTask();
+        return string.Join(Environment.NewLine, lines);
+    }
+
     public async Task DotnetPack(string projectPath)
     {
         var psi = CreateHermeticStartInfo("pack -bl");

@@ -84,7 +84,7 @@ public class ConstantsGenerator : IIncrementalGenerator
             cs.LanguageVersion < LanguageVersion.CSharp10)
         {
             spc.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor("MA002", "AssemblyInfoNamespace requires C# 10.0 or higher",
+                new DiagnosticDescriptor("RSAI002", "AssemblyInfoNamespace requires C# 10.0 or higher",
                     "AssemblyInfoNamespace requires C# 10.0 or higher", "AssemblyInfo", DiagnosticSeverity.Error, true),
                 Location.None));
             return;

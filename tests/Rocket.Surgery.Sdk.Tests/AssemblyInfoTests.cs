@@ -37,6 +37,23 @@ public class AssemblyInfoTests
         await Assert.That(output).IsEqualTo("World");
     }
 
+    [Test]
+    public async Task FileBasedApp_PackageDirective_GeneratesAssemblyInfo()
+    {
+        // A file-based app's project is virtual (no .csproj on disk); reading the project file must not fail.
+        using var project = new SdkTestProject();
+        project.AddFile("app.cs", $"""
+            #:sdk Rocket.Surgery.Sdk
+            #:package Rocket.Surgery.AssemblyInfo@{project.PackageVersion("Rocket.Surgery.AssemblyInfo")}
+
+            System.Console.Write(AssemblyInfo.Project.AssemblyName);
+            """);
+
+        var output = await project.DotnetRunFile("app.cs");
+
+        await Assert.That(output).IsEqualTo("app");
+    }
+
     private static ProjectCreator CreateApp(SdkTestProject project) =>
         ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
                       .Property("OutputType", "Exe")

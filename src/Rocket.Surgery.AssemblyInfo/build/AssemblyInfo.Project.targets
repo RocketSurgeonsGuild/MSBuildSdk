@@ -7,7 +7,8 @@
 
     <Target Name="PrepareProjectProperties" BeforeTargets="PrepareConstants" DependsOnTargets="$(PrepareProjectPropertiesDependsOn)">
         <PropertyGroup>
-            <ProjectFile Condition="'$(ProjectFile)' == ''">$([System.IO.File]::ReadAllText('$(MSBuildProjectFullPath)'))</ProjectFile>
+            <!-- File-based apps (dotnet run app.cs) evaluate a virtual project that has no file on disk. -->
+            <ProjectFile Condition="'$(ProjectFile)' == '' and Exists('$(MSBuildProjectFullPath)')">$([System.IO.File]::ReadAllText('$(MSBuildProjectFullPath)'))</ProjectFile>
         </PropertyGroup>
         <ItemGroup>
             <ProjectPropertyDistinct Include="@(ProjectProperty -> Distinct())" />

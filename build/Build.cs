@@ -14,6 +14,6 @@ using Rocket.Surgery.ModularPipelines.Extensions.Modules;
 
 var pipelineBuilder = Pipeline.CreateBuilder(args);
 PluginRegistry.Register(new ConventionsPlugin(ConventionContextBuilder.Create(Imports.Instance)
-.AddIfMissing(nameof(MyAssembly.Project.BuildScriptsRoot), MyAssembly.Project.BuildScriptsRoot),
+.AddIfMissing(nameof(AssemblyInfo.Project.BuildScriptsRoot), AssemblyInfo.Project.BuildScriptsRoot),
 a => !( a == typeof(RemoveUnusedDependenciesModule) )));
 await pipelineBuilder.Build().RunAsync();
