@@ -19,7 +19,8 @@
       into consumer builds whose id starts with one of the prefixes below gets its version tracked
       centrally in Directory.Packages.props; the packed props file is generated from those versions
       at pack time, so adding a new package only means adding it to Directory.Packages.props — no
-      manual property to keep in sync.
+      manual property to keep in sync. Mark a PackageVersion ExcludeFromSdkPackagesProps="true" to keep
+      a repo-only package (e.g. a test dependency) out of the generated file.
 
       Property naming: "Rocket.Surgery.Extensions.Testing.TUnit" becomes
       $(RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version).
@@ -44,6 +45,8 @@
         var versionsById = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var item in GlobalPackageReferences.Concat(PackageVersions))
         {
+            if (string.Equals(item.GetMetadata("ExcludeFromSdkPackagesProps"), "true", StringComparison.OrdinalIgnoreCase))
+                continue;
             var version = item.GetMetadata("Version");
             if (!string.IsNullOrEmpty(version))
                 versionsById[item.ItemSpec] = version;

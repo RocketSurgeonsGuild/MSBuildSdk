@@ -1,0 +1,14 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="Polyfill" PrivateAssets="all" />
+        <PackageReference Include="Scriban" Pack="false" IncludeAssets="build" />
+        <Using Remove="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
+        <Compile
+            Include="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\**\*.cs"
+            Exclude="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\obj\**;$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\bin\**"
+        />
+        <!-- Templates are looked up by file-name suffix (see EmbeddedResource.cs), so the logical name only needs to end in the file name. -->
+        <EmbeddedResource Include="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\*.sbntxt" LogicalName="Rocket.Surgery.AssemblyInfo.%(Filename)%(Extension)" />
+    </ItemGroup>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

@@ -4,19 +4,36 @@ using System.Reflection.PortableExecutable;
 namespace Rocket.Surgery.AssemblyInfo.Tests.Packaging;
 
 /// <summary>
-/// The package ships a second build of the generators for Roslyn 4.6 hosts
-/// (analyzers/dotnet/roslyn4.6/cs); make sure that build actually contains them.
+/// The package ships extra builds of the generators for older Roslyn hosts
+/// (analyzers/dotnet/roslyn5.0/cs, roslyn5.3/cs and roslyn5.6/cs); make sure those builds actually contain them.
 /// </summary>
 public class PackagedGeneratorTests
 {
-    /// <summary>The roslyn4.6 assembly defines <paramref name="generatorTypeName" />.</summary>
+    private static readonly string[] GeneratorAssemblies =
+    [
+        MyNamespace.AssemblyInfo.Project.Roslyn50GeneratorAssembly,
+        MyNamespace.AssemblyInfo.Project.Roslyn53GeneratorAssembly,
+        MyNamespace.AssemblyInfo.Project.Roslyn56GeneratorAssembly,
+    ];
+
+    private static readonly string[] GeneratorTypeNames =
+    [
+        "Rocket.Surgery.AssemblyInfo.ConstantsGenerator",
+        "Rocket.Surgery.AssemblyInfo.ResourcesGenerator",
+        "Rocket.Surgery.AssemblyInfo.StringsGenerator",
+    ];
+
+    public static IEnumerable<(string GeneratorAssembly, string GeneratorTypeName)> GeneratorCases() =>
+        from assembly in GeneratorAssemblies
+        from typeName in GeneratorTypeNames
+        select (assembly, typeName);
+
+    /// <summary>The supports assembly at <paramref name="generatorAssembly" /> defines <paramref name="generatorTypeName" />.</summary>
     [Test]
-    [Arguments("Rocket.Surgery.AssemblyInfo.ConstantsGenerator")]
-    [Arguments("Rocket.Surgery.AssemblyInfo.ResourcesGenerator")]
-    [Arguments("Rocket.Surgery.AssemblyInfo.StringsGenerator")]
-    public async Task Roslyn46Build_ContainsGenerator(string generatorTypeName)
+    [MethodDataSource(nameof(GeneratorCases))]
+    public async Task SupportsBuild_ContainsGenerator(string generatorAssembly, string generatorTypeName)
     {
-        using var stream = File.OpenRead(MyNamespace.AssemblyInfo.Project.Roslyn46GeneratorAssembly);
+        using var stream = File.OpenRead(generatorAssembly);
         using var peReader = new PEReader(stream);
         var metadata = peReader.GetMetadataReader();
         var typeNames = metadata.TypeDefinitions

@@ -2,11 +2,12 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <NoPackageAnalysis>true</NoPackageAnalysis>
-        <DefineConstants>$(DefineConstants);ROSLYN4_9;SCRIBAN_NO_ASYNC</DefineConstants>
+        <DefineConstants>$(DefineConstants);ROSLYN_CURRENT;SCRIBAN_NO_ASYNC</DefineConstants>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>NU5105;$(NoWarn)</NoWarn>
         <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
+        <_AnalyzersLocation>$(MSBuildThisFileDirectory)../Rocket.Surgery.AssemblyInfo.supports/bin/</_AnalyzersLocation>
     </PropertyGroup>
     <ItemGroup>
         <None Remove="*.sbntxt" />
@@ -16,17 +17,16 @@
         <None Include="buildTransitive/*.*" Pack="true" PackagePath="buildTransitive" />
         <PackageReference Include="Polyfill" PrivateAssets="All" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
-        <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.roslyn4.6/Rocket.Surgery.AssemblyInfo.roslyn4.6.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.6.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
         <PackageReference Include="Scriban" Pack="false" IncludeAssets="build" />
     </ItemGroup>
     <ItemGroup>
-        <None
-            Include="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo.roslyn4.6\bin\$(Configuration)\netstandard2.0\$(AssemblyName).dll"
-            Pack="true"
-            PackagePath="analyzers/dotnet/roslyn4.6/cs"
-            Visible="false"
-        />
-        <None Include="bin\$(Configuration)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.9/cs" Visible="false" />
+        <None Include="bin\$(Configuration)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.9/cs" Visible="false" />
+        <None Include="$(_AnalyzersLocation)roslyn5.0/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
+        <None Include="$(_AnalyzersLocation)roslyn5.3/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.3/cs" Visible="false" />
+        <None Include="$(_AnalyzersLocation)roslyn5.6/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.6/cs" Visible="false" />
     </ItemGroup>
     <ItemGroup>
         <Using Remove="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
