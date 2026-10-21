@@ -63,6 +63,7 @@
 
   <Import Project="$(MSBuildThisFileDirectory)Analyzers.targets"/>
   <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.targets"/>
+  <Import Project="$(MSBuildThisFileDirectory)GitVersion.targets"/>
   <Import Project="$(MSBuildThisFileDirectory)Testing.targets" Condition="'$(IsTestProject)' == 'true'"/>
   <!-- Imported last: expands every RsgSdkImplicitPackageReference declared above (and in this
        file's own SBOM ItemGroup) into a real PackageReference. -->

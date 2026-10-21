@@ -9,6 +9,14 @@
     </PropertyGroup>
     <ItemGroup>
     <PackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" />
+    <!--
+        MSBuild.ProjectCreation / StructuredLogger bring Microsoft.Build.Framework and Utilities.Core
+        along. Compile against them, but never copy them to bin: MSBuildAssemblyResolver must load
+        every Microsoft.Build* assembly from the running .NET SDK, or a newer SDK's Microsoft.Build.dll
+        binds to an older Framework.dll and fails with TypeLoadException.
+    -->
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" ExcludeAssets="runtime" />
     <PackageReference Include="MSBuild.ProjectCreation" />
     <PackageReference Include="MSBuild.StructuredLogger.Utils" />
     <PackageReference Include="ProcessX" />

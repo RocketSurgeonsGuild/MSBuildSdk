@@ -21,8 +21,8 @@
         $(TestingPlatformCommandLineArguments), so everything is enabled through the same
         properties that inject the packages.
 
-        Coverage collection defaults to CI-only (it slows local runs); set
-        RsgSdk_Testing_CodeCoverage=true to always collect, or =false to disable entirely.
+        Coverage collection is on by default; set RsgSdk_Testing_CodeCoverage=false to disable it
+        (it slows local runs).
     -->
   <PropertyGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
     <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>

@@ -16,13 +16,14 @@
       CopyDocumentationFilesFromPackages: true,
       CustomBeforeDirectoryBuildProps: ;{TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/Sdk/../common/Common.props,
       DebugType: portable,
-      EmbedUntrackedSources: true,
+      EmbeddedResourceUseDependentUponConvention: true,
       EnableNETAnalyzers: true,
       Features: strict,
       GenerateDocumentationFile: true,
       GeneratePackageOnBuild: false,
       ImplicitUsings: enable,
       IncludeBuildOutput: true,
+      IncludeSourceRevisionInInformationalVersion: true,
       IncludeSymbols: true,
       IsPackable: true,
       LangVersion: preview,
@@ -32,6 +33,7 @@
       NuGetAuditMode: all,
       Nullable: enable,
       PackageOutputPath: bin\Debug/,
+      PackageVersion: 1.0.0,
       ProduceReferenceAssembly: true,
       PublishDocumentationFile: true,
       PublishReferencesDocumentationFiles: true,
@@ -45,31 +47,38 @@
       RocketSurgeryEditorConfig: true,
       RocketSurgeryEditorConfigJetBrains: true,
       RocketSurgeryEditorConfigRoslynator: true,
+      RocketSurgeryGitVersion: true,
+      RocketSurgeryJetBrainsAnnotations: true,
       RocketSurgeryPublicApiAnalyzers: true,
       RocketSurgeryRoslynatorAnalyzers: true,
       RocketSurgerySdkName: Rocket.Surgery.Sdk,
       RocketSurgerySourceLink: true,
       RocketSurgeryWarningsAsErrors: true,
-      RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version: Version_0,
-      RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_0,
-      RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_0,
-      RsgSdk_MicrosoftSbomTargets_Version: Version_1,
-      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_3,
-      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_4,
-      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_4,
-      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_2,
-      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_2,
-      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_5,
-      RsgSdk_RoslynatorAnalyzers_Version: Version_6,
-      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_6,
-      RsgSdk_RoslynatorCodeFixes_Version: Version_6,
-      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_6,
-      RsgSdk_RoslynatorRefactorings_Version: Version_6,
+      RsgSdk_JetBrainsAnnotationsSources_Version: Version_0,
+      RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version: Version_1,
+      RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version: Version_1,
+      RsgSdk_MicrosoftCodeAnalysisCSharp_Version: Version_2,
+      RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version: Version_1,
+      RsgSdk_MicrosoftSbomTargets_Version: Version_3,
+      RsgSdk_MicrosoftTestingExtensionsAzureDevOpsReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsCodeCoverage_Version: Version_5,
+      RsgSdk_MicrosoftTestingExtensionsCrashDump_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsGitHubActionsReport_Version: Version_6,
+      RsgSdk_MicrosoftTestingExtensionsHangDump_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHotReload_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsHtmlReport_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsJUnitReport_Version: Version_6,
+      RsgSdk_MicrosoftTestingExtensionsRetry_Version: Version_4,
+      RsgSdk_MicrosoftTestingExtensionsTrxReport_Version: Version_4,
+      RsgSdk_RocketSurgeryExtensionsTestingFakeItEasy_Version: Version_7,
+      RsgSdk_RocketSurgeryExtensionsTestingSourceGenerators_Version: Version_7,
+      RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version: Version_7,
+      RsgSdk_RoslynatorAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorCodeAnalysisAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorCodeFixes_Version: Version_8,
+      RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_8,
+      RsgSdk_RoslynatorRefactorings_Version: Version_8,
+      SymbolPackageFormat: snupkg,
       TargetFramework: net10.0,
       TreatWarningsAsErrors: false,
       Version: 1.0.0,
@@ -86,56 +95,63 @@
       }
     ],
     PackageReference: {
-      Microsoft.CodeAnalysis.Analyzers: {
+      JetBrains.Annotations.Sources: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
         Version: Version_0
+      },
+      Microsoft.CodeAnalysis.Analyzers: {
+        IncludeAssets: runtime; build; native; contentfiles; analyzers,
+        IsImplicitlyDefined: true,
+        PrivateAssets: all,
+        Version: Version_1
       },
       Microsoft.CodeAnalysis.BannedApiAnalyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_0
+        Version: Version_1
       },
       Microsoft.CodeAnalysis.PublicApiAnalyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_0
+        Version: Version_1
       },
       Roslynator.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_6
+        Version: Version_8
       },
       Roslynator.CodeAnalysis.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_6
+        Version: Version_8
       },
       Roslynator.CodeFixes: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_6
+        Version: Version_8
       },
       Roslynator.Formatting.Analyzers: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_6
+        Version: Version_8
       },
       Roslynator.Refactorings: {
         IncludeAssets: runtime; build; native; contentfiles; analyzers,
         IsImplicitlyDefined: true,
         PrivateAssets: all,
-        Version: Version_6
+        Version: Version_8
       }
     },
     Using: [
+      JetBrains.Annotations,
       System,
       System.Collections.Generic,
       System.IO,
@@ -165,8 +181,8 @@
         ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.props,
         Imports: [
           {
-            Path: $(MSBuildThisFileDirectory)ci/appveyor.props,
-            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+            Path: $(MSBuildThisFileDirectory)ci/azuredevops.props,
+            Reason: false condition; ('$(TF_BUILD)'!='' was evaluated as ''!='').
           }
         ]
       },
@@ -174,8 +190,8 @@
         ProjectFilePath: {TempPath}sdk-tests/{id}/.nuget/packages/rocket.surgery.sdk/{sdk-version}/common/ContinuousIntegration.targets,
         Imports: [
           {
-            Path: $(MSBuildThisFileDirectory)ci/appveyor.targets,
-            Reason: false condition; ('$(APPVEYOR)'!='' was evaluated as ''!='').
+            Path: $(MSBuildThisFileDirectory)ci/azuredevops.targets,
+            Reason: false condition; ('$(TF_BUILD)'!='' was evaluated as ''!='').
           }
         ]
       },

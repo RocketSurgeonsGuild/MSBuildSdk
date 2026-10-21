@@ -14,5 +14,6 @@
     <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
     <RocketSurgeryEditorConfigJetBrains Condition="'$(RocketSurgeryEditorConfigJetBrains)' == ''">true</RocketSurgeryEditorConfigJetBrains>
     <RocketSurgeryEditorConfigRoslynator Condition="'$(RocketSurgeryEditorConfigRoslynator)' == ''">true</RocketSurgeryEditorConfigRoslynator>
+    <RocketSurgeryJetBrainsAnnotations Condition="'$(RocketSurgeryJetBrainsAnnotations)' == ''">true</RocketSurgeryJetBrainsAnnotations>
   </PropertyGroup>
 </Project>

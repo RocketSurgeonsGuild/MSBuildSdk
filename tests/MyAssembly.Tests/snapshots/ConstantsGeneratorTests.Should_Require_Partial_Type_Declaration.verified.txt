@@ -1,0 +1,26 @@
+{
+  FileOptions: {
+    Test: {
+      build_metadata.Constant.Comment: comment,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: root,
+      build_metadata.Constant.RootComment: rootComment,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: Value
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.MyAssembly.ConstantsGenerator: []
+  },
+  References: [
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

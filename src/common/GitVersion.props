@@ -1,0 +1,21 @@
+<Project>
+    <!--
+        Maps GitVersion's exported variables (GitVersion_* environment variables, e.g. from
+        `dotnet-gitversion /output buildserver` or the GitVersion CI actions) onto the SDK's version
+        properties. Each property is only set when its GitVersion variable exists and the consumer
+        has not already set it. Opt out with RocketSurgeryGitVersion=false.
+    -->
+    <PropertyGroup>
+        <RocketSurgeryGitVersion Condition="'$(RocketSurgeryGitVersion)' == ''">true</RocketSurgeryGitVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RocketSurgeryGitVersion)' == 'true'">
+        <Version Condition="'$(Version)' == '' and '$(GitVersion_SemVer)' != ''">$(GitVersion_SemVer)</Version>
+        <PackageVersion Condition="'$(PackageVersion)' == '' and '$(GitVersion_SemVer)' != ''">$(GitVersion_SemVer)</PackageVersion>
+        <AssemblyVersion Condition="'$(AssemblyVersion)' == '' and '$(GitVersion_Major)' != ''">$(GitVersion_Major).0.0.0</AssemblyVersion>
+        <FileVersion Condition="'$(FileVersion)' == '' and '$(GitVersion_AssemblySemVer)' != ''">$(GitVersion_AssemblySemVer)</FileVersion>
+        <InformationalVersion Condition="'$(InformationalVersion)' == '' and '$(GitVersion_InformationalVersion)' != ''">$(GitVersion_InformationalVersion)</InformationalVersion>
+        <!-- GitVersion's InformationalVersion already carries the commit sha; don't let the .NET SDK append it a second time. -->
+        <IncludeSourceRevisionInInformationalVersion Condition="'$(IncludeSourceRevisionInInformationalVersion)' == '' and '$(GitVersion_InformationalVersion)' != ''">false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+</Project>

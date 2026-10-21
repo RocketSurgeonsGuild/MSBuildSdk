@@ -60,6 +60,17 @@
     <None Include="$(MSBuildThisFileDirectory)/LICENSE" Pack="true" PackagePath="/" Visible="false" />
     <None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>
+  <!--
+      This repo builds itself with its own (dependency-free) common files instead of the retired
+      Rocket.Surgery.MSBuild.* packages. Analyzers.props/.targets can't be used here: their package
+      versions come from common/Packages.props, which only exists inside a packed SDK.
+  -->
+  <PropertyGroup>
+    <RocketSurgerySourceLink>true</RocketSurgerySourceLink>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)src/common/ContinuousIntegration.props" />
+  <Import Project="$(MSBuildThisFileDirectory)src/common/GitVersion.props" />
+  <Import Project="$(MSBuildThisFileDirectory)src/common/SourceLink.props" />
   <ItemGroup>
     <ProjectCapability Include="DynamicDependentFile" />
     <ProjectCapability Include="DynamicFileNesting" />

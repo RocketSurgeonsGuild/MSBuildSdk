@@ -8,7 +8,6 @@
     <_RocketSurgeryCommonPropsImported>true</_RocketSurgeryCommonPropsImported>
     <RocketSurgeryDefaultWarningsAsErrors Condition="'$(RocketSurgeryDefaultWarningsAsErrors)' == ''">true</RocketSurgeryDefaultWarningsAsErrors>
     <RocketSurgeryWarningsAsErrors Condition="'$(RocketSurgeryWarningsAsErrors)' == ''">true</RocketSurgeryWarningsAsErrors>
-    <RocketSurgeryEditorConfig Condition="'$(RocketSurgeryEditorConfig)' == ''">true</RocketSurgeryEditorConfig>
     <RocketSurgerySourceLink Condition="'$(RocketSurgerySourceLink)' == ''">true</RocketSurgerySourceLink>
   </PropertyGroup>
 
@@ -80,6 +79,7 @@
 
     <Import Project="$(MSBuildThisFileDirectory)Analyzers.props" />
     <Import Project="$(MSBuildThisFileDirectory)ContinuousIntegration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)GitVersion.props" />
     <Import Project="$(MSBuildThisFileDirectory)Packages.props" />
     <Import Project="$(MSBuildThisFileDirectory)SourceLink.props" />
     <Import Project="$(MSBuildThisFileDirectory)Testing.props" Condition="'$(IsTestProject)' == 'true'" />

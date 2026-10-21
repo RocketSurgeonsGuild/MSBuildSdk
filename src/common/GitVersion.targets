@@ -1,0 +1,29 @@
+<Project>
+    <!-- Stamps every GitVersion variable that is present onto the assembly as AssemblyMetadata. -->
+    <ItemGroup Condition="'$(RocketSurgeryGitVersion)' == 'true' and '$(GitVersion_SemVer)' != ''">
+        <AssemblyMetadata Include="GitVersion_Major" Value="$(GitVersion_Major)" />
+        <AssemblyMetadata Include="GitVersion_Minor" Value="$(GitVersion_Minor)" />
+        <AssemblyMetadata Include="GitVersion_Patch" Value="$(GitVersion_Patch)" />
+        <AssemblyMetadata Include="GitVersion_PreReleaseTag" Value="$(GitVersion_PreReleaseTag)" />
+        <AssemblyMetadata Include="GitVersion_PreReleaseTagWithDash" Value="$(GitVersion_PreReleaseTagWithDash)" />
+        <AssemblyMetadata Include="GitVersion_PreReleaseLabel" Value="$(GitVersion_PreReleaseLabel)" />
+        <AssemblyMetadata Include="GitVersion_PreReleaseNumber" Value="$(GitVersion_PreReleaseNumber)" />
+        <AssemblyMetadata Include="GitVersion_BuildMetaData" Value="$(GitVersion_BuildMetaData)" />
+        <AssemblyMetadata Include="GitVersion_BuildMetaDataPadded" Value="$(GitVersion_BuildMetaDataPadded)" />
+        <AssemblyMetadata Include="GitVersion_FullBuildMetaData" Value="$(GitVersion_FullBuildMetaData)" />
+        <AssemblyMetadata Include="GitVersion_MajorMinorPatch" Value="$(GitVersion_MajorMinorPatch)" />
+        <AssemblyMetadata Include="GitVersion_SemVer" Value="$(GitVersion_SemVer)" />
+        <AssemblyMetadata Include="GitVersion_LegacySemVer" Value="$(GitVersion_LegacySemVer)" />
+        <AssemblyMetadata Include="GitVersion_LegacySemVerPadded" Value="$(GitVersion_LegacySemVerPadded)" />
+        <AssemblyMetadata Include="GitVersion_AssemblySemVer" Value="$(GitVersion_AssemblySemVer)" />
+        <AssemblyMetadata Include="GitVersion_FullSemVer" Value="$(GitVersion_FullSemVer)" />
+        <AssemblyMetadata Include="GitVersion_InformationalVersion" Value="$(GitVersion_InformationalVersion)" />
+        <AssemblyMetadata Include="GitVersion_BranchName" Value="$(GitVersion_BranchName)" />
+        <AssemblyMetadata Include="GitVersion_Sha" Value="$(GitVersion_Sha)" />
+        <AssemblyMetadata Include="GitVersion_NuGetVersionV2" Value="$(GitVersion_NuGetVersionV2)" />
+        <AssemblyMetadata Include="GitVersion_NuGetVersion" Value="$(GitVersion_NuGetVersion)" />
+        <AssemblyMetadata Include="GitVersion_CommitsSinceVersionSource" Value="$(GitVersion_CommitsSinceVersionSource)" />
+        <AssemblyMetadata Include="GitVersion_CommitsSinceVersionSourcePadded" Value="$(GitVersion_CommitsSinceVersionSourcePadded)" />
+        <AssemblyMetadata Include="GitVersion_CommitDate" Value="$(GitVersion_CommitDate)" />
+    </ItemGroup>
+</Project>

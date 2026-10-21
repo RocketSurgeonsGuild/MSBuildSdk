@@ -234,8 +234,11 @@ internal static class Config
         );
     }
 
+    // Only the SDK's own files: Rocket.Surgery.MyAssembly also lives under src/, but it is an ordinary
+    // opt-in package, so its properties are not part of what an SDK consumer evaluates.
     public static FrozenSet<string> AllPropertyNames => field ??= Directory.EnumerateFiles(Path.Combine(RootDirectory, "src"), "*.props", SearchOption.AllDirectories)
         .Concat(Directory.EnumerateFiles(Path.Combine(RootDirectory, "src"), "*.targets", SearchOption.AllDirectories))
+        .Where(z => !z.Contains("Rocket.Surgery.MyAssembly", StringComparison.Ordinal))
         .SelectMany(z => XDocument.Parse(File.ReadAllText(z)).Document!.Descendants("PropertyGroup")
             .SelectMany(z => z.Elements().Select(e => e.Name.LocalName))
             .Distinct()

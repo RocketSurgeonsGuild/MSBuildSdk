@@ -1,7 +1,15 @@
 <Project>
+    <!-- EmbedUntrackedSources is intentionally not set here: the .NET SDK (8+) already defaults it to true. -->
     <PropertyGroup Condition="'$(RocketSurgerySourceLink)' == 'true'">
-        <EmbedUntrackedSources Condition="'$(EmbedUntrackedSources)' == ''">true</EmbedUntrackedSources>
         <IncludeSymbols Condition="'$(IncludeSymbols)' == ''">true</IncludeSymbols>
+        <SymbolPackageFormat Condition="'$(SymbolPackageFormat)' == ''">snupkg</SymbolPackageFormat>
         <DebugType Condition="'$(DebugType)' == ''">portable</DebugType>
+    </PropertyGroup>
+    <!--
+        The .NET SDK only enables this for netcoreapp3.0+ / netstandard2.1+; enabling it everywhere keeps
+        manifest resource names stable for netstandard2.0 and .NET Framework projects.
+    -->
+    <PropertyGroup>
+        <EmbeddedResourceUseDependentUponConvention Condition="'$(EmbeddedResourceUseDependentUponConvention)' == ''">true</EmbeddedResourceUseDependentUponConvention>
     </PropertyGroup>
 </Project>

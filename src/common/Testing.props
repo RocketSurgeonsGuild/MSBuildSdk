@@ -1,6 +1,6 @@
 <Project>
-  <!-- Every default is guarded so the consumer always wins. Coverage collection is CI-only
-       by default (it slows local runs); set RsgSdk_Testing_CodeCoverage=true to always collect. -->
+  <!-- Every default is guarded so the consumer always wins. Set RsgSdk_Testing_CodeCoverage=false
+       to skip coverage collection (it slows local runs). -->
   <PropertyGroup>
     <!--
 
@@ -20,8 +20,6 @@
     <RsgSdk_Testing_CrashDump Condition="'$(RsgSdk_Testing_CrashDump)' == ''">true</RsgSdk_Testing_CrashDump>
     <RsgSdk_Testing_TrxReport Condition="'$(RsgSdk_Testing_TrxReport)' == ''">true</RsgSdk_Testing_TrxReport>
     <RsgSdk_Testing_CodeCoverage Condition="'$(RsgSdk_Testing_CodeCoverage)' == ''">true</RsgSdk_Testing_CodeCoverage>
-    <RsgSdk_Testing_HotReload Condition="'$(RsgSdk_Testing_HotReload)' == ''">true</RsgSdk_Testing_HotReload>
-    <RsgSdk_Testing_MinimumExpectedTests Condition="'$(RsgSdk_Testing_MinimumExpectedTests)' == ''">0</RsgSdk_Testing_MinimumExpectedTests>
     <RsgSdk_Testing_RetryCount Condition="'$(RsgSdk_Testing_RetryCount)' == ''">0</RsgSdk_Testing_RetryCount>
   </PropertyGroup>
 </Project>

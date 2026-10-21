@@ -39,4 +39,13 @@
         <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version)" Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
         <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version)" Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     </ItemGroup>
+
+    <!--
+        JetBrains.Annotations as source (internal, never exported), plus the global using for it.
+        Opt out with RocketSurgeryJetBrainsAnnotations=false. Independent of RocketSurgeryAnalyzers.
+    -->
+    <ItemGroup Condition="'$(RocketSurgeryJetBrainsAnnotations)' == 'true' and '$(Language)' == 'C#'">
+        <RsgSdkImplicitPackageReference Include="JetBrains.Annotations.Sources" Version="$(RsgSdk_JetBrainsAnnotationsSources_Version)" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <Using Include="JetBrains.Annotations" Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'" />
+    </ItemGroup>
 </Project>
