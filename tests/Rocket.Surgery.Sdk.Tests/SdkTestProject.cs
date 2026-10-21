@@ -99,9 +99,9 @@ public sealed class SdkTestProject : IDisposable
         var stdout = await proc.StandardOutput.ReadToEndAsync();
         var stderr = await proc.StandardError.ReadToEndAsync();
         await proc.WaitForExitAsync();
-        return  proc.ExitCode != 0 
+        return proc.ExitCode != 0
             ? throw new TUnitException($"dotnet msbuild failed for {projectPath}:\n{stdout}\n{stderr}")
-            :  JsonDocument.Parse(stdout);
+            : JsonDocument.Parse(stdout);
     }
 
     public async Task DotnetPack(string projectPath)
