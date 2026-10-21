@@ -5,7 +5,9 @@
     <!--
         The build script uses this repo's own Rocket.Surgery.AssemblyInfo generator: the project
         reference supplies the generator and the imports supply what its NuGet package's build/
-        folder would (see Directory.Build.targets for the .targets half).
+        folder would (see Directory.Build.targets for the .targets half). It is built without packing:
+        the script compiles before the pipeline has downloaded the package icon (.temp/), and the
+        pipeline packs it properly later.
     -->
     <Import Project="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.props" />
     <ItemGroup>
@@ -14,6 +16,7 @@
             Include="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj"
             OutputItemType="Analyzer"
             ReferenceOutputAssembly="false"
+            AdditionalProperties="GeneratePackageOnBuild=false"
         />
     </ItemGroup>
 </Project>
