@@ -1,0 +1,26 @@
+<Project>
+    <PropertyGroup>
+        <!-- InjectMyAssemblyProjectDependsOn is the original (MyAssembly-era) name; both are honored. -->
+        <PrepareProjectPropertiesDependsOn>$(PrepareProjectPropertiesDependsOn);$(InjectMyAssemblyProjectDependsOn)</PrepareProjectPropertiesDependsOn>
+        <PrepareProjectPropertiesDependsOn Condition="'$(SourceControlInformationFeatureSupported)' == 'true'">InitializeSourceControlInformation;$(PrepareProjectPropertiesDependsOn)</PrepareProjectPropertiesDependsOn>
+    </PropertyGroup>
+
+    <Target Name="PrepareProjectProperties" BeforeTargets="PrepareConstants" DependsOnTargets="$(PrepareProjectPropertiesDependsOn)">
+        <PropertyGroup>
+            <!-- File-based apps (dotnet run app.cs) evaluate a virtual project that has no file on disk. -->
+            <ProjectFile Condition="'$(ProjectFile)' == '' and Exists('$(MSBuildProjectFullPath)')">$([System.IO.File]::ReadAllText('$(MSBuildProjectFullPath)'))</ProjectFile>
+        </PropertyGroup>
+        <ItemGroup>
+            <ProjectPropertyDistinct Include="@(ProjectProperty -> Distinct())" />
+        </ItemGroup>
+        <ItemGroup>
+            <!-- Collect requested properties, and eval their value -->
+            <Constant
+                Include="@(ProjectPropertyDistinct -> 'Project.%(Identity)')"
+                Value="$(%(ProjectPropertyDistinct.Identity))"
+                Comment="%(ProjectPropertyDistinct.Comment)"
+                Root="."
+            />
+        </ItemGroup>
+    </Target>
+</Project>

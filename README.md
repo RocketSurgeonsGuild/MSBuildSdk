@@ -14,6 +14,10 @@ source link, and Microsoft.Testing.Platform test wiring.
 | `Rocket.Surgery.Sdk.WindowsDesktop` | Microsoft.NET.Sdk.WindowsDesktop | WPF / WinForms |
 | `Rocket.Surgery.Sdk.Script` | Microsoft.NET.Sdk | File-based C# apps (`#:sdk` shorthand) |
 
+## Requirements
+
+.NET SDK 10 or later.
+
 ## Usage
 
 Pin the version once in `global.json`:
@@ -62,7 +66,10 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - SBOM generation on pack, but only for packable projects in CI (`Microsoft.Sbom.Targets`, opt out with `GenerateSBOM=false`)
 - Package validation: set `PackageValidationBaselineVersion` to your last released version to turn on `EnablePackageValidation`
 - `RollForward=LatestMajor` for non-test executables; assemblies carry a `RocketSurgery.Sdk.Name` metadata attribute (when `GenerateAssemblyInfo=true`)
-- Source-linked, portable-PDB, symbol-package defaults (`EmbedUntrackedSources`, `IncludeSymbols`, `DebugType=portable`)
+- Source-linked, portable-PDB, symbol-package defaults (`IncludeSymbols`, `SymbolPackageFormat=snupkg`, `DebugType=portable`; `EmbedUntrackedSources` comes from the .NET SDK itself)
+- `EmbeddedResourceUseDependentUponConvention=true` for every target framework (the .NET SDK only does this for netcoreapp3.0+/netstandard2.1+), so resx manifest names stay stable on netstandard2.0 and .NET Framework
+- GitVersion integration: when `GitVersion_*` environment variables are present (e.g. `dotnet-gitversion /output buildserver`), they set `Version`, `PackageVersion`, `AssemblyVersion` (major only), `FileVersion` and `InformationalVersion`, and are stamped onto the assembly as `AssemblyMetadata`
+- `JetBrains.Annotations.Sources` injected (internal source, never exported) with a global `using JetBrains.Annotations;`
 - Publish/copy defaults: `PublishRepositoryUrl`, `PublishDocumentationFile`, `PublishReferencesDocumentationFiles`, `PublishReferencesSymbols`, `CopyDebugSymbolFilesFromPackages`, `CopyDocumentationFilesFromPackages` all default `true`
 - Applied editorconfigs/BannedSymbols are embedded into `-bl` binary logs for diagnosability
 
@@ -75,15 +82,13 @@ is automatic, based on your `PackageReference`s:
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
 
 Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`,
-`HotReload`, `AzureDevOpsReport` and `GitHubActionsReport` on by default, plus `CodeCoverage` in
-CI — with the matching command-line options wired through `dotnet test` automatically: crash/hang
+`HotReload`, `AzureDevOpsReport` and `GitHubActionsReport` on by default, plus `CodeCoverage` — with the matching command-line options wired through `dotnet test` automatically: crash/hang
 dumps (mini, 1-hour hang timeout), TRX reports, `--report-azdo` (Azure Pipelines) and `--report-gh`
 (GitHub Actions) — both are harmless no-ops outside their respective CI, and (once
 `RsgSdk_Testing_Extensions` is on) `--minimum-expected-tests 1` so a run that discovers zero tests
 fails — set `RsgSdk_Testing_MinimumExpectedTests=0` to disable. Coverage (cobertura, via the SDK's
-default `coverage.runsettings`, overridable with `RunSettingsFilePath`) is collected in CI by
-default; set `RsgSdk_Testing_CodeCoverage=true` to also collect locally, or `=false` to disable
-entirely. `HotReload` activates via `TESTINGPLATFORM_HOTRELOAD_ENABLED=1` (set automatically by
+default `coverage.runsettings`, overridable with `RunSettingsFilePath`) is collected by default;
+set `RsgSdk_Testing_CodeCoverage=false` to disable it. `HotReload` activates via `TESTINGPLATFORM_HOTRELOAD_ENABLED=1` (set automatically by
 `dotnet watch`), not a command-line flag, so there's nothing to wire for it beyond the package
 reference. Analyzers are skipped when compiling for `dotnet test`
 (`RocketSurgeryOptimizeTestBuild=true` to enable — it's opt-in). `Microsoft.Testing.Extensions.Retry`
@@ -108,6 +113,7 @@ All defaults are guarded (`Condition="'$(Property)' == ''"`), so anything set in
 | `RocketSurgeryEditorConfig` | `true` | Master switch for the shipped global editorconfig profiles |
 | `RocketSurgeryEditorConfigJetBrains` | `true` | Include `JetBrains.editorconfig` |
 | `RocketSurgeryEditorConfigRoslynator` | `true` | Include `Roslynator.editorconfig` |
+| `RocketSurgeryJetBrainsAnnotations` | `true` | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
 
 Editorconfig profiles are also applied automatically per project shape — `Tests.editorconfig` when
 `IsTestProject=true`, `Samples.editorconfig` when `IsSampleProject=true`,
@@ -134,7 +140,6 @@ opt-out property beyond `RocketSurgeryEditorConfig`.
 | `RocketSurgeryDefaultWarningsAsErrors` | `true` | appends `RS0017` to `WarningsAsErrors` |
 | `RocketSurgeryWarningsAsErrors` | `true` | gates whether `TreatWarningsAsErrors` gets defaulted at all |
 | `TreatWarningsAsErrors` | `true` | only when `RocketSurgeryWarningsAsErrors=true` **and** (`ContinuousIntegrationBuild=true` **or** `Configuration=Release`) |
-| `RocketSurgeryEditorConfig` | `true` | see Analyzers above (also guarded here) |
 | `RocketSurgerySourceLink` | `true` | gates the Source Link section below |
 | `RocketSurgerySingleFileApp` | `true` | only when `FileBasedProgram=true` (file-based `dotnet run app.cs` apps) |
 | `IsTestProject` / `UseMicrosoftTestingPlatformRunner` | `true` | only for `Rocket.Surgery.Sdk.Test` |
@@ -164,9 +169,27 @@ Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSur
 
 | Property | Default |
 | --- | --- |
-| `EmbedUntrackedSources` | `true` |
 | `IncludeSymbols` | `true` |
+| `SymbolPackageFormat` | `snupkg` |
 | `DebugType` | `portable` |
+
+`EmbeddedResourceUseDependentUponConvention` defaults to `true` regardless of `RocketSurgerySourceLink`.
+`EmbedUntrackedSources` is not set by this SDK; the .NET SDK already defaults it to `true`.
+
+### GitVersion (`src/common/GitVersion.props` / `GitVersion.targets`)
+
+Only active when the matching `GitVersion_*` variable is present, and never overrides a value you set.
+Opt out entirely with `RocketSurgeryGitVersion=false`.
+
+| Property | Source |
+| --- | --- |
+| `Version`, `PackageVersion` | `GitVersion_SemVer` |
+| `AssemblyVersion` | `GitVersion_Major` → `<major>.0.0.0` |
+| `FileVersion` | `GitVersion_AssemblySemVer` |
+| `InformationalVersion` | `GitVersion_InformationalVersion` |
+| `IncludeSourceRevisionInInformationalVersion` | `false` when `GitVersion_InformationalVersion` is set (it already contains the sha) |
+
+Every `GitVersion_*` variable is also added as `AssemblyMetadata` when `GitVersion_SemVer` is present.
 
 ### Testing (`src/common/Testing.props` / `Testing.targets`, only imported for test projects)
 
@@ -206,6 +229,7 @@ prefixes is picked up automatically:
 - `Roslynator`
 - `Microsoft.CodeAnalysis.`
 - `Microsoft.Sbom.Targets` (exact match)
+- `JetBrains.Annotations.Sources` (exact match)
 
 Adding a new package to that list is enough to make the SDK inject a version default for it — no
 manual property to add or keep in sync. The generated property name follows a fixed pattern: strip
@@ -234,9 +258,64 @@ variables.
 > Migrating a repo that used `GlobalPackageReference` for these analyzers? Remove those entries —
 > the SDK injects them.
 
+## Migrating from Rocket.Surgery.MSBuild.*
+
+The SDK replaces `Rocket.Surgery.MSBuild.CI`, `.GitVersion`, `.SourceLink`, `.GlobalAnalyzerConfig`,
+`.JetBrains.Annotations` and the `Rocket.Surgery.MSBuild` meta-package. Remove those
+`GlobalPackageReference`s, and `Microsoft.SourceLink.*` too: the .NET SDK bundles Source Link, and
+referencing the package switches the bundled copy off. AppVeyor detection was not carried over.
+
+`Rocket.Surgery.MyAssembly` is now `Rocket.Surgery.AssemblyInfo` and ships from this repository
+(see [AssemblyInfo](#assemblyinfo) below). It is opt-in, so reference it where you use it.
+
+Renamed switches:
+
+| Rocket.Surgery.MSBuild.GlobalAnalyzerConfig | Rocket.Surgery.Sdk |
+| --- | --- |
+| `RSGEditorConfigEnabled` | `RocketSurgeryEditorConfig` |
+| `RSGRiderEnabled` | `RocketSurgeryEditorConfigJetBrains` |
+| `RSGRoslynatorEnabled` | `RocketSurgeryEditorConfigRoslynator` |
+| `RSGBannedApisEnabled` | `RocketSurgeryBannedApiAnalyzers` |
+| `RSGBannedNewtonsoftJsonEnabled` | `RocketSurgeryBannedNewtonsoftJson` |
+| `RSGSingleFileApp` | `RocketSurgerySingleFileApp` |
+
 ## Versioning & releases
 
 Versions follow `<year>.<month>.<build>` (e.g. `2026.7.1`) and a release is published weekly by
 GitHub Actions using [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
 (OIDC — no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
-`RocketSurgeonsGuild/rsg-sdk` with workflow `release.yml`.
+`RocketSurgeonsGuild/MSBuildSdk` with workflow `release.yml`.
+
+## AssemblyInfo
+
+`Rocket.Surgery.AssemblyInfo` (formerly `Rocket.Surgery.MyAssembly`) is a source generator that
+exposes build-time information as a generated `AssemblyInfo` class. It is not injected by the SDK:
+
+```xml
+<PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
+```
+
+| Area | Source |
+| --- | --- |
+| `AssemblyInfo.Attributes.*` | assembly attributes (`Title`, `Version`, `Company`, …) |
+| `AssemblyInfo.Metadata.*` | `@(AssemblyMetadata)` items |
+| `AssemblyInfo.Project.*` | `@(ProjectProperty)` items (defaults include `AssemblyName`, `RootNamespace`, target framework and runtime identifiers) |
+| `AssemblyInfo.Git.*` | `Branch`, `Commit`, `Sha`, `Root`, `Url` |
+| `AssemblyInfo.Constants.*` | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes |
+| `AssemblyInfo.Resources.*` | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()` |
+| `AssemblyInfo.Strings.*` | strings from `.resx` files |
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `AssemblyInfoNamespace` | *(none)* | Namespace for the generated class (C# 10+) |
+| `AssemblyInfoVisibility` | `internal` | Set to `public` to expose the class |
+| `AssemblyInfoGitComment` | *(none)* | XML doc comment for the `Git` area |
+
+Diagnostics: `RSAI001` (warning) when no Source Link provider is available, so `Git.*` values may be
+empty; `RSAI002` (error) when `AssemblyInfoNamespace` is set on C# older than 10. These were `TA001`
+and `MA002` in MyAssembly, so update any suppressions.
+
+Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyNamespace` →
+`AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`
+→ `AssemblyInfoGitComment`; the generated class `MyAssembly` → `AssemblyInfo`, and its `Info` area →
+`Attributes`. Code that uses `MyAssembly.*` has to be updated.

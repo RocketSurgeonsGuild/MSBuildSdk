@@ -9,8 +9,10 @@
     <File Path="src\common\ContinuousIntegration.props" />
     <File Path="src\common\ContinuousIntegration.targets" />
     <File Path="src\common\coverage.runsettings" />
-    <File Path="src\common\Packages.props" />
-    <File Path="src\common\SourceLink.targets" />
+    <File Path="src\common\GitVersion.props" />
+    <File Path="src\common\GitVersion.targets" />
+    <File Path="src\common\ImplicitPackageReferences.targets" />
+    <File Path="src\common\SourceLink.props" />
     <File Path="src\common\Testing.props" />
     <File Path="src\common\Testing.targets" />
   </Folder>
@@ -33,6 +35,8 @@
     <File Path="src\common\editorconfig\Tests.editorconfig" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.roslyn4.6/Rocket.Surgery.AssemblyInfo.roslyn4.6.csproj" />
+    <Project Path="src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.BlazorWebAssembly/Rocket.Surgery.Sdk.BlazorWebAssembly.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Razor/Rocket.Surgery.Sdk.Razor.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Script/Rocket.Surgery.Sdk.Script.csproj" />
@@ -42,6 +46,7 @@
     <Project Path="src/Rocket.Surgery.Sdk/Rocket.Surgery.Sdk.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Rocket.Surgery.AssemblyInfo.Tests/Rocket.Surgery.AssemblyInfo.Tests.csproj" />
     <Project Path="tests/Rocket.Surgery.Sdk.Tests/Rocket.Surgery.Sdk.Tests.csproj" />
   </Folder>
 </Solution>

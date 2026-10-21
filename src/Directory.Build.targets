@@ -1,18 +1,14 @@
 <Project>
   <PropertyGroup>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageType>MSBuildSdk</PackageType>
-    <NoBuildOutput>true</NoBuildOutput>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IncludeSymbols>false</IncludeSymbols>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
     <PackageOutputPath>$(SolutionDir)artifacts/nuget-local</PackageOutputPath>
     <PackageOutputPath Condition="'$(Configuration)' == 'Release'">$(SolutionDir)artifacts/nuget</PackageOutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(_RocketSurgeryIsSdkPackage)' == 'true'">
+    <NoBuildOutput>true</NoBuildOutput>
+  </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(_RocketSurgeryIsSdkPackage)' == 'true'">
     <Using Remove="*" />
     <None Include="Sdk.props;Sdk.targets" Pack="true" PackagePath="Sdk" />
     <None Include="$(MSBuildThisFileDirectory)common/**" Pack="true" PackagePath="common" />
@@ -87,13 +83,14 @@
     </Task>
   </UsingTask>
 
-  <Target Name="_RocketSurgeryGeneratePackagesProps" BeforeTargets="_GetPackageFiles;Pack">
+  <Target Name="_RocketSurgeryGeneratePackagesProps" BeforeTargets="_GetPackageFiles;Pack" Condition="'$(_RocketSurgeryIsSdkPackage)' == 'true'">
     <ItemGroup>
       <_RocketSurgeryPackagesPropsPrefix Include="Rocket.Surgery.Extensions." />
       <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.Testing.Extensions." />
       <_RocketSurgeryPackagesPropsPrefix Include="Roslynator" />
       <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.CodeAnalysis." />
       <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.Sbom.Targets" />
+      <_RocketSurgeryPackagesPropsPrefix Include="JetBrains.Annotations.Sources" />
     </ItemGroup>
 
     <GenerateRocketSurgeryPackagesProps

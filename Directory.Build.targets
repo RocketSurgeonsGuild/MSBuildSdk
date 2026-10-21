@@ -3,4 +3,14 @@
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations.Sources" PrivateAssets="all" />
     </ItemGroup>
+    <ItemGroup>
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)src/common/editorconfig/CodeAnalysis.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)src/common/editorconfig/CodingStyle.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)src/common/editorconfig/JetBrains.editorconfig" />
+        <EditorConfigFiles Include="$(MSBuildThisFileDirectory)src/common/editorconfig/Roslynator.editorconfig" />
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)src/common/BannedSymbols.txt" Visible="false" />
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)src/common/BannedSymbols.NewtonsoftJson.txt" Visible="false" />
+    </ItemGroup>
+    <Import Project="$(MSBuildThisFileDirectory)src/common/ContinuousIntegration.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)src/common/GitVersion.targets" />
 </Project>

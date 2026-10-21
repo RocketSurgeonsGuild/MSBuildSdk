@@ -1,0 +1,8 @@
+<Project>
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Metadata.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Project.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Resources.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Git.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Constants.targets" />
+</Project>

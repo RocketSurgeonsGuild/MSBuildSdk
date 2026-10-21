@@ -1,12 +1,21 @@
 <Project>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <!--
+      src/ holds two kinds of package: the Rocket.Surgery.Sdk* MSBuild project SDKs (props/targets only,
+      no build output) and ordinary compiled packages such as Rocket.Surgery.AssemblyInfo, which carry
+      their own settings. Project names decide which applies, because a property set in a csproj body
+      is evaluated too late here.
+  -->
   <PropertyGroup>
+    <_RocketSurgeryIsSdkPackage Condition="$(MSBuildProjectName.StartsWith('Rocket.Surgery.Sdk'))">true</_RocketSurgeryIsSdkPackage>
+    <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(_RocketSurgeryIsSdkPackage)' == 'true'">
     <TargetFramework>netstandard2.0</TargetFramework>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <PackageType>MSBuildSdk</PackageType>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version Condition="'$(Version)' == ''">0.0.1-local</Version>
   </PropertyGroup>
 </Project>

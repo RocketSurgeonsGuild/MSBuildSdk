@@ -3,7 +3,7 @@
     <Company>Rocket Surgeons Guild</Company>
     <Copyright>Copyright Rocket Surgeons Guild © $([System.DateTime]::Now.ToString('yyyy'))</Copyright>
     <Authors>David Driscoll,Rocket Surgeons Guild contributors</Authors>
-    <PackageProjectUrl>https://rocketsurgeonsguild.github.io/rsg-sdk/</PackageProjectUrl>
+    <PackageProjectUrl>https://rocketsurgeonsguild.github.io/MSBuildSdk/</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageIcon>images/packageicon.png</PackageIcon>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -34,6 +34,10 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <PropertyGroup>
+    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
+    <Verify_SponsorshipExemptionUntil>$([System.DateTime]::Today.AddDays(300).ToString("yyyy-MM"))</Verify_SponsorshipExemptionUntil>
+  </PropertyGroup>
+  <PropertyGroup>
     <RollForward>LatestMajor</RollForward>
 
     <!--
@@ -60,6 +64,17 @@
     <None Include="$(MSBuildThisFileDirectory)/LICENSE" Pack="true" PackagePath="/" Visible="false" />
     <None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>
+  <!--
+      This repo builds itself with its own (dependency-free) common files instead of the retired
+      Rocket.Surgery.MSBuild.* packages. Analyzers.props/.targets can't be used here: their package
+      versions come from common/Packages.props, which only exists inside a packed SDK.
+  -->
+  <PropertyGroup>
+    <RocketSurgerySourceLink>true</RocketSurgerySourceLink>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)src/common/ContinuousIntegration.props" />
+  <Import Project="$(MSBuildThisFileDirectory)src/common/GitVersion.props" />
+  <Import Project="$(MSBuildThisFileDirectory)src/common/SourceLink.props" />
   <ItemGroup>
     <ProjectCapability Include="DynamicDependentFile" />
     <ProjectCapability Include="DynamicFileNesting" />
