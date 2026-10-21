@@ -184,6 +184,6 @@ public class FeatureTests
 
     private static string[] ItemIdentities(JsonDocument evaluation, string itemType) =>
         evaluation.RootElement.TryGetProperty("Items", out var items) && items.TryGetProperty(itemType, out var values)
-            ? values.EnumerateArray().Select(z => z.GetProperty("Identity").GetString()!).ToArray()
+            ? [.. values.EnumerateArray().Select(z => z.GetProperty("Identity").GetString()!)]
             : [];
 }

@@ -20,7 +20,7 @@ namespace Rocket.Surgery.Sdk.Tests;
 public sealed class SdkTestProject : IDisposable
 {
     private readonly List<ProjectCreator> _projects = [];
-    private readonly Dictionary<string, string> _environment = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _environment = [with(StringComparer.Ordinal)];
     private readonly VerifySettings _settings;
 
     public string NugetArtifactsDirectory { get; }
@@ -93,18 +93,15 @@ public sealed class SdkTestProject : IDisposable
     public async Task<JsonDocument> Evaluate(string projectPath, IEnumerable<string> properties, IEnumerable<string>? items = null)
     {
         // MSBuild only prints JSON when more than one value is requested; a lone -getProperty prints the raw value.
-        var arguments = string.Join(' ', properties.Append("MSBuildProjectName").Select(z => $"-getProperty:{z}").Concat((items ?? []).Select(z => $"-getItem:{z}")));
+        var arguments = string.Join(' ', properties.Append("MSBuildProjectName").Select(z => $"-getProperty:{z}").Concat(( items ?? [] ).Select(z => $"-getItem:{z}")));
         var psi = CreateHermeticStartInfo($"msbuild \"{Path.Combine(Directory, projectPath)}\" {arguments}");
         using var proc = Process.Start(psi)!;
         var stdout = await proc.StandardOutput.ReadToEndAsync();
         var stderr = await proc.StandardError.ReadToEndAsync();
         await proc.WaitForExitAsync();
-        if (proc.ExitCode != 0)
-        {
-            throw new TUnitException($"dotnet msbuild failed for {projectPath}:\n{stdout}\n{stderr}");
-        }
-
-        return JsonDocument.Parse(stdout);
+        return  proc.ExitCode != 0 
+            ? throw new TUnitException($"dotnet msbuild failed for {projectPath}:\n{stdout}\n{stderr}")
+            :  JsonDocument.Parse(stdout);
     }
 
     public async Task DotnetPack(string projectPath)
