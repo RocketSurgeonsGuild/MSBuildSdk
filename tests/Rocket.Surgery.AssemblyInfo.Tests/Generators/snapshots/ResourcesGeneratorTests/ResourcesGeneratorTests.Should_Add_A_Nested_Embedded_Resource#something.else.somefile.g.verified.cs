@@ -67,9 +67,9 @@ partial class AssemblyInfo
                     static byte[] GetBytes(string relativePath)
                     {
                         using var stream = GetStream(relativePath);
-                        var bytes = new byte[stream.Length];
-                        stream.Read(bytes, 0, bytes.Length);
-                        return bytes;
+                        using var buffer = new MemoryStream();
+                        stream.CopyTo(buffer);
+                        return buffer.ToArray();
                     }
 
                     /// <summary>

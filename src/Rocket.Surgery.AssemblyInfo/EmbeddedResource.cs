@@ -26,10 +26,11 @@ public static class EmbeddedResource
     /// </summary>
     public static byte[] GetBytes(string relativePath)
     {
+        // Stream.Read may return fewer bytes than requested; copy the whole stream instead.
         using var stream = GetStream(relativePath);
-        var bytes = new byte[stream.Length];
-        stream.Read(bytes, 0, bytes.Length);
-        return bytes;
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        return buffer.ToArray();
     }
 
     /// <summary>

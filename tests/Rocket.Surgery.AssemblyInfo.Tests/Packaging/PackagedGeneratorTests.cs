@@ -9,7 +9,7 @@ namespace Rocket.Surgery.AssemblyInfo.Tests.Packaging;
 /// </summary>
 public class PackagedGeneratorTests
 {
-    /// <summary />
+    /// <summary>The roslyn4.6 assembly defines <paramref name="generatorTypeName" />.</summary>
     [Test]
     [Arguments("Rocket.Surgery.AssemblyInfo.ConstantsGenerator")]
     [Arguments("Rocket.Surgery.AssemblyInfo.ResourcesGenerator")]

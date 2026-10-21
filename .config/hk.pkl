@@ -1,5 +1,6 @@
-amends "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Config.pkl"
-import "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Builtins.pkl"
+amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
+
+import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
 
 // Solution the .NET formatters operate against.
 local solution = "MSBuildSdk.slnx"
@@ -72,7 +73,7 @@ local jbCleanupCode: Step = new Step {
   fix = "jb cleanupcode \(solution) --include=\"{{ files | replace(from=\" \", to=\";\") }}\""
 }
 
-local linters = new Mapping<String, Step> {
+steps {
   ["mise"] = Builtins.mise
   ["biome"] = Builtins.biome
   ["tombi"] = Builtins.tombi
@@ -95,17 +96,3 @@ local linters = new Mapping<String, Step> {
 }
 
 exclude = excludes
-hooks {
-  ["pre-commit"] {
-    fix = true
-    stash = "git"
-    steps = linters
-  }
-  ["fix"] {
-    fix = true
-    steps = linters
-  }
-  ["check"] {
-    steps = linters
-  }
-}
