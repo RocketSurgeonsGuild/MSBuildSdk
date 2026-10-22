@@ -6,7 +6,8 @@ namespace Rocket.Surgery.Sdk.Tests;
 public class FeatureTests
 {
     [Test]
-    public async Task CentralPackageManagement_Consumer_RestoresAndBuilds()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task CentralPackageManagement_Consumer_RestoresAndBuilds(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject(
@@ -15,7 +16,7 @@ public class FeatureTests
             .ItemPackageVersion("Polyfill", "10.11.2")
         ).AddProject(
             "lib/lib.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework)
             .ItemPackageReference("Polyfill")
         ).AddFile("lib/Class1.cs", """
             namespace Scratch;
@@ -28,11 +29,12 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task TestProjects_GetDumpAndMinimumExpectedTestArguments()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task TestProjects_GetDumpAndMinimumExpectedTestArguments(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: targetFramework)
                 .Property("ContinuousIntegrationBuild", "true")
                 .ItemPackageReference("TUnit", Config.TUnitVersion));
 
@@ -40,11 +42,12 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task ContinuousIntegrationBuild_GithubActions()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task ContinuousIntegrationBuild_GithubActions(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: targetFramework)
                 .Property("GITHUB_ACTIONS", "true")
                 .ItemPackageReference("TUnit", Config.TUnitVersion));
 
@@ -52,11 +55,12 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task ContinuousIntegrationBuild_AzureDevOps()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task ContinuousIntegrationBuild_AzureDevOps(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.AddProject("tests/tests.csproj",
-            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: "net10.0")
+            ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk.Test", targetFramework: targetFramework)
                 .Property("TF_BUILD", "true")
                 .ItemPackageReference("TUnit", Config.TUnitVersion));
 
@@ -64,14 +68,15 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task GitVersion_EnvironmentVariables_SetVersionProperties()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task GitVersion_EnvironmentVariables_SetVersionProperties(string targetFramework)
     {
         using var project = new SdkTestProject();
         project.WithEnvironment("GitVersion_Major", "1")
                .WithEnvironment("GitVersion_SemVer", "1.2.3-beta.4")
                .WithEnvironment("GitVersion_AssemblySemVer", "1.2.3.0")
                .WithEnvironment("GitVersion_InformationalVersion", "1.2.3-beta.4+Branch.main.Sha.abcdef")
-               .AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0"));
+               .AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework));
 
         using var evaluation = await project.Evaluate(
             "lib/lib.csproj",
@@ -96,10 +101,11 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task GitVersion_WithoutVariables_LeavesSdkDefaults()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task GitVersion_WithoutVariables_LeavesSdkDefaults(string targetFramework)
     {
         using var project = new SdkTestProject();
-        project.AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0"));
+        project.AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework));
 
         using var evaluation = await project.Evaluate("lib/lib.csproj", ["Version", "IncludeSourceRevisionInInformationalVersion"], ["AssemblyMetadata"]);
 
@@ -113,10 +119,11 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task Pack_ProducesSnupkg()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task Pack_ProducesSnupkg(string targetFramework)
     {
         using var project = new SdkTestProject();
-        project.AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0"))
+        project.AddProject("lib/lib.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework))
                .AddFile("lib/Class1.cs", """
                    namespace Scratch;
 
@@ -149,6 +156,7 @@ public class FeatureTests
 
     [Test]
     [Arguments("Rocket.Surgery.Sdk", "net10.0", false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", false)]
     [Arguments("Rocket.Surgery.Sdk.WindowsDesktop", "net10.0-windows", true)]
     public async Task EmbedUntrackedSources_ComesFromDotnetSdk(string sdk, string targetFramework, bool useWpf)
     {
@@ -165,12 +173,13 @@ public class FeatureTests
     }
 
     [Test]
-    public async Task JetBrainsAnnotations_AreInjected_AndCanBeDisabled()
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task JetBrainsAnnotations_AreInjected_AndCanBeDisabled(string targetFramework)
     {
         using var project = new SdkTestProject();
-        project.AddProject("on/on.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0"))
+        project.AddProject("on/on.csproj", ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework))
                .AddProject("off/off.csproj",
-                   ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: "net10.0")
+                   ProjectCreator.Templates.SdkCsproj(sdk: "Rocket.Surgery.Sdk", targetFramework: targetFramework)
                        .Property("RocketSurgeryJetBrainsAnnotations", "false"));
 
         using var on = await project.Evaluate("on/on.csproj", [], ["PackageReference", "Using"]);
@@ -180,6 +189,58 @@ public class FeatureTests
         await Assert.That(ItemIdentities(on, "Using")).Contains("JetBrains.Annotations");
         await Assert.That(ItemIdentities(off, "PackageReference")).DoesNotContain("JetBrains.Annotations.Sources");
         await Assert.That(ItemIdentities(off, "Using")).DoesNotContain("JetBrains.Annotations");
+    }
+
+    [Test]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", null, null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", null, null, true)]
+    [Arguments("Rocket.Surgery.Sdk", "net10.0", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0-browser", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk.BlazorWebAssembly", "net11.0", "true", null, null, false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", "RuntimeIdentifier", "browser-wasm", false)]
+    [Arguments("Rocket.Surgery.Sdk", "net11.0", "true", "UseRuntimeAsync", "false", false)]
+    public async Task RuntimeAsync_IsOptIn_AndOnlyForNet11NonBrowser(
+        string sdk, string targetFramework, string? runtimeAsync, string? extraProperty, string? extraValue, bool expected)
+    {
+        using var project = new SdkTestProject();
+        var csproj = ProjectCreator.Templates.SdkCsproj(sdk: sdk, targetFramework: targetFramework);
+        if (runtimeAsync is not null)
+        {
+            csproj.Property("RocketSurgeryRuntimeAsync", runtimeAsync);
+        }
+
+        if (extraProperty is not null)
+        {
+            csproj.Property(extraProperty, extraValue);
+        }
+
+        project.AddProject("lib/lib.csproj", csproj);
+
+        using var evaluation = await project.Evaluate("lib/lib.csproj", ["Features"]);
+
+        var features = evaluation.RootElement.GetProperty("Properties").GetProperty("Features").GetString()!.Split(';');
+        await Assert.That(features.Contains("runtime-async=on")).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task RuntimeAsync_OptIn_BuildsAndRuns_AcrossTargetFrameworks()
+    {
+        // A net10.0 build with the flag fails (SYSLIB5007/CA2252), so this proves the gate keeps it off there.
+        using var project = new SdkTestProject();
+        project.AddProject("app/app.csproj",
+                   ProjectCreator.Templates.SdkCsproj(targetFrameworks: TargetFrameworks.All(), sdk: "Rocket.Surgery.Sdk")
+                                 .Property("OutputType", "Exe")
+                                 .Property("IsSampleProject", "true")
+                                 .Property("RocketSurgeryRuntimeAsync", "true"))
+               .AddFile("app/Program.cs", """
+                   await System.Threading.Tasks.Task.Yield();
+                   System.Console.Write("ok");
+                   """);
+
+        foreach (var targetFramework in TargetFrameworks.All())
+        {
+            await Assert.That(await project.DotnetRun("app", targetFramework)).IsEqualTo("ok");
+        }
     }
 
     private static string[] ItemIdentities(JsonDocument evaluation, string itemType) =>

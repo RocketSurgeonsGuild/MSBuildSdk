@@ -1643,7 +1643,3 @@ dotnet_diagnostic.IDE0330.severity = warning
 # IDE1005: Use conditional delegate call
 dotnet_diagnostic.IDE1005.severity = warning
 # Options: csharp_style_conditional_delegate_call
-
-[*.g.cs]
-dotnet_diagnostic.CS0105.severity = none
-dotnet_diagnostic.CS8669.severity = none

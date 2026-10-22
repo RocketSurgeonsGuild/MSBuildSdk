@@ -4,27 +4,63 @@ using System.Xml.Linq;
 using DiffEngine;
 using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.Build.Utilities.ProjectCreation;
+using Task = System.Threading.Tasks.Task;
 
 namespace Rocket.Surgery.Sdk.Tests;
 
 internal static class Config
 {
     [Before(HookType.Assembly)]
-    public static void Setup(AssemblyHookContext context)
+    public static async Task Setup(AssemblyHookContext context)
     {
         MSBuildAssemblyResolver.Register();
         VerifierSettings.InitializePlugins();
 
         DiffRunner.Disabled = true;
         VerifierSettings.AddExtraSettings(z => z.Converters.Add(new ProjectEvaluationSerializer()));
+
+        // Scaffolded projects pin whichever SDK the repo resolves (global.json, with mise installing it).
+        var (exitCode, version, error) = await ProcessRunner.RunAndCaptureAsync(new("dotnet", "--version")
+        {
+            WorkingDirectory = RootDirectory,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        });
+        DotnetSdkVersion = exitCode == 0 ? version.Trim() : throw new InvalidOperationException($"dotnet --version failed:\n{error}");
     }
+
+    public static string DotnetSdkVersion { get; private set; } = "";
 
     public static string TUnitVersion => field ??= typeof(TestAttribute).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split('+')[0];
 
+    // Shared by every snapshot (so equal versions get equal names across tests) and written from parallel tests.
     private static readonly OrderedDictionary<string, string> _namedVersions = [];
+    private static readonly Lock _namedVersionsLock = new();
+
+    private static string NameVersion(string version)
+    {
+        lock (_namedVersionsLock)
+        {
+            if (!_namedVersions.TryGetValue(version, out _, out var index))
+            {
+                _namedVersions.TryAdd(version, version, out index);
+            }
+
+            return $"Version_{index}";
+        }
+    }
 
     private class ProjectEvaluationSerializer : WriteOnlyJsonConverter<ProjectEvaluation>
     {
+        // Every test runs once per target framework (see TargetFrameworks) against one shared snapshot.
+        private const string TargetFrameworkScrubbed = "{TargetFramework}";
+
+        // Implicit usings Microsoft.NET.Sdk itself adds only for newer target frameworks (System.Net.Http.Json
+        // from net11.0; Microsoft.NET.Sdk.Web has it on every framework). They aren't this SDK's and would
+        // split the shared snapshot.
+        private static readonly FrozenSet<string> TargetFrameworkImplicitUsings = ["System.Net.Http.Json"];
+
         private static readonly IReadOnlyCollection<string> PropertiesToWrite =
         [
             nameof(ProjectEvaluation.Configuration),
@@ -40,7 +76,7 @@ internal static class Config
             foreach (var item in PropertiesToWrite)
             {
                 writer.WritePropertyName(item);
-                writer.WriteValue(value.GetType().GetProperty(item)?.GetValue(value));
+                writer.WriteValue(item == nameof(ProjectEvaluation.TargetFramework) ? TargetFrameworkScrubbed : value.GetType().GetProperty(item)?.GetValue(value));
             }
 
             writer.WritePropertyName("Properties");
@@ -51,17 +87,15 @@ internal static class Config
                     )
             {
                 writer.WritePropertyName(property.Key);
+                if (property.Key == nameof(ProjectEvaluation.TargetFramework))
+                {
+                    writer.WriteValue(TargetFrameworkScrubbed);
+                    continue;
+                }
+
                 if (property.Key.StartsWith("RsgSdk_") && property.Key.EndsWith("_Version"))
                 {
-                    if (_namedVersions.TryGetValue(property.Value, out _, out var index))
-                    {
-                        writer.WriteValue($"Version_{index}");
-                    }
-                    else
-                    {
-                        _namedVersions.TryAdd(property.Value, property.Value, out index);
-                        writer.WriteValue($"Version_{index}");
-                    }
+                    writer.WriteValue(NameVersion(property.Value));
                     continue;
                 }
                 writer.WriteValue(property.Value);
@@ -101,15 +135,7 @@ internal static class Config
                     writer.WritePropertyName(value.Name);
                     if (value.Name == "Version")
                     {
-                        if (_namedVersions.TryGetValue(value.Value, out _, out var index))
-                        {
-                            writer.WriteValue($"Version_{index}");
-                        }
-                        else
-                        {
-                            _namedVersions.TryAdd(value.Value, $"Version_{_namedVersions.Count + 1}", out index);
-                            writer.WriteValue($"Version_{index}");
-                        }
+                        writer.WriteValue(NameVersion(value.Value));
                         continue;
                     }
 
@@ -163,7 +189,9 @@ internal static class Config
         {
             writer.WritePropertyName(name);
             writer.WriteStartArray();
-            foreach (var item in GetItemGroup(project, name).OrderBy(z => z.Name))
+            var isWebProject = project.GetProperties().TryGetValue("UsingMicrosoftNETSdkWeb", out var usingWeb) && usingWeb == "true";
+            // DistinctBy: on net11.0 Microsoft.NET.Sdk and Microsoft.NET.Sdk.Web both add System.Net.Http.Json.
+            foreach (var item in GetItemGroup(project, name).Where(z => isWebProject || !TargetFrameworkImplicitUsings.Contains(z.Name)).DistinctBy(z => z.Name).OrderBy(z => z.Name))
             {
                 writer.WriteValue(item.Name);
             }
@@ -193,15 +221,7 @@ internal static class Config
                     writer.WritePropertyName(value.Name);
                     if (value.Name == "Version")
                     {
-                        if (_namedVersions.TryGetValue(value.Value, out _, out var index))
-                        {
-                            writer.WriteValue($"Version_{index}");
-                        }
-                        else
-                        {
-                            _namedVersions.TryAdd(value.Value, $"Version_{_namedVersions.Count + 1}", out index);
-                            writer.WriteValue($"Version_{index}");
-                        }
+                        writer.WriteValue(NameVersion(value.Value));
                         continue;
                     }
 

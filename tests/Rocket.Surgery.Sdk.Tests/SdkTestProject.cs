@@ -54,9 +54,8 @@ public sealed class SdkTestProject : IDisposable
         // registrations each run against the original line rather than chaining.
         var tempPath = Path.GetTempPath();
         _settings.ScrubLinesWithReplace(z => z.Replace("/private" + tempPath, "{TempPath}").Replace(id, "{id}"));
-
-        var currentGlobalJson = JsonDocument.Parse(File.ReadAllText(Path.Combine(Config.RootDirectory, "global.json")));
-        var version = currentGlobalJson.RootElement.GetProperty("sdk").GetProperty("version").GetString();
+        // Every target framework shares one snapshot; the serializer scrubs TargetFramework itself.
+        _settings.IgnoreParametersForVerified();
 
         var globalJson = GlobalJsonCreator.Create(new DirectoryInfo(Directory));
         foreach (var sdkName in repository.Packages.Where(z => z.Id.StartsWith("Rocket.Surgery.Sdk", StringComparison.OrdinalIgnoreCase)))
@@ -67,7 +66,7 @@ public sealed class SdkTestProject : IDisposable
 
         globalJson
             .TestRunner("Microsoft.Testing.Platform")
-            .SdkVersion(version)
+            .SdkVersion(Config.DotnetSdkVersion)
             .SdkRollForward(GlobalJsonSdkRollForward.LatestMajor)
             .Save();
     }
@@ -101,11 +100,8 @@ public sealed class SdkTestProject : IDisposable
         // MSBuild only prints JSON when more than one value is requested; a lone -getProperty prints the raw value.
         var arguments = string.Join(' ', properties.Append("MSBuildProjectName").Select(z => $"-getProperty:{z}").Concat(( items ?? [] ).Select(z => $"-getItem:{z}")));
         var psi = CreateHermeticStartInfo($"msbuild \"{Path.Combine(Directory, projectPath)}\" {arguments}");
-        using var proc = Process.Start(psi)!;
-        var stdout = await proc.StandardOutput.ReadToEndAsync();
-        var stderr = await proc.StandardError.ReadToEndAsync();
-        await proc.WaitForExitAsync();
-        return proc.ExitCode != 0
+        var (exitCode, stdout, stderr) = await ProcessRunner.RunAndCaptureAsync(psi);
+        return exitCode != 0
             ? throw new TUnitException($"dotnet msbuild failed for {projectPath}:\n{stdout}\n{stderr}")
             : JsonDocument.Parse(stdout);
     }
@@ -118,15 +114,17 @@ public sealed class SdkTestProject : IDisposable
 
     /// <summary>
     /// Builds a project, then runs it and returns only the program's standard output (building
-    /// separately keeps compiler warnings out of it).
+    /// separately keeps compiler warnings out of it). Pass <paramref name="targetFramework"/> to pick
+    /// one framework of a multi-targeted project.
     /// </summary>
-    public async Task<string> DotnetRun(string projectPath)
+    public async Task<string> DotnetRun(string projectPath, string? targetFramework = null)
     {
-        var build = CreateHermeticStartInfo("build");
+        var framework = targetFramework is null ? "" : $" --framework {targetFramework}";
+        var build = CreateHermeticStartInfo("build" + framework);
         build.WorkingDirectory = Path.Combine(Directory, projectPath);
         await ProcessX.StartAsync(build).ToTask();
 
-        var run = CreateHermeticStartInfo("run --no-build");
+        var run = CreateHermeticStartInfo("run --no-build" + framework);
         run.WorkingDirectory = build.WorkingDirectory;
         var lines = await ProcessX.StartAsync(run).ToTask();
         return string.Join(Environment.NewLine, lines);
@@ -170,11 +168,8 @@ public sealed class SdkTestProject : IDisposable
 
             var psi = CreateHermeticStartInfo("build -bl");
             psi.WorkingDirectory = relativePath;
-            using var proc = Process.Start(psi)!;
-            var stdout = await proc.StandardOutput.ReadToEndAsync();
-            var stderr = await proc.StandardError.ReadToEndAsync();
-            await proc.WaitForExitAsync();
-            if (proc.ExitCode != 0)
+            var (exitCode, stdout, stderr) = await ProcessRunner.RunAndCaptureAsync(psi);
+            if (exitCode != 0)
             {
                 throw new TUnitException($"dotnet build failed for {relativePath}:\n{stdout}\n{stderr}");
             }
@@ -203,14 +198,14 @@ public sealed class SdkTestProject : IDisposable
     /// is evaluated exactly like a project on disk. Contract:
     /// dotnet/sdk src/Cli/dotnet/Commands/Run/Api/RunApiCommand.cs (release/10.0.3xx).
     /// </summary>
-    public async Task<SdkTestProject> AddFileBasedApp(string entryPointRelativePath, string fileContent, CancellationToken cancellationToken = default)
+    public async Task<SdkTestProject> AddFileBasedApp(string entryPointRelativePath, string targetFramework, string fileContent, CancellationToken cancellationToken = default)
     {
         AddFile(entryPointRelativePath, fileContent);
         var entryPointPath = Path.Combine(Directory, entryPointRelativePath);
         var (content, projectPath) = await GetVirtualProject(entryPointPath, cancellationToken);
         using var reader = XmlReader.Create(new StringReader(content));
         var root = ProjectRootElement.Create(reader);
-        root.Properties.Single(z => z.Name == "TargetFramework").Value = "net10.0";
+        root.Properties.Single(z => z.Name == "TargetFramework").Value = targetFramework;
         var ctro = typeof(ProjectCreator).GetTypeInfo().DeclaredConstructors.Single(z => z.GetParameters().Length == 2);
         var project = (ProjectCreator)ctro.Invoke([root, null]);
         // var project = (ProjectCreator)Activator.CreateInstance(typeof(ProjectCreator), BindingFlags.NonPublic | BindingFlags.CreateInstance, null, [root, null], null)!;
@@ -292,6 +287,9 @@ public sealed class SdkTestProject : IDisposable
             UseShellExecute = false,
         };
         psi.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
+        // Dozens of parallel scaffolded builds time out connecting to the MSBuild server; the CLI then falls
+        // back in-process but writes a warning to stderr, which ProcessX reports as a failure.
+        psi.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "false";
         // Keep scaffolded builds hermetic: CI env vars would flip ContinuousIntegrationBuild
         // (warnings-as-errors, coverage) and make results differ between local and CI runs.
         psi.Environment.Remove("GITHUB_ACTIONS");

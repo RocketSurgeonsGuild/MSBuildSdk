@@ -11,4 +11,9 @@
         <EmbeddedResource Include="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\*.sbntxt" LogicalName="Rocket.Surgery.AssemblyInfo.%(Filename)%(Extension)" />
     </ItemGroup>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+    <!-- Release tracking: the diagnostics live in Rocket.Surgery.AssemblyInfo's sources, so these builds track them with its files. -->
+    <ItemGroup>
+        <AdditionalFiles Remove="AnalyzerReleases.Shipped.md;AnalyzerReleases.Unshipped.md" />
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\AnalyzerReleases.Shipped.md;$(MSBuildThisFileDirectory)..\Rocket.Surgery.AssemblyInfo\AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
 </Project>

@@ -9,6 +9,8 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+// Type names come from file and folder names (e.g. swagger-ui.css -> css), so they can be all lowercase.
+#pragma warning disable CS8981
 using _A = System.Reflection.Assembly;
 using System;
 using System.IO;

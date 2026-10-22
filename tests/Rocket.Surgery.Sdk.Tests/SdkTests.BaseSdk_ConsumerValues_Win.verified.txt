@@ -3,7 +3,7 @@
     Name: lib.csproj,
     Configuration: Debug,
     Platform: AnyCPU,
-    TargetFramework: net10.0,
+    TargetFramework: {TargetFramework},
     Properties: {
       _RocketSurgeryCommonPropsImported: true,
       _RocketSurgeryCommonTargetsImported: true,
@@ -32,6 +32,7 @@
       NuGetAuditLevel: moderate,
       NuGetAuditMode: all,
       Nullable: disable,
+      OutputType: Library,
       PackageOutputPath: bin\Debug/,
       PackageVersion: 1.0.0,
       ProduceReferenceAssembly: true,
@@ -79,7 +80,7 @@
       RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_8,
       RsgSdk_RoslynatorRefactorings_Version: Version_8,
       SymbolPackageFormat: snupkg,
-      TargetFramework: net10.0,
+      TargetFramework: {TargetFramework},
       TreatWarningsAsErrors: false,
       Version: 1.0.0,
       WarningsAsErrors: ;RS0017;NU1605;SYSLIB0011

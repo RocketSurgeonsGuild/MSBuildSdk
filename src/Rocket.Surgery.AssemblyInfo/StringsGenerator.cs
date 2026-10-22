@@ -7,9 +7,13 @@ using Scriban;
 
 namespace Rocket.Surgery.AssemblyInfo;
 
+/// <summary>
+/// Generates <c>AssemblyInfo.Strings</c> from the project's <c>.resx</c> files.
+/// </summary>
 [Generator(LanguageNames.CSharp)]
 public class StringsGenerator : IIncrementalGenerator
 {
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Read the AssemblyInfoNamespace property or default to null

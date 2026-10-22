@@ -34,7 +34,7 @@ Pin the version once in `global.json`:
 ```xml
 <Project Sdk="Rocket.Surgery.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     </PropertyGroup>
 </Project>
 ```
@@ -54,7 +54,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 ## What you get
 
 - `LangVersion=preview`, `Features=strict`, `Nullable=enable`, `ImplicitUsings=enable`, `ProduceReferenceAssembly=true` (unless it's a single-file app)
-- Default `TargetFramework` (the SDK's newest, e.g. `net10.0`) — a csproj can be a single line
+- No default `TargetFramework`: a csproj sets `TargetFramework` or `TargetFrameworks` itself, as with Microsoft.NET.Sdk
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
 - Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK, individually overridable — see [Injected package versions](#injected-package-versions) below)
@@ -72,11 +72,12 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - `JetBrains.Annotations.Sources` injected (internal source, never exported) with a global `using JetBrains.Annotations;`
 - Publish/copy defaults: `PublishRepositoryUrl`, `PublishDocumentationFile`, `PublishReferencesDocumentationFiles`, `PublishReferencesSymbols`, `CopyDebugSymbolFilesFromPackages`, `CopyDocumentationFilesFromPackages` all default `true`
 - Applied editorconfigs/BannedSymbols are embedded into `-bl` binary logs for diagnosability
+- Opt-in [runtime async](#runtime-async) for net11.0+ builds (`RocketSurgeryRuntimeAsync=true`)
 
 ### Test projects
 
-Use `Rocket.Surgery.Sdk` (or `Rocket.Surgery.Sdk.Test`, which also sets `IsTestProject=true` and
-`UseMicrosoftTestingPlatformRunner=true` up front), then just reference your framework. Detection
+Use `Rocket.Surgery.Sdk` (or `Rocket.Surgery.Sdk.Test`, which also sets `IsTestProject=true`,
+`UseMicrosoftTestingPlatformRunner=true` and `OutputType=Exe` up front), then just reference your framework. Detection
 is automatic, based on your `PackageReference`s:
 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
@@ -143,6 +144,7 @@ opt-out property beyond `RocketSurgeryEditorConfig`.
 | `RocketSurgerySourceLink` | `true` | gates the Source Link section below |
 | `RocketSurgerySingleFileApp` | `true` | only when `FileBasedProgram=true` (file-based `dotnet run app.cs` apps) |
 | `IsTestProject` / `UseMicrosoftTestingPlatformRunner` | `true` | only for `Rocket.Surgery.Sdk.Test` |
+| `OutputType` | `Exe` | only for `Rocket.Surgery.Sdk.Test`, so restore fetches the apphost pack for older target frameworks |
 | `PublishRepositoryUrl` | `true` | — |
 | `PublishDocumentationFile` | `true` | — |
 | `PublishReferencesDocumentationFiles` | `true` | — |
@@ -161,9 +163,27 @@ documentation, and `RS0017` public-API tracking; see `src/common/Common.targets`
 | `GenerateSBOM` | `true` | CI build **and** `IsPackable=true` (opt out with `GenerateSBOM=false`) |
 | `EnablePackageValidation` | `true` | only once `PackageValidationBaselineVersion` is set to your last released version |
 | `IsPackable` | `false` | test projects and sample projects |
+| `Features` | appends `runtime-async=on` | only when `RocketSurgeryRuntimeAsync=true`, see [Runtime async](#runtime-async) |
 
 Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSurgerySdkName` is set
 (one fixed value per SDK package, e.g. `Rocket.Surgery.Sdk.Web`) and `GenerateAssemblyInfo=true`.
+
+### Runtime async
+
+.NET 11 can run `async` methods on the runtime itself instead of compiler-generated state machines.
+It is off by default; set `RocketSurgeryRuntimeAsync=true` (in the project, `Directory.Build.props`,
+or on the command line) to turn on `<Features>runtime-async=on</Features>` for:
+
+- target frameworks compatible with `net11.0`. The flag breaks net10.0 builds (SYSLIB5007, CA2252),
+  so a `net10.0;net11.0` project only gets it on its net11.0 build;
+- non-browser targets only. `net11.0-browser` targets and anything built for the `browser-wasm`
+  runtime identifier (Blazor WebAssembly included) never get it: Mono WebAssembly can't run
+  runtime-async IL and fails with `InvalidProgramException`.
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `RocketSurgeryRuntimeAsync` | *(unset/off)* | opt-in: append `runtime-async=on` to `Features` for eligible target frameworks |
+| `UseRuntimeAsync` | *(unset)* | set to `false` to opt a single project back out once the switch is on |
 
 ### Source Link (`src/common/SourceLink.props`, only when `RocketSurgerySourceLink=true`)
 
@@ -278,6 +298,17 @@ Renamed switches:
 | `RSGBannedApisEnabled` | `RocketSurgeryBannedApiAnalyzers` |
 | `RSGBannedNewtonsoftJsonEnabled` | `RocketSurgeryBannedNewtonsoftJson` |
 | `RSGSingleFileApp` | `RocketSurgerySingleFileApp` |
+
+## Contributing
+
+Run `mise install` before building: it installs the .NET SDK and the extra .NET 10 runtime that the net10.0 tests run on (`.config/mise.toml`). `global.json` pins the same SDK, so a `dotnet` outside mise fails fast unless that SDK is installed.
+
+> [!NOTE]
+> On macOS, the first `mise install` of a new .NET SDK can overwrite the shared `~/.local/share/mise/dotnet-root/dotnet` host in place, and macOS then kills every `dotnet` command (SIGKILL). Replace the host with a fresh copy to fix it:
+>
+> ```bash
+> cd ~/.local/share/mise/dotnet-root && cp -p dotnet dotnet.fresh && mv -f dotnet.fresh dotnet
+> ```
 
 ## Versioning & releases
 

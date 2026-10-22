@@ -13,9 +13,23 @@ using Scriban;
 #pragma warning disable RS1035
 namespace Rocket.Surgery.AssemblyInfo;
 
+/// <summary>
+/// Generates <c>AssemblyInfo.Constants</c> from <c>@(Constant)</c> and <c>@(FileConstant)</c> items.
+/// </summary>
 [Generator]
 public class ConstantsGenerator : IIncrementalGenerator
 {
+    // A static readonly field so analyzer release tracking (AnalyzerReleases.*.md) sees it.
+    private static readonly DiagnosticDescriptor NamespaceRequiresCSharp10 = new(
+        "RSAI002",
+        "AssemblyInfoNamespace requires C# 10.0 or higher",
+        "AssemblyInfoNamespace requires C# 10.0 or higher",
+        "AssemblyInfo",
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var files = context.AdditionalTextsProvider
@@ -83,10 +97,7 @@ public class ConstantsGenerator : IIncrementalGenerator
         if (!string.IsNullOrWhiteSpace(ns) &&
             cs.LanguageVersion < LanguageVersion.CSharp10)
         {
-            spc.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor("RSAI002", "AssemblyInfoNamespace requires C# 10.0 or higher",
-                    "AssemblyInfoNamespace requires C# 10.0 or higher", "AssemblyInfo", DiagnosticSeverity.Error, true),
-                Location.None));
+            spc.ReportDiagnostic(Diagnostic.Create(NamespaceRequiresCSharp10, Location.None));
             return;
         }
 
