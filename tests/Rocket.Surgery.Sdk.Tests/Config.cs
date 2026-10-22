@@ -19,7 +19,7 @@ internal static class Config
         DiffRunner.Disabled = true;
         VerifierSettings.AddExtraSettings(z => z.Converters.Add(new ProjectEvaluationSerializer()));
 
-        // global.json doesn't pin the SDK (mise does), so scaffolded projects pin whichever SDK the repo resolves.
+        // Scaffolded projects pin whichever SDK the repo resolves (global.json, with mise installing it).
         var (exitCode, version, error) = await ProcessRunner.RunAndCaptureAsync(new("dotnet", "--version")
         {
             WorkingDirectory = RootDirectory,
