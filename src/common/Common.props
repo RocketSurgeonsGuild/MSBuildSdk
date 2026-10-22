@@ -16,10 +16,16 @@
     <RocketSurgerySingleFileApp Condition="'$(RocketSurgerySingleFileApp)' == '' and '$(FileBasedProgram)' == 'true'">true</RocketSurgerySingleFileApp>
   </PropertyGroup>
 
-    <!-- Rocket.Surgery.Sdk.Test marks projects as test projects up front. -->
+    <!--
+        Rocket.Surgery.Sdk.Test marks projects as test projects up front. Microsoft.Testing.Platform test
+        projects are executables; frameworks such as TUnit set OutputType=Exe from package props, which
+        don't exist yet during the first restore, so restore skips the apphost pack. That breaks the build
+        for an older target framework (net10.0 on the .NET 11 SDK) whose apphost isn't bundled with the SDK.
+    -->
     <PropertyGroup Condition="'$(RocketSurgerySdkName)' == 'Rocket.Surgery.Sdk.Test'">
         <IsTestProject Condition="'$(IsTestProject)' == ''">true</IsTestProject>
         <UseMicrosoftTestingPlatformRunner Condition="'$(UseMicrosoftTestingPlatformRunner)' == ''">true</UseMicrosoftTestingPlatformRunner>
+        <OutputType Condition="'$(OutputType)' == ''">Exe</OutputType>
     </PropertyGroup>
 
   <PropertyGroup Label="SingleFileApp" Condition="'$(RocketSurgerySingleFileApp)' == 'true'">

@@ -76,8 +76,8 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 
 ### Test projects
 
-Use `Rocket.Surgery.Sdk` (or `Rocket.Surgery.Sdk.Test`, which also sets `IsTestProject=true` and
-`UseMicrosoftTestingPlatformRunner=true` up front), then just reference your framework. Detection
+Use `Rocket.Surgery.Sdk` (or `Rocket.Surgery.Sdk.Test`, which also sets `IsTestProject=true`,
+`UseMicrosoftTestingPlatformRunner=true` and `OutputType=Exe` up front), then just reference your framework. Detection
 is automatic, based on your `PackageReference`s:
 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
@@ -144,6 +144,7 @@ opt-out property beyond `RocketSurgeryEditorConfig`.
 | `RocketSurgerySourceLink` | `true` | gates the Source Link section below |
 | `RocketSurgerySingleFileApp` | `true` | only when `FileBasedProgram=true` (file-based `dotnet run app.cs` apps) |
 | `IsTestProject` / `UseMicrosoftTestingPlatformRunner` | `true` | only for `Rocket.Surgery.Sdk.Test` |
+| `OutputType` | `Exe` | only for `Rocket.Surgery.Sdk.Test`, so restore fetches the apphost pack for older target frameworks |
 | `PublishRepositoryUrl` | `true` | — |
 | `PublishDocumentationFile` | `true` | — |
 | `PublishReferencesDocumentationFiles` | `true` | — |

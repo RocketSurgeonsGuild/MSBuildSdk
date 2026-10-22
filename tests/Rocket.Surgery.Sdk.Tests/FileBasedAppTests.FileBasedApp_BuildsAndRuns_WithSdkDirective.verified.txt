@@ -33,6 +33,7 @@
       NuGetAuditLevel: moderate,
       NuGetAuditMode: all,
       Nullable: enable,
+      OutputType: Exe,
       PackageOutputPath: artifacts/app,
       PackageVersion: 1.0.0,
       ProduceReferenceAssembly: true,
