@@ -10,9 +10,13 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 #pragma warning disable RS1035
 namespace Rocket.Surgery.AssemblyInfo;
 
+/// <summary>
+/// Generates <c>AssemblyInfo.Resources</c> accessors for <c>@(EmbeddedResource)</c> items.
+/// </summary>
 [Generator]
 public class ResourcesGenerator : IIncrementalGenerator
 {
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var files = context.AdditionalTextsProvider

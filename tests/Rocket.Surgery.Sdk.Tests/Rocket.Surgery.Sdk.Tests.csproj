@@ -13,6 +13,12 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <!--
+            MSB3277: Microsoft.Build's reference assembly was built against NuGet.Frameworks 7.10, which isn't on
+            nuget.org, while MSBuild.StructuredLogger.Utils brings NuGet.Frameworks 6.11. Microsoft.Build is
+            compile-only here; at test time it loads from the running .NET SDK (see below), so the mismatch is moot.
+        -->
+        <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     </PropertyGroup>
     <ItemGroup>
     <PackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" />
