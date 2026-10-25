@@ -11,7 +11,7 @@
     <GlobalPackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="5.0.1" />
     <GlobalPackageReference Include="Roslynator.CodeFixes" Version="5.0.1" />
     <GlobalPackageReference Include="Roslynator.Refactorings" Version="5.0.1" />
-    <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100-rc.2.26504.105" />
+    <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100-rc.3.26522.148" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
     <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.13" />
     <GlobalPackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1" />
