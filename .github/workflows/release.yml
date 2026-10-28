@@ -13,7 +13,7 @@ on:
 
 permissions:
   contents: write # push tag + create release
-  id-token: write # NuGet trusted publishing (OIDC)
+  actions: write # dispatch build.yml on the new tag
 
 concurrency:
   group: release
@@ -22,7 +22,6 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment: nuget
     steps:
       - uses: actions/checkout@v7
         with:
@@ -62,6 +61,16 @@ jobs:
         run: |
           git tag "v$VERSION"
           git push origin "v$VERSION"
-          gh release create "v$VERSION" artifacts/*.nupkg \
-            --title "v$VERSION" \
-            --generate-notes
+
+          # draft-release.yml keeps a draft for the next version; publish it rather than adding a second release.
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            gh release edit "v$VERSION" --draft=false --latest
+          else
+            gh release create "v$VERSION" --verify-tag \
+              --title "v$VERSION" \
+              --generate-notes
+          fi
+
+          # A tag pushed with GITHUB_TOKEN doesn't start a workflow run, but a dispatch does: build.yml builds the tag
+          # and its publish job pushes the packages to nuget.org.
+          gh workflow run build.yml --ref "v$VERSION"
