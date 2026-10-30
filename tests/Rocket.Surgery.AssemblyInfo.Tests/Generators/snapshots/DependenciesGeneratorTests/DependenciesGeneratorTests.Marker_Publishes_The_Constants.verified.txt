@@ -1,0 +1,139 @@
+﻿{
+  FileOptions: {
+    Attributes.Version: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: 1.2.3.0
+    },
+    Count: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: int,
+      build_metadata.Constant.Value: 123
+    },
+    Enabled: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: bool,
+      build_metadata.Constant.Value: true
+    },
+    Git.Branch: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: main
+    },
+    Git.Root: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: /home/runner/work/alpha
+    },
+    Greeting: {
+      build_metadata.Constant.Comment: dropped, only values travel,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: Hello
+    },
+    Metadata.Flavor: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: Spicy
+    },
+    Multi: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: first`nsecond`nthird
+    },
+    Project.AssemblyName: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: Acme.Alpha
+    },
+    Quoted: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: say "hi" \ done
+    },
+    Ratio: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: double,
+      build_metadata.Constant.Value: 1.5
+    },
+    Some.Nested.Value: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: Custom.Root,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: deep
+    },
+    Unsupported: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: TimeSpan,
+      build_metadata.Constant.Value: TimeSpan.Zero
+    },
+    Wide: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: Int64,
+      build_metadata.Constant.Value: 123
+    },
+    WithSemiColon: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: |A|B|C|
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.DependenciesMarkerGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoMarker: true
+  },
+  References: [
+    mscorlib.dll,
+    netstandard.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

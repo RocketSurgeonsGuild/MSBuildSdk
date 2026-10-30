@@ -1,0 +1,24 @@
+﻿{
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.DependenciesGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoDependencies: true
+  },
+  References: [
+    1st.Place.dll,
+    class.dll,
+    Dependencies.dll,
+    Foo_Bar.dll,
+    Foo-Bar.dll,
+    Foo.Bar.dll,
+    Git.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

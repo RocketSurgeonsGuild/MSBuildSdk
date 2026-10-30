@@ -21,6 +21,8 @@ public class PackagedGeneratorTests
         "Rocket.Surgery.AssemblyInfo.ConstantsGenerator",
         "Rocket.Surgery.AssemblyInfo.ResourcesGenerator",
         "Rocket.Surgery.AssemblyInfo.StringsGenerator",
+        "Rocket.Surgery.AssemblyInfo.DependenciesMarkerGenerator",
+        "Rocket.Surgery.AssemblyInfo.DependenciesGenerator",
     ];
 
     public static IEnumerable<(string GeneratorAssembly, string GeneratorTypeName)> GeneratorCases() =>

@@ -352,3 +352,80 @@ Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyName
 `AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`
 → `AssemblyInfoGitComment`; the generated class `MyAssembly` → `AssemblyInfo`, and its `Info` area →
 `Attributes`. Code that uses `MyAssembly.*` has to be updated.
+
+### Dependencies: typed information about referenced assemblies
+
+An application can read the same typed information about every assembly it references that also uses
+AssemblyInfo, with no reflection. A library publishes a marker, and the application's generator finds the
+marked references (transitive ones included) and emits a typed copy of each one under
+`AssemblyInfo.Dependencies`, one class per assembly. It is opt-in on both sides:
+
+| Property | Set by | Purpose |
+| --- | --- | --- |
+| `AssemblyInfoMarker` | the library | `true` publishes this assembly's AssemblyInfo as the marker |
+| `AssemblyInfoDependencies` | the application | `true` generates `AssemblyInfo.Dependencies.*` from the marked references |
+
+```xml
+<!-- Acme.Widgets.csproj -->
+<PropertyGroup>
+  <AssemblyInfoMarker>true</AssemblyInfoMarker>
+</PropertyGroup>
+
+<!-- the application, which references Acme.Widgets directly or through another library -->
+<PropertyGroup>
+  <AssemblyInfoDependencies>true</AssemblyInfoDependencies>
+</PropertyGroup>
+```
+
+```csharp
+Console.WriteLine(AssemblyInfo.Dependencies.Acme_Widgets.Attributes.Version);
+Console.WriteLine(AssemblyInfo.Dependencies.Acme_Widgets.Git.Commit);
+Console.WriteLine(AssemblyInfo.Dependencies.Acme_Widgets.Metadata.Flavor);
+```
+
+What you get:
+
+- The areas of the producer's own `AssemblyInfo`: `Attributes`, `Metadata`, `Project`, `Git` and `Constants`,
+  and any other `Root` its `@(Constant)` items use. `Git.Root` is left out, because it is a path on the build
+  machine. `Resources` and `Strings` are not copied: they read from the producing assembly when they run, so
+  there is nothing to copy at compile time. Constants are copied when their `Type` is `string`, `bool` or a number
+  (`int`, `long`, `double`, `decimal` and so on); a number has to be a plain literal. Newlines in published values
+  are LF on every platform, so the same source gives the same assembly.
+- References without the marker are ignored, and so is everything when `AssemblyInfoDependencies` is not `true`.
+  Marked references come from whatever the compiler is given, which includes the transitive references of
+  project and package references; a dependency a package does not pass on to its consumers is not given.
+- A class is named after the assembly with everything that is not valid in an identifier replaced by `_`
+  (`Acme.Widgets` is `Acme_Widgets`), following the same rules as `Constants`. When two assemblies would get the
+  same name, or a name is a keyword or would sit inside a class of the same name, the first one in (name, version)
+  order keeps it and the others get `_2`, `_3` and so on.
+- `AssemblyInfoNamespace` and `AssemblyInfoVisibility` apply to `Dependencies` as they do to the rest of
+  `AssemblyInfo`. `Dependencies` is a reserved root: do not use it as the `Root` of your own constants.
+- `RSAI004` (warning) names a marked reference that publishes a format this version cannot read (it was built with
+  a newer Rocket.Surgery.AssemblyInfo); it is left out until you update the package.
+
+The marker publishes values, so anything in the constants of a marked assembly is in its public assembly
+metadata. Do not put secrets in them.
+
+#### How the data travels
+
+The information has to get from the producing assembly to the generator of the consuming project. Two ways were
+considered:
+
+1. **Read the producer's generated `AssemblyInfo` through compiler symbols.** Nothing extra is stored, but the
+   generated class is internal unless `AssemblyInfoVisibility=public`, and reference assemblies leave out internal
+   types (`ProduceReferenceAssembly` is on by default), so a project reference sees nothing. With
+   `AssemblyInfoVisibility=public` the members are properties, whose values are code and not metadata, so
+   symbols cannot give the value. It would work for some constants in some configurations.
+2. **Embed the data in the marker.** The producer's generator publishes its constants as
+   `System.Reflection.AssemblyMetadata` attributes: one marker (`Rocket.Surgery.AssemblyInfo` = the format
+   version) and one `Rocket.Surgery.AssemblyInfo:<Root>.<Name>` attribute per value (`type:value`).
+   Assembly-level attributes of a framework type are kept in reference assemblies, whatever the visibility, and
+   the consuming generator reads them with `IAssemblySymbol.GetAttributes()`, on every Roslyn release the package
+   supports. The cost is the same values stored twice in the producer (as a constant and as an attribute).
+
+The marker was chosen: it is the only one that works for every visibility and for both project references and
+packages, and the attribute is also the "marker" the consumer needs to tell marked assemblies from the rest. The
+consumer never trusts the text it reads: strings are escaped and numbers are parsed and written again, never pasted.
+
+The generators ship once per Roslyn release (`analyzers/dotnet/roslyn5.0`, `5.3`, `5.6` and `5.9`); the SDK tests
+build the whole scenario with the compiler of each of those releases.
