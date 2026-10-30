@@ -5,4 +5,5 @@
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Resources.targets" />
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Git.targets" />
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Constants.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Dependencies.targets" />
 </Project>

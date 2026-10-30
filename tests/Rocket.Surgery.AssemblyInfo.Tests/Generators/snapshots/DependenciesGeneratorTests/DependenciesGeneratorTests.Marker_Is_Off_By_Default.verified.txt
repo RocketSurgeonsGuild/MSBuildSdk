@@ -1,0 +1,24 @@
+﻿{
+  FileOptions: {
+    Git.Branch: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: main
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.DependenciesMarkerGenerator: []
+  },
+  References: [
+    mscorlib.dll,
+    netstandard.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

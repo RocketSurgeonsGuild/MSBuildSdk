@@ -1,0 +1,12 @@
+<Project>
+    <!--
+        Opt-in, off by default:
+          AssemblyInfoMarker=true        this assembly publishes its AssemblyInfo, as assembly metadata attributes
+          AssemblyInfoDependencies=true  AssemblyInfo.Dependencies.* holds the AssemblyInfo of every referenced marked assembly
+        Both are decided by the generators, which read them as build properties.
+    -->
+    <ItemGroup>
+        <CompilerVisibleProperty Include="AssemblyInfoMarker" />
+        <CompilerVisibleProperty Include="AssemblyInfoDependencies" />
+    </ItemGroup>
+</Project>

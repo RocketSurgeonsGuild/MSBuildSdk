@@ -1,0 +1,59 @@
+﻿{
+  FileOptions: {
+    Attributes.Version: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: 1.2.3.0
+    },
+    Count: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: int,
+      build_metadata.Constant.Value: 7
+    },
+    Git.Branch: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: main
+    },
+    Metadata.Flavor: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: .,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: Spicy
+    },
+    Multi: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: first`nsecond
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.DependenciesMarkerGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoMarker: true
+  },
+  References: [
+    mscorlib.dll,
+    netstandard.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

@@ -1,0 +1,19 @@
+﻿{
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.DependenciesGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoDependencies: true
+  },
+  References: [
+    Acme.Alpha.dll,
+    Acme.Future.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Core.dll,
+    System.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}
