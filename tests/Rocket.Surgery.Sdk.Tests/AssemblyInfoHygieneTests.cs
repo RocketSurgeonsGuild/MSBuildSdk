@@ -1,3 +1,5 @@
+using TUnit.Assertions.Enums;
+
 namespace Rocket.Surgery.Sdk.Tests;
 
 /// <summary>
@@ -49,6 +51,90 @@ public class AssemblyInfoHygieneTests
         var newline = Environment.NewLine.Replace("\r", "<CR>").Replace("\n", "<LF>");
         var multiline = $"first{newline}second";
         await Assert.That(output).IsEqualTo($"{multiline}|{multiline}|{multiline}|C:\\new\\node");
+    }
+
+    /// <summary>
+    /// Each row is a Constant: the Value attribute as it is written in the project (MSBuild wants $ as %24 and % as
+    /// %25 there) and the text the generated constant must hold. Whatever the characters, the value has to get from the
+    /// project through the targets, the editorconfig file and the generator unchanged, newlines aside, which
+    /// become the build machine's own newline.
+    /// </summary>
+    private static readonly (string Name, string Attribute, string Expected)[] SpecialCharacters =
+    [
+        ("Apostrophe", "Rocket's guild", "Rocket's guild"),
+        ("DoubleQuotes", "say &quot;hi&quot; and 'bye'", "say \"hi\" and 'bye'"),
+        ("Dollar", "cost %245 and %24(Foo) and %24%24", "cost $5 and $(Foo) and $$"),
+        ("Percent", "100%25 and %2541", "100% and %41"),
+        ("Semicolons", "A;B;C", "A;B;C"),
+        ("Padded", " it's; padded ", " it's; padded "),
+        ("PercentInWrapped", "50%2541; done", "50%41; done"),
+        ("Tab", "a&#9;b", "a\tb"),
+        // The compiler splits the editorconfig file at these as well as at CR and LF, so they count as newlines.
+        ("UnicodeLineBreaks", "a&#x85;b&#x2028;c&#x2029;d", $"a{Environment.NewLine}b{Environment.NewLine}c{Environment.NewLine}d"),
+        ("Backslashes", @"C:\new\node and \\server\share", @"C:\new\node and \\server\share"),
+        ("Multiline", "first&#10;it's second&#13;&#10;third", $"first{Environment.NewLine}it's second{Environment.NewLine}third"),
+        ("NonAscii", "héllo ✓ 😀 日本語", "héllo ✓ 😀 日本語"),
+        ("Backticks", "run `npm` now", "run `npm` now"),
+        ("BacktickN", "a`nb", "a`nb"),
+        ("DoubledBackticks", "a``b ``n", "a``b ``n"),
+        ("BacktickThenNewline", "x`&#10;y", $"x`{Environment.NewLine}y"),
+        ("TrailingBacktick", "end`", "end`"),
+        ("Everything", "It's &quot;all&quot;; %24(X) 100%25 C:\\new`n&#10;é ✓`", $"It's \"all\"; $(X) 100% C:\\new`n{Environment.NewLine}é ✓`"),
+    ];
+
+    [Test]
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task Special_Characters_RoundTrip_In_Constant_Values(string targetFramework)
+    {
+        using var project = new SdkTestProject();
+        project.AddFile("app/app.csproj", Csproj(
+                        project,
+                        targetFramework,
+                        // Description reaches the generated code twice more: as Project.Description and as Attributes.Description.
+                        properties: """
+                            <Description>Rocket's guild</Description>
+                            <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+                            <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/generated</CompilerGeneratedFilesOutputPath>
+                            """,
+                        items: string.Join(
+                            Environment.NewLine,
+                            SpecialCharacters
+                               .Select(row => $"""<Constant Include="{row.Name}" Value="{row.Attribute}" />""")
+                               .Append("""<ProjectProperty Include="Description" />""")
+                               .Append("""<Constant Include="Documented" Value="value" Comment="Don't break &amp; don't `n escape" />""")
+                        )
+                    ))
+               .AddFile("app/Program.cs", $$"""
+                   static string Show(string value) => string.Concat(value.Select(c => c switch
+                   {
+                       '\r' => "<CR>",
+                       '\n' => "<LF>",
+                       < ' ' or > '~' => "\\u" + ((int)c).ToString("X4"),
+                       _ => c.ToString(),
+                   }));
+                   {{string.Join(Environment.NewLine, SpecialCharacters.Select(row => $"""System.Console.WriteLine("{row.Name}=" + Show(AssemblyInfo.Constants.{row.Name}));"""))}}
+                   System.Console.WriteLine("ProjectDescription=" + Show(AssemblyInfo.Project.Description));
+                   System.Console.WriteLine("AttributeDescription=" + Show(AssemblyInfo.Attributes.Description));
+                   """);
+
+        var output = await project.DotnetRun("app");
+
+        var expected = SpecialCharacters
+                      .Select(row => $"{row.Name}={Show(row.Expected)}")
+                      .Append("ProjectDescription=Rocket's guild")
+                      .Append("AttributeDescription=Rocket's guild");
+        await Assert.That(output.Split(Environment.NewLine)).IsEquivalentTo(expected, CollectionOrdering.Matching);
+
+        // A comment goes through the same path, and into the XML doc comment.
+        var generatedDocumented = Path.Combine(
+            project.Directory,
+            "app",
+            "generated",
+            "Rocket.Surgery.AssemblyInfo",
+            "Rocket.Surgery.AssemblyInfo.ConstantsGenerator",
+            "Constants.Documented.g.cs"
+        );
+        await Assert.That(File.ReadAllText(generatedDocumented)).Contains("/// Don't break &amp; don't `n escape");
     }
 
     [Test]
@@ -117,6 +203,16 @@ public class AssemblyInfoHygieneTests
         );
         await Assert.That(File.ReadAllText(generatedGit)).Contains("/// Provides access project-defined constants.");
     }
+
+    // The same escaping the Program.cs above uses, so the expected text can be compared line by line.
+    private static string Show(string value) =>
+        string.Concat(value.Select(c => c switch
+        {
+            '\r' => "<CR>",
+            '\n' => "<LF>",
+            < ' ' or > '~' => "\\u" + ((int)c).ToString("X4"),
+            _ => c.ToString(),
+        }));
 
     // Written by hand rather than with ProjectCreator: the newlines in Constant values have to be exactly the
     // character references above, and ProjectCreator would normalize them when it saves.
