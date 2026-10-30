@@ -1,5 +1,4 @@
 using System.Globalization;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -26,6 +25,8 @@ internal static class DependencyLiteral
 
                 literal = boolean ? "true" : "false";
                 return true;
+            default:
+                break;
         }
 
         if (!TryReadNumber(text, out var number, out var digits, out var negative))
@@ -92,10 +93,9 @@ internal static class DependencyLiteral
             return false;
 
         digits = literal.Token.Text.Replace("_", "");
-        if (number is float or double or decimal)
-            digits = digits.TrimEnd('f', 'F', 'd', 'D', 'm', 'M');
-        else
-            digits = Convert.ToDecimal(number, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+        digits = number is float or double or decimal 
+            ?  digits.TrimEnd('f', 'F', 'd', 'D', 'm', 'M') 
+            :  Convert.ToDecimal(number, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
 
         return true;
     }
@@ -104,7 +104,7 @@ internal static class DependencyLiteral
     {
         literal = null;
         // Only whole numbers: 1.5 is not an int.
-        if (number is not (int or uint or long or ulong))
+        if (number is not ( int or uint or long or ulong ))
             return false;
 
         var value = Convert.ToDecimal(number, CultureInfo.InvariantCulture);

@@ -16,7 +16,7 @@ namespace Rocket.Surgery.AssemblyInfo;
 public class DependenciesMarkerGenerator : IIncrementalGenerator
 {
     // Local paths of the build machine: they say nothing about the assembly, and publishing them undoes deterministic builds.
-    private static readonly HashSet<string> ExcludedPaths = new(StringComparer.Ordinal) { "Git.Root", };
+    private static readonly HashSet<string> ExcludedPaths = [with(StringComparer.Ordinal), "Git.Root",];
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -66,7 +66,7 @@ public class DependenciesMarkerGenerator : IIncrementalGenerator
             new MarkerModel(
                 SymbolDisplay.FormatLiteral(DependencyMarker.MarkerKey, quote: true),
                 SymbolDisplay.FormatLiteral(DependencyMarker.FormatVersion, quote: true),
-                [..entries.Values]
+                [.. entries.Values]
             ),
             member => member.Name
         );

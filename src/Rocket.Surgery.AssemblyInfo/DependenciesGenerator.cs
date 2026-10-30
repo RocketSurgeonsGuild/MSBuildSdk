@@ -41,7 +41,7 @@ public class DependenciesGenerator : IIncrementalGenerator
         // so typing in the project does not regenerate anything unless a reference changed.
         var dependencies = context.CompilationProvider
                                   .Combine(settings.Select((x, _) => x.enabled))
-                                  .Select((x, ct) => x.Right ? DependencyInfo.Read(x.Left, ct) : ImmutableArray<DependencyInfo>.Empty)
+                                  .Select((x, ct) => x.Right ? DependencyInfo.Read(x.Left, ct) : [])
                                   .WithComparer(DependencyInfoListComparer.Instance);
 
         context.RegisterSourceOutput(dependencies.Combine(settings).Combine(context.ParseOptionsProvider), Generate);

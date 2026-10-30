@@ -10,27 +10,20 @@ internal sealed record DependencyEntry(string Path, string Type, string Value);
 /// A referenced assembly that carries the marker, as the generator reads it. Equatable, so the incremental
 /// pipeline does not regenerate when a compilation changes but the references' markers do not.
 /// </summary>
-internal sealed class DependencyInfo : IEquatable<DependencyInfo>
+internal sealed class DependencyInfo(string name, string version, string format, ImmutableArray<DependencyEntry> entries) : IEquatable<DependencyInfo>
 {
-    public DependencyInfo(string name, string version, string format, ImmutableArray<DependencyEntry> entries)
-    {
-        Name = name;
-        Version = version;
-        Format = format;
-        Entries = entries;
-    }
 
     /// <summary>The assembly's simple name.</summary>
-    public string Name { get; }
+    public string Name { get; } = name;
 
     /// <summary>The assembly's version, which only tells apart two references with the same name.</summary>
-    public string Version { get; }
+    public string Version { get; } = version;
 
     /// <summary>The marker's value: the format version the producer wrote.</summary>
-    public string Format { get; }
+    public string Format { get; } = format;
 
     /// <summary>The published values, ordered by path. Empty when <see cref="Format" /> is not one this build reads.</summary>
-    public ImmutableArray<DependencyEntry> Entries { get; }
+    public ImmutableArray<DependencyEntry> Entries { get; } = entries;
 
     public bool IsSupportedFormat => Format == DependencyMarker.FormatVersion;
 
@@ -112,7 +105,7 @@ internal sealed class DependencyInfo : IEquatable<DependencyInfo>
             identity.Version.ToString(),
             format,
             // A format this build can not read is reported, not guessed at.
-            format == DependencyMarker.FormatVersion ? ImmutableArray.CreateRange(entries.Values) : ImmutableArray<DependencyEntry>.Empty
+            format == DependencyMarker.FormatVersion ? [.. entries.Values] : []
         );
     }
 
