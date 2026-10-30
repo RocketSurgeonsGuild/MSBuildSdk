@@ -1,0 +1,30 @@
+﻿{
+  FileOptions: {
+    Path: {
+      build_metadata.Constant.Comment: ,
+      build_metadata.Constant.ItemType: Constant,
+      build_metadata.Constant.Root: ,
+      build_metadata.Constant.RootComment: ,
+      build_metadata.Constant.Type: ,
+      build_metadata.Constant.Value: C:\new\node
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.ConstantsGenerator: [],
+    Rocket.Surgery.AssemblyInfo.ResourcesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.StringsGenerator: []
+  },
+  References: [
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Collections.Concurrent.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Linq.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

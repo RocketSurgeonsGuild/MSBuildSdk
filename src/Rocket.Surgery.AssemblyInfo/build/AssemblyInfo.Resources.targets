@@ -23,12 +23,20 @@
 
     <Target Name="PrepareEmbeddedResources" DependsOnTargets="PrepareResourceNames" />
 
-    <Target Name="_InjectStringsResxAdditionalFiles" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun" DependsOnTargets="CreateManifestResourceNames">
+    <Target
+        Name="_InjectStringsResxAdditionalFiles"
+        BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+        DependsOnTargets="SplitResourcesByCulture;CreateManifestResourceNames"
+    >
         <ItemGroup>
-            <!-- Only primary .resx files (no culture suffix like .fr.resx) with AssemblyInfoStrings=true or auto-detected -->
+            <!--
+                Only primary .resx files, i.e. not culture variants like Strings.fr.resx. The SDK decides what is a
+                culture variant (AssignCulture sets WithCulture), so a dot in the name alone, as in Foo.Bar.resx, does not
+                exclude a file.
+            -->
             <_ResxStrings
                 Include="@(EmbeddedResource)"
-                Condition="'%(Extension)' == '.resx' AND !$([System.String]::new('%(Filename)').Contains('.')) AND '%(ManifestResourceName)' != ''"
+                Condition="'%(Extension)' == '.resx' AND '%(WithCulture)' != 'true' AND '%(ManifestResourceName)' != ''"
             />
             <_ResxStrings>
                 <AssemblyInfoStrings>true</AssemblyInfoStrings>
