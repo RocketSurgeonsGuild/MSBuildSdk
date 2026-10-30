@@ -1,0 +1,29 @@
+﻿{
+  FileOptions: {
+    Strings/Messages.resx: {
+      build_metadata.ResxCode.AssemblyInfoStrings: true,
+      build_metadata.ResxCode.ManifestResourceName: Test.Strings.Messages
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.ConstantsGenerator: [],
+    Rocket.Surgery.AssemblyInfo.ResourcesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.StringsGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoVisibility: public
+  },
+  References: [
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Collections.Concurrent.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Linq.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

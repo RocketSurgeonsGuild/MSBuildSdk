@@ -343,8 +343,10 @@ exposes build-time information as a generated `AssemblyInfo` class. It is not in
 | `AssemblyInfoGitComment` | *(none)* | XML doc comment for the `Git` area |
 
 Diagnostics: `RSAI001` (warning) when no Source Link provider is available, so `Git.*` values may be
-empty; `RSAI002` (error) when `AssemblyInfoNamespace` is set on C# older than 10. These were `TA001`
-and `MA002` in MyAssembly, so update any suppressions.
+empty; `RSAI002` (error) when `AssemblyInfoNamespace` is set on C# older than 10; `RSAI003` (warning)
+when a `.resx` string mixes named (`{name}`) and indexed (`{0}`) format arguments, because no
+`AssemblyInfo.Strings` member is generated for it. `RSAI001` and `RSAI002` were `TA001` and `MA002` in
+MyAssembly, so update any suppressions.
 
 Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyNamespace` →
 `AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`

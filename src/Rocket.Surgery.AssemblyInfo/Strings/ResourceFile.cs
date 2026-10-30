@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Rocket.Surgery.AssemblyInfo.Strings;
@@ -20,7 +21,7 @@ internal static class ResourceFile
     public static ResourceArea LoadText(string resourceText, string rootArea)
     {
         return Load(
-            XDocument.Parse(resourceText)
+            XDocument.Parse(resourceText, LoadOptions.SetLineInfo)
                      .Root!.Elements("data")
                      .Where(e => e.Attribute("type") == null),
             rootArea);
@@ -48,15 +49,17 @@ internal static class ResourceFile
                          .Replace(">", "&gt;")
                          .Replace("\r\n", " ").Replace("\n", " ");
 
+            var line = element is IXmlLineInfo lineInfo && lineInfo.HasLineInfo() ? lineInfo.LineNumber : 0;
+
             var areaParts = id.Split(["_"], StringSplitOptions.RemoveEmptyEntries);
             if (areaParts.Length <= 1)
             {
-                root.Values.Add(GetValue(id, nameAttribute, valueElement) with { Comment = comment });
+                root.Values.Add(GetValue(id, nameAttribute, valueElement) with { Comment = comment, Line = line });
             }
             else
             {
                 var area = GetArea(root, areaParts.Take(areaParts.Length - 1));
-                var value = GetValue(areaParts.Skip(areaParts.Length - 1).First(), nameAttribute, valueElement) with { Comment = comment };
+                var value = GetValue(areaParts.Skip(areaParts.Length - 1).First(), nameAttribute, valueElement) with { Comment = comment, Line = line };
 
                 area.Values.Add(value);
             }
