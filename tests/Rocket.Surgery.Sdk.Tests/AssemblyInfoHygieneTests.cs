@@ -210,7 +210,7 @@ public class AssemblyInfoHygieneTests
         {
             '\r' => "<CR>",
             '\n' => "<LF>",
-            < ' ' or > '~' => "\\u" + ((int)c).ToString("X4"),
+            < ' ' or > '~' => "\\u" + ( (int)c ).ToString("X4"),
             _ => c.ToString(),
         }));
 

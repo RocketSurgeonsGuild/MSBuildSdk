@@ -39,6 +39,8 @@ internal static class ConstantText
                         result.Append(Environment.NewLine);
                         i++;
                         continue;
+                    default:
+                        break;
                 }
             }
 
