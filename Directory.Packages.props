@@ -16,7 +16,7 @@
     <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.13" />
     <GlobalPackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1" />
     <GlobalPackageReference Include="xunit.analyzers" Version="2.2.0" />
-    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.171" />
+    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.172" />
   </ItemGroup>
   <ItemGroup>
     <!-- Rocket.Surgery.AssemblyInfo (src/) and its tests -->
