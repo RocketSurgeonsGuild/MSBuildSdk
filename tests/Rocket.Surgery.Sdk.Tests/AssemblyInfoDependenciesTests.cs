@@ -208,9 +208,9 @@ public class AssemblyInfoDependenciesTests
     {
         var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
         var sdk = dotnetRoot is null ? null : Path.Combine(dotnetRoot, "sdk", Config.DotnetSdkVersion);
-        return  sdk is null || !Directory.Exists(sdk) 
+        return sdk is null || !Directory.Exists(sdk)
             ? project
-            :  project
+            : project
               .WithEnvironment("MSBUILD_EXE_PATH", Path.Combine(sdk, "MSBuild.dll"))
               .WithEnvironment("MSBuildExtensionsPath", sdk)
               .WithEnvironment("MSBuildSDKsPath", Path.Combine(sdk, "Sdks"));

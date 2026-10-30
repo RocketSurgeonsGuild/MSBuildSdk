@@ -93,9 +93,9 @@ internal static class DependencyLiteral
             return false;
 
         digits = literal.Token.Text.Replace("_", "");
-        digits = number is float or double or decimal 
-            ?  digits.TrimEnd('f', 'F', 'd', 'D', 'm', 'M') 
-            :  Convert.ToDecimal(number, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+        digits = number is float or double or decimal
+            ? digits.TrimEnd('f', 'F', 'd', 'D', 'm', 'M')
+            : Convert.ToDecimal(number, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
 
         return true;
     }
