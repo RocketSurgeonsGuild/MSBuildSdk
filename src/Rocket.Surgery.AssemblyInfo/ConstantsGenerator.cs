@@ -102,11 +102,11 @@ public class ConstantsGenerator : IIncrementalGenerator
         }
 
         comment = comment is not null
-            ? "/// " + string.Join(Environment.NewLine + "/// ", new XText(comment).ToString().Trim().Replace("`n", Environment.NewLine).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None))
-            : "/// " + string.Join(Environment.NewLine + "/// ", new XText(value).ToString().Replace("`n", Environment.NewLine).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None));
+            ? "/// " + string.Join(Environment.NewLine + "/// ", ConstantText.Unescape(new XText(comment).ToString().Trim()).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None))
+            : "/// " + string.Join(Environment.NewLine + "/// ", ConstantText.Unescape(new XText(value).ToString()).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None));
 
-        // Revert normalization of newlines performed in MSBuild to workaround the limitation in editorconfig.
-        var rootArea = Area.Load([new(name, value.Replace("`n", Environment.NewLine).Trim(['\r', '\n']), comment, type ?? "string"),], root, rootComment);
+        // Revert the escaping of newlines and backticks performed in MSBuild to workaround the limitation in editorconfig.
+        var rootArea = Area.Load([new(name, ConstantText.Unescape(value).Trim(['\r', '\n']), comment, type ?? "string"),], root, rootComment);
         // For now, we only support C# though
         const string file = "Constants.sbntxt";
         var template = Template.Parse(EmbeddedResource.GetContent(file), file);
