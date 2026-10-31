@@ -38,7 +38,7 @@
       build_metadata.Constant.Root: .,
       build_metadata.Constant.RootComment: ,
       build_metadata.Constant.Type: ,
-      build_metadata.Constant.Value: /home/runner/work/alpha
+      build_metadata.Constant.Value: /build-agent/work/alpha
     },
     Greeting: {
       build_metadata.Constant.Comment: dropped, only values travel,

@@ -19,7 +19,9 @@ public class DependenciesGeneratorTests : GeneratorTest
     {
         var result = await Producer()
                           .AddConstant("Git.Branch", "main", root: ".")
-                          .AddConstant("Git.Root", "/home/runner/work/alpha", root: ".")
+                          // A path no machine has as its home: Verify scrubs the running user's profile directory out of the
+                          // snapshot, so a value under /home/runner or /Users/<name> snapshots differently on the machine that has it.
+                          .AddConstant("Git.Root", "/build-agent/work/alpha", root: ".")
                           .AddConstant("Attributes.Version", "1.2.3.0", root: ".")
                           .AddConstant("Metadata.Flavor", "Spicy", root: ".")
                           .AddConstant("Project.AssemblyName", "Acme.Alpha", root: ".")
@@ -248,6 +250,31 @@ public class DependenciesGeneratorTests : GeneratorTest
 
         var git = result.Assembly!.GetType("AssemblyInfo+Dependencies+Acme_Alpha+Git", throwOnError: true)!;
         await Assert.That(git.GetField("Branch")!.GetValue(null)).IsEqualTo("release/1.x");
+    }
+
+    [Test]
+    public async Task Dependencies_Round_Trip_Backticks_The_Way_The_Targets_Escape_Them()
+    {
+        // AssemblyInfo.Constants.targets doubles every backtick and turns a newline into a backtick and n, so the marker has
+        // to read them back left to right, as ConstantsGenerator does: ``npm`` is `npm`, ``n is a backtick and an n, `n is a newline.
+        var alpha = await Producer()
+                         .AddConstant("Ticks", "run ``npm`` now")
+                         .AddConstant("Both", "literal ``n then newline`nnext")
+                         .AddConstant("TickThenNewline", "a```nb")
+                         .Build()
+                         .GenerateAsync();
+
+        var result = await Consumer(alpha.Publish("Acme.Alpha"))
+                          .Build()
+                          .GenerateAsync();
+
+        result.AssertCompilationWasSuccessful();
+        var constants = result.Assembly!.GetType("AssemblyInfo+Dependencies+Acme_Alpha+Constants", throwOnError: true)!;
+        object? Value(string name) => constants.GetField(name)!.GetValue(null);
+
+        await Assert.That(Value("Ticks")).IsEqualTo("run `npm` now");
+        await Assert.That(Value("Both")).IsEqualTo("literal `n then newline\nnext");
+        await Assert.That(Value("TickThenNewline")).IsEqualTo("a`\nb");
     }
 
     // A producing project: the marker generator, switched on, over the constants the targets would hand it.

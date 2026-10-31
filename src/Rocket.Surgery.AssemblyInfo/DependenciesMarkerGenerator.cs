@@ -55,7 +55,7 @@ public class DependenciesMarkerGenerator : IIncrementalGenerator
                 new MarkerEntry(
                     SymbolDisplay.FormatLiteral(DependencyMarker.EntryPrefix + path, quote: true),
                     // LF whatever the build machine uses: the attribute is part of the assembly, and the same source should give the same assembly.
-                    SymbolDisplay.FormatLiteral(DependencyMarker.Encode(canonicalType, ConstantItems.RestoreNewlines(value).Replace("\r\n", "\n")), quote: true)
+                    SymbolDisplay.FormatLiteral(DependencyMarker.Encode(canonicalType, ConstantItems.RestoreValue(value).Replace("\r\n", "\n")), quote: true)
                 )
             );
         }

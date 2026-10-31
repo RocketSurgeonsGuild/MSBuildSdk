@@ -348,6 +348,14 @@ when a `.resx` string mixes named (`{name}`) and indexed (`{0}`) format argument
 `AssemblyInfo.Strings` member is generated for it. `RSAI001` and `RSAI002` were `TA001` and `MA002` in
 MyAssembly, so update any suppressions.
 
+Values and comments of `@(Constant)` items (and so of `Project`, `Metadata`, `Attributes` and `Git`) can hold
+any text: quotes and apostrophes, `$`, `%`, `;`, backslashes and non-ASCII characters come out exactly as
+written. Every kind of line break (CRLF, LF, CR and the Unicode line and paragraph separators) becomes the
+build machine's newline, and the newlines at the very start and end of a value are dropped. To get the text
+across, the package's build targets compile a small inline MSBuild task (`RoslynCodeTaskFactory`, which the
+dotnet CLI and Visual Studio both provide), which adds about a quarter of a second to the first project built
+in an MSBuild process and a few milliseconds to each project after it.
+
 Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyNamespace` →
 `AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`
 → `AssemblyInfoGitComment`; the generated class `MyAssembly` → `AssemblyInfo`, and its `Info` area →

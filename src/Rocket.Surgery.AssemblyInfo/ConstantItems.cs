@@ -11,7 +11,8 @@ internal static class ConstantItems
 {
     /// <summary>
     /// The <c>@(Constant)</c> items, with the root resolved (<c>Root="."</c> takes the first part of the name) and the
-    /// value unwrapped. Newlines in the value are still the <c>`n</c> marker; see <see cref="RestoreNewlines" />.
+    /// value unwrapped. The value is still as AssemblyInfo.Constants.targets escaped it (backticks doubled, newlines as
+    /// <c>`n</c>); see <see cref="RestoreValue" />.
     /// </summary>
     public static IncrementalValuesProvider<(string name, string value, string? type, string? comment, string root, string rootComment)> Read(
         IncrementalGeneratorInitializationContext context
@@ -59,8 +60,8 @@ internal static class ConstantItems
                 });
 
     /// <summary>
-    /// Revert the newline normalization performed in MSBuild to work around the limitation in editorconfig
-    /// (AssemblyInfo.Constants.targets turns every newline into the <c>`n</c> marker).
+    /// Revert the escaping performed in MSBuild to work around the limitation in editorconfig (see
+    /// <see cref="ConstantText.Unescape" />), without the newlines around the value.
     /// </summary>
-    public static string RestoreNewlines(string value) => value.Replace("`n", Environment.NewLine).Trim(['\r', '\n']);
+    public static string RestoreValue(string value) => ConstantText.Unescape(value).Trim(['\r', '\n']);
 }
