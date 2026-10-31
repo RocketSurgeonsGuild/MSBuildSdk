@@ -72,6 +72,21 @@ public static class GeneratorTestContextBuilderExtensions
               .AddOption(text, "build_metadata.EmbeddedResource.Comment", comment ?? "");
     }
 
+    /// <summary>
+    /// An @(EmbeddedResource) item some other package added, by absolute path: AssemblyInfo.Resources.targets
+    /// passes it on like the rest but only its item definitions apply, so Value (and the rest) is empty.
+    /// </summary>
+    public static GeneratorTestContextBuilder AddForeignEmbeddedResource(this GeneratorTestContextBuilder builder, string path)
+    {
+        var text = new EmptyAdditionalText(path);
+        return builder
+              .AddAdditionalTexts(text)
+              .AddOption(text, "build_metadata.EmbeddedResource.AssemblyInfoResource", "true")
+              .AddOption(text, "build_metadata.EmbeddedResource.Value", "")
+              .AddOption(text, "build_metadata.EmbeddedResource.Kind", "")
+              .AddOption(text, "build_metadata.EmbeddedResource.Comment", "");
+    }
+
     private sealed class EmptyAdditionalText(string path) : AdditionalText
     {
         public override string Path { get; } = path;

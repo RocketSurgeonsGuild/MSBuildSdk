@@ -11,6 +11,12 @@
         <CompilerVisibleItemMetadata Include="ResxCode" MetadataName="ManifestResourceName" />
     </ItemGroup>
 
+    <!--
+        _InjectResourcesAdditionalFiles batches on these without qualifying them. An item definition applies to every
+        EmbeddedResource of the project, wherever and however it is added (including by another package's targets
+        and from other item types), so this is what keeps those from failing the build with MSB4096. Do not remove one
+        of these while a target here still reads it.
+    -->
     <ItemDefinitionGroup>
         <EmbeddedResource>
             <Link />
@@ -33,10 +39,15 @@
                 Only primary .resx files, i.e. not culture variants like Strings.fr.resx. The SDK decides what is a
                 culture variant (AssignCulture sets WithCulture), so a dot in the name alone, as in Foo.Bar.resx, does not
                 exclude a file.
+
+                WithCulture and ManifestResourceName are set by the SDK on the resources it has already processed, and
+                the item definitions above cannot default them (they would hide the real values). Another package can
+                add an EmbeddedResource after that, which then has neither. The metadata is qualified so that item is
+                skipped: unqualified, the build fails with MSB4096 on it.
             -->
             <_ResxStrings
                 Include="@(EmbeddedResource)"
-                Condition="'%(Extension)' == '.resx' AND '%(WithCulture)' != 'true' AND '%(ManifestResourceName)' != ''"
+                Condition="'%(EmbeddedResource.Extension)' == '.resx' AND '%(EmbeddedResource.WithCulture)' != 'true' AND '%(EmbeddedResource.ManifestResourceName)' != ''"
             />
             <_ResxStrings>
                 <AssemblyInfoStrings>true</AssemblyInfoStrings>
