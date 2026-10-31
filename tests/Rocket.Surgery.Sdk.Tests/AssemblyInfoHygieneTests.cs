@@ -204,6 +204,97 @@ public class AssemblyInfoHygieneTests
         await Assert.That(File.ReadAllText(generatedGit)).Contains("/// Provides access project-defined constants.");
     }
 
+    /// <summary>
+    /// Other packages add EmbeddedResource items of their own. Joinery.Dovetail, for one, adds its appsettings files by
+    /// absolute path, copied from another item type, with metadata of its own (LogicalName, DovetailConfiguration, ...).
+    /// A rooted path takes no part in the Area and FileExtension step of the resource targets, so such an item only has
+    /// what the targets' item definitions give it, and the build must not trip over that (MSB4096).
+    /// </summary>
+    [Test]
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task Embedded_Resources_From_Other_Packages_Do_Not_Break_The_Build(string targetFramework)
+    {
+        using var project = new SdkTestProject();
+        AddResourceApp(
+            project,
+            targetFramework,
+            items: """
+                <ForeignSettings Include="$(MSBuildProjectDirectory)/appsettings.json" />
+                <EmbeddedResource Include="@(ForeignSettings)" LogicalName="app.json" DovetailConfiguration="true" Visible="false" />
+                <EmbeddedResource Include="$(MSBuildProjectDirectory)/appsettings.yaml" LogicalName="app.yaml" DovetailConfiguration="true" Visible="false" />
+                <FileConstant Include="$(MSBuildProjectDirectory)/appsettings.yaml" />
+                """
+        );
+
+        var output = await project.DotnetRun("app");
+
+        await Assert.That(output).IsEqualTo(ResourceAppOutput);
+    }
+
+    /// <summary>
+    /// The same, for items another package adds once the SDK has already named the resources (which is when it sets
+    /// WithCulture and ManifestResourceName on the ones it knows). Nothing defaults those two, so the strings step has
+    /// to cope with an EmbeddedResource that has neither.
+    /// </summary>
+    [Test]
+    [MethodDataSource(typeof(TargetFrameworks), nameof(TargetFrameworks.All))]
+    public async Task Embedded_Resources_Added_After_The_Sdk_Named_Them_Do_Not_Break_The_Build(string targetFramework)
+    {
+        using var project = new SdkTestProject();
+        AddResourceApp(
+            project,
+            targetFramework,
+            targets: """
+                <Target Name="AddForeignResources" AfterTargets="CreateManifestResourceNames">
+                  <ItemGroup>
+                    <EmbeddedResource Include="$(MSBuildProjectDirectory)/appsettings.json" LogicalName="app.json" DovetailConfiguration="true" Visible="false" />
+                    <EmbeddedResource Include="Content/Late.txt" />
+                    <FileConstant Include="$(MSBuildProjectDirectory)/appsettings.yaml" />
+                  </ItemGroup>
+                </Target>
+                """
+        );
+        project.AddFile("app/Content/Late.txt", "late");
+
+        var output = await project.DotnetRun("app");
+
+        // The resources that carry the metadata come out as they always do; the late ones are not part of the output.
+        await Assert.That(output).IsEqualTo(ResourceAppOutput);
+    }
+
+    // What Program.cs of the app AddResourceApp writes: a text resource and a string from a .resx, both ordinary.
+    private const string ResourceAppOutput = "hello|Hi from resx";
+
+    private static void AddResourceApp(SdkTestProject project, string targetFramework, string items = "", string targets = "") =>
+        project.AddFile("app/app.csproj", Csproj(
+                        project,
+                        targetFramework,
+                        items: $"""
+                            <EmbeddedResource Include="Content/Hello.txt" Kind="Text" Comment="Greeting" />
+                            {items}
+                            """,
+                        targets: targets
+                    ))
+               .AddFile("app/Program.cs", """
+                   System.Console.Write(AssemblyInfo.Resources.Content.Hello.Text + "|" + AssemblyInfo.Strings.Greeting);
+                   """)
+               .AddFile("app/Content/Hello.txt", "hello")
+               .AddFile("app/Strings.resx", Resx("Greeting", "Hi from resx"))
+               .AddFile("app/appsettings.json", "{}")
+               .AddFile("app/appsettings.yaml", "a: 1");
+
+    private static string Resx(string name, string value) =>
+        $"""
+        <?xml version="1.0" encoding="utf-8"?>
+        <root>
+          <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+          <resheader name="version"><value>2.0</value></resheader>
+          <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+          <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+          <data name="{name}" xml:space="preserve"><value>{value}</value></data>
+        </root>
+        """;
+
     // The same escaping the Program.cs above uses, so the expected text can be compared line by line.
     private static string Show(string value) =>
         string.Concat(value.Select(c => c switch
@@ -216,7 +307,7 @@ public class AssemblyInfoHygieneTests
 
     // Written by hand rather than with ProjectCreator: the newlines in Constant values have to be exactly the
     // character references above, and ProjectCreator would normalize them when it saves.
-    private static string Csproj(SdkTestProject project, string targetFramework, string properties = "", string items = "") =>
+    private static string Csproj(SdkTestProject project, string targetFramework, string properties = "", string items = "", string targets = "") =>
         $$"""
         <Project Sdk="Rocket.Surgery.Sdk">
           <PropertyGroup>
@@ -229,6 +320,7 @@ public class AssemblyInfoHygieneTests
             <PackageReference Include="Rocket.Surgery.AssemblyInfo" Version="{{project.PackageVersion("Rocket.Surgery.AssemblyInfo")}}" PrivateAssets="all" />
             {{items}}
           </ItemGroup>
+          {{targets}}
         </Project>
         """;
 }

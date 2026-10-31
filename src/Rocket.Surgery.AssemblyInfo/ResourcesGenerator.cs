@@ -24,7 +24,9 @@ public class ResourcesGenerator : IIncrementalGenerator
             .Where(x =>
                 x.Right.GetOptions(x.Left).TryGetValue("build_metadata.EmbeddedResource.AssemblyInfoResource", out var assemblyResource)
                 && bool.TryParse(assemblyResource, out var isAssemblyResource) && isAssemblyResource)
-            .Where(x => x.Right.GetOptions(x.Left).TryGetValue("build_metadata.EmbeddedResource.Value", out var value) && value != null)
+            // The targets give every EmbeddedResource an empty Value and fill it for the ones they can name, so an item
+            // another package added by absolute path arrives with an empty one. It has no accessor to generate.
+            .Where(x => x.Right.GetOptions(x.Left).TryGetValue("build_metadata.EmbeddedResource.Value", out var value) && !string.IsNullOrEmpty(value))
             .Select((x, ct) =>
             {
                 x.Right.GetOptions(x.Left).TryGetValue("build_metadata.EmbeddedResource.Value", out var resourceName);

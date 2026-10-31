@@ -8,6 +8,11 @@
         <CompilerVisibleItemMetadata Include="Constant" MetadataName="RootComment" />
     </ItemGroup>
 
+    <!--
+        PrepareConstants batches on these without qualifying them. An item definition applies to every FileConstant of
+        the project, wherever and however it is added, so this is what keeps items an extender adds from failing the
+        build with MSB4096. Do not remove one of these while a target here still reads it.
+    -->
     <ItemDefinitionGroup>
         <FileConstant>
             <Link />
