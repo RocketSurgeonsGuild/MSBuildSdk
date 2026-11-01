@@ -63,7 +63,7 @@ internal static class ManifestJson
     /// <exception cref="FormatException">The text is not JSON, or not shaped like a manifest.</exception>
     public static AssemblyInfoManifest Read(string text)
     {
-        var root = Parse(text) as Dictionary<string, object?> ?? throw new FormatException("The manifest is not a JSON object.");
+        var root = Parse(text) as Dictionary<string, object> ?? throw new FormatException("The manifest is not a JSON object.");
 
         var manifest = new AssemblyInfoManifest
         {
@@ -77,7 +77,7 @@ internal static class ManifestJson
 
         foreach (var item in GetArray(root, "constants"))
         {
-            var constant = item as Dictionary<string, object?> ?? throw new FormatException("A constant is not a JSON object.");
+            var constant = item as Dictionary<string, object> ?? throw new FormatException("A constant is not a JSON object.");
             manifest.Constants.Add(
                 new(
                     GetString(constant, "path") ?? throw new FormatException("A constant has no path."),
@@ -90,7 +90,7 @@ internal static class ManifestJson
 
         foreach (var item in GetArray(root, "resources"))
         {
-            var resource = item as Dictionary<string, object?> ?? throw new FormatException("A resource is not a JSON object.");
+            var resource = item as Dictionary<string, object> ?? throw new FormatException("A resource is not a JSON object.");
             manifest.Resources.Add(
                 new(
                     GetString(resource, "path") ?? throw new FormatException("A resource has no path."),
@@ -104,7 +104,7 @@ internal static class ManifestJson
         return manifest;
     }
 
-    internal static string? GetString(Dictionary<string, object?> json, string name) =>
+    internal static string GetString(Dictionary<string, object> json, string name) =>
         json.TryGetValue(name, out var value) switch
         {
             false => null,
@@ -113,10 +113,10 @@ internal static class ManifestJson
             _ => throw new FormatException($"'{name}' is not a string."),
         };
 
-    internal static List<object?> GetArray(Dictionary<string, object?> json, string name) =>
+    internal static List<object> GetArray(Dictionary<string, object> json, string name) =>
         !json.TryGetValue(name, out var value) || value is null
             ? []
-            : value as List<object?> ?? throw new FormatException($"'{name}' is not an array.");
+            : value as List<object> ?? throw new FormatException($"'{name}' is not an array.");
 
     internal static StringBuilder AppendMember(StringBuilder json, string indent, string name, string value)
     {
@@ -129,7 +129,7 @@ internal static class ManifestJson
 
     /// <summary>Parses JSON into dictionaries, lists, strings, doubles, booleans and nulls.</summary>
     /// <exception cref="FormatException">The text is not JSON.</exception>
-    internal static object? Parse(string text) => new Reader(text).ReadDocument();
+    internal static object Parse(string text) => new Reader(text).ReadDocument();
 
     private static void AppendString(StringBuilder json, string value)
     {
@@ -155,7 +155,7 @@ internal static class ManifestJson
                     break;
                 // Line and paragraph separators are valid in JSON strings, but not in some readers' idea of a line.
                 case < ' ' or (char)0x2028 or (char)0x2029:
-                    json.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
+                    json.Append("\\u").Append(( (int)c ).ToString("x4", CultureInfo.InvariantCulture));
                     break;
                 default:
                     json.Append(c);
@@ -173,7 +173,7 @@ internal static class ManifestJson
     {
         private int _position;
 
-        public object? ReadDocument()
+        public object ReadDocument()
         {
             // A UTF-8 byte order mark read as text.
             if (text.Length > 0 && text[0] == (char)0xFEFF)
@@ -184,9 +184,11 @@ internal static class ManifestJson
             return _position == text.Length ? value : throw Error("Unexpected text after the JSON value");
         }
 
-        private object? ReadValue()
+        private object ReadValue()
         {
             SkipWhitespace();
+
+<<<<<<< TODO: Unmerged change from project 'Rocket.Surgery.AssemblyInfo', Before:
             if (_position >= text.Length)
                 throw Error("Unexpected end of the JSON text");
 
@@ -207,11 +209,38 @@ internal static class ManifestJson
                 default:
                     return ReadNumber();
             }
+=======
+            return  _position >= text.Length 
+                ? throw Error("Unexpected end of the JSON text")
+                :  text[_position] switch
+            {
+                '{' => ReadObject(),
+                '[' => ReadArray(),
+                '"' => ReadString(),
+                't' => ReadLiteral("true", true),
+                'f' => ReadLiteral("false", false),
+                'n' => ReadLiteral("null", null),
+                _ => ReadNumber(),
+            };
+>>>>>>> After
+            if (_position >= text.Length)
+                throw Error("Unexpected end of the JSON text");
+
+            return text[_position] switch
+            {
+                '{' => ReadObject(),
+                '[' => ReadArray(),
+                '"' => ReadString(),
+                't' => ReadLiteral("true", true),
+                'f' => ReadLiteral("false", false),
+                'n' => ReadLiteral("null", null),
+                _ => ReadNumber(),
+            };
         }
 
-        private Dictionary<string, object?> ReadObject()
+        private Dictionary<string, object> ReadObject()
         {
-            var result = new Dictionary<string, object?>(StringComparer.Ordinal);
+            var result = new Dictionary<string, object>(StringComparer.Ordinal);
             _position++;
             SkipWhitespace();
             if (TryConsume('}'))
@@ -236,9 +265,9 @@ internal static class ManifestJson
             }
         }
 
-        private List<object?> ReadArray()
+        private List<object> ReadArray()
         {
-            var result = new List<object?>();
+            var result = new List<object>();
             _position++;
             SkipWhitespace();
             if (TryConsume(']'))
@@ -323,12 +352,12 @@ internal static class ManifestJson
                 var c = text[_position];
                 code = code * 16
                      + c switch
-                       {
-                           >= '0' and <= '9' => c - '0',
-                           >= 'a' and <= 'f' => c - 'a' + 10,
-                           >= 'A' and <= 'F' => c - 'A' + 10,
-                           _ => throw Error("Invalid \\u escape"),
-                       };
+                     {
+                         >= '0' and <= '9' => c - '0',
+                         >= 'a' and <= 'f' => c - 'a' + 10,
+                         >= 'A' and <= 'F' => c - 'A' + 10,
+                         _ => throw Error("Invalid \\u escape"),
+                     };
             }
 
             return (char)code;
@@ -342,13 +371,13 @@ internal static class ManifestJson
 
             // netstandard2.0 (the tasks and the generators) has no span overload of double.TryParse.
 #pragma warning disable CA1846
-            return double.TryParse(text.Substring(start, _position - start), NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+            return double.TryParse(text[start.._position], NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
 #pragma warning restore CA1846
                 ? number
                 : throw Error("Invalid value");
         }
 
-        private object? ReadLiteral(string literal, object? value)
+        private object ReadLiteral(string literal, object value)
         {
             if (string.CompareOrdinal(text, _position, literal, 0, literal.Length) != 0)
                 throw Error("Invalid value");

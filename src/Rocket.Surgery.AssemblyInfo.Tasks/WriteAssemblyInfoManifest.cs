@@ -122,7 +122,7 @@ public sealed class WriteAssemblyInfoManifest : Task
              ?? "";
             // The informational version ends in +<commit> when SourceLink is on; the package version is enough here.
             var plus = version.IndexOf('+');
-            return "Rocket.Surgery.AssemblyInfo/" + ( plus < 0 ? version : version.Substring(0, plus) );
+            return "Rocket.Surgery.AssemblyInfo/" + ( plus < 0 ? version : version[..plus] );
         }
     }
 

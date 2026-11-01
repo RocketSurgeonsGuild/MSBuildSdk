@@ -96,8 +96,5 @@ public class ManifestJsonTests
     [Arguments("{\"schemaVersion\":1,\"assemblyName\":\"Lib\"} trailing")]
     [Arguments("{\"schemaVersion\":1,\"assemblyName\":\"unterminated}")]
     [Arguments("{\"schemaVersion\":1,\"assemblyName\":\"bad \\q escape\"}")]
-    public async Task Rejects_What_Is_Not_A_Manifest(string json)
-    {
-        await Assert.That(() => ManifestJson.Read(json)).Throws<FormatException>();
-    }
+    public async Task Rejects_What_Is_Not_A_Manifest(string json) => await Assert.That(() => ManifestJson.Read(json)).Throws<FormatException>();
 }

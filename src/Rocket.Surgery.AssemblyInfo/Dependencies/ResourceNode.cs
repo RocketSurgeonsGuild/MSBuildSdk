@@ -17,7 +17,7 @@ namespace Rocket.Surgery.AssemblyInfo.Dependencies;
 [DebuggerDisplay("{Name}")]
 internal sealed class ResourceNode(string name, string comment)
 {
-    private readonly SortedDictionary<string, ResourceNode> _children = new(StringComparer.Ordinal);
+    private readonly SortedDictionary<string, ResourceNode> _children = [with(StringComparer.Ordinal)];
 
     public string Name { get; } = name;
 
@@ -59,7 +59,7 @@ internal sealed class ResourceNode(string name, string comment)
             foreach (var resource in group)
             {
                 var extension = Path.GetExtension(resource.Path);
-                area.AddResource(extension.Length > 1 ? extension.Substring(1) : "_", resource);
+                area.AddResource(extension.Length > 1 ? extension[1..] : "_", resource);
             }
         }
 
@@ -103,7 +103,7 @@ internal sealed class ResourceNode(string name, string comment)
     {
         var slash = path.LastIndexOf('/');
         var dot = path.LastIndexOf('.');
-        return dot > slash + 1 ? path.Substring(0, dot) : path;
+        return dot > slash + 1 ? path[..dot] : path;
     }
 }
 

@@ -156,7 +156,7 @@ public sealed class ResolveAssemblyInfoDependencies : Task
         if (fusionName.Length > 0)
         {
             var comma = fusionName.IndexOf(',');
-            return ( comma < 0 ? fusionName : fusionName.Substring(0, comma) ).Trim();
+            return ( comma < 0 ? fusionName : fusionName[..comma] ).Trim();
         }
 
         return Path.GetFileNameWithoutExtension(reference.ItemSpec);
@@ -183,7 +183,7 @@ public sealed class ResolveAssemblyInfoDependencies : Task
         var pathInPackage = reference.GetMetadata("PathInPackage").Replace('\\', '/');
         if (pathInPackage.StartsWith("ref/", StringComparison.OrdinalIgnoreCase))
         {
-            var packageRoot = reference.ItemSpec.Substring(0, reference.ItemSpec.Length - pathInPackage.Length);
+            var packageRoot = reference.ItemSpec[..^pathInPackage.Length];
             candidate = Path.Combine(packageRoot, "lib", Path.GetFileName(Path.GetDirectoryName(pathInPackage)) ?? "", fileName);
             if (File.Exists(candidate))
                 return candidate;

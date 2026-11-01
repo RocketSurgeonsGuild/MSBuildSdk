@@ -67,6 +67,6 @@ internal static class ConstantText
         while (end > start && char.IsWhiteSpace(text[end - 1]) && !IsLineBreak(text[end - 1]))
             end--;
 
-        return text.Substring(start, end - start);
+        return text[start..end];
     }
 }

@@ -26,10 +26,7 @@ public class AssemblyInfoTasksTests
     [Arguments("Exact.Name", "Exact.Name", true)]
     [Arguments("Exact.Name", "Exact.NameAndMore", false)]
     [Arguments("Exact.Name", "ExactXName", false)]
-    public async Task Pattern_Matches_The_Whole_Name(string pattern, string assemblyName, bool expected)
-    {
-        await Assert.That(new AssemblyNamePattern(pattern).IsMatch(assemblyName)).IsEqualTo(expected);
-    }
+    public async Task Pattern_Matches_The_Whole_Name(string pattern, string assemblyName, bool expected) => await Assert.That(new AssemblyNamePattern(pattern).IsMatch(assemblyName)).IsEqualTo(expected);
 
     [Test]
     public async Task Patterns_Are_Split_On_Semicolons_And_Commas()

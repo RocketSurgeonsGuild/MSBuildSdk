@@ -183,15 +183,14 @@ public partial class DependenciesGeneratorTests : GeneratorTest
     private static partial Regex DependencyDirectory();
 
     private static Diagnostic[] Diagnostics(GeneratorTestResults result) =>
-        result.Results.Values.SelectMany(r => r.Diagnostics).Where(d => d.Id.StartsWith("RSAI", StringComparison.Ordinal)).ToArray();
+        [.. result.Results.Values.SelectMany(r => r.Diagnostics).Where(d => d.Id.StartsWith("RSAI", StringComparison.Ordinal))];
 
     private static string[] GeneratedFiles(GeneratorTestResults result) =>
-        result
+        [.. result
            .Results.Values.SelectMany(r => r.SyntaxTrees)
            .Select(tree => Path.GetFileName(tree.FilePath))
            .Where(name => name.StartsWith("Dependencies.", StringComparison.Ordinal))
-           .Order(StringComparer.Ordinal)
-           .ToArray();
+           .Order(StringComparer.Ordinal)];
 
     private static string GeneratedText(GeneratorTestResults result, string fileName) =>
         result.Results.Values.SelectMany(r => r.SyntaxTrees).Single(tree => Path.GetFileName(tree.FilePath) == fileName).ToString();
