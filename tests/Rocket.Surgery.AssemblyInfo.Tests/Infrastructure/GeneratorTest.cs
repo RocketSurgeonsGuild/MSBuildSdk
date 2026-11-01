@@ -42,10 +42,10 @@ public static class GeneratorTestContextBuilderExtensions
         this GeneratorTestContextBuilder builder,
         string name,
         string value,
-        string? type = null,
-        string? comment = null,
-        string? root = null,
-        string? rootComment = null
+        string type = null,
+        string comment = null,
+        string root = null,
+        string rootComment = null
     )
     {
         var text = new JsonAdditionalText(
@@ -61,8 +61,8 @@ public static class GeneratorTestContextBuilderExtensions
     public static GeneratorTestContextBuilder AddEmbeddedResource(
         this GeneratorTestContextBuilder builder,
         string path,
-        string? kind = null,
-        string? comment = null
+        string kind = null,
+        string comment = null
     )
     {
         var text = new EmptyAdditionalText(path);
@@ -93,13 +93,13 @@ public static class GeneratorTestContextBuilderExtensions
     {
         public override string Path { get; } = path;
 
-        public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From(json, Encoding.UTF8);
+        public override SourceText GetText(CancellationToken cancellationToken = default) => SourceText.From(json, Encoding.UTF8);
     }
 
     private sealed class EmptyAdditionalText(string path) : AdditionalText
     {
         public override string Path { get; } = path;
 
-        public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From("", Encoding.UTF8);
+        public override SourceText GetText(CancellationToken cancellationToken = default) => SourceText.From("", Encoding.UTF8);
     }
 }
