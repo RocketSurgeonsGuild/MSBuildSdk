@@ -59,14 +59,18 @@
     <Target
         Name="_InjectConstantAdditionalFiles"
         BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
-        DependsOnTargets="PrepareResourceNames;PrepareConstants"
+        DependsOnTargets="PrepareResourceNames;PrepareConstants;_AssemblyInfoTasksMissing"
     >
         <PropertyGroup>
             <AssemblyInfoConstantsFile Condition="'$(AssemblyInfoConstantsFile)' == ''"
                 >$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', '$(AssemblyName).AssemblyInfo.constants.json'))</AssemblyInfoConstantsFile>
         </PropertyGroup>
-        <WriteAssemblyInfoConstants Constants="@(Constant)" ConstantsFile="$(AssemblyInfoConstantsFile)" />
-        <ItemGroup>
+        <WriteAssemblyInfoConstants
+            Constants="@(Constant)"
+            ConstantsFile="$(AssemblyInfoConstantsFile)"
+            Condition="Exists('$(AssemblyInfoTasksAssembly)')"
+        />
+        <ItemGroup Condition="Exists('$(AssemblyInfoConstantsFile)')">
             <AssemblyInfoConstantsInput Include="$(AssemblyInfoConstantsFile)" AssemblyInfoConstants="true" />
             <AdditionalFiles Include="@(AssemblyInfoConstantsInput)" />
             <FileWrites Include="$(AssemblyInfoConstantsFile)" />

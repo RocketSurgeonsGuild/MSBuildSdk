@@ -22,7 +22,7 @@
     <!-- No Inputs/Outputs: this only makes items. The manifests it finds are compiler inputs, which is what rebuilds on change. -->
     <Target
         Name="ResolveAssemblyInfoDependencies"
-        DependsOnTargets="ResolveAssemblyReferences"
+        DependsOnTargets="ResolveAssemblyReferences;_AssemblyInfoTasksMissing"
         BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
         Condition="'$(AssemblyInfoDependencies)' != 'false'"
     >
@@ -33,6 +33,7 @@
             IgnorePatterns="$(AssemblyInfoDependencyIgnore)"
             IgnoreItems="@(AssemblyInfoDependencyIgnore)"
             IncludeFrameworkDependencies="$(AssemblyInfoIncludeFrameworkDependencies)"
+            Condition="Exists('$(AssemblyInfoTasksAssembly)')"
         >
             <Output TaskParameter="Dependencies" ItemName="AssemblyInfoResolvedDependency" />
         </ResolveAssemblyInfoDependencies>

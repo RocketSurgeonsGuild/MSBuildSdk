@@ -1,4 +1,14 @@
 <Project>
+    <!--
+        Every target that runs one of these tasks checks first that the assembly exists, when it runs (not when the project
+        is evaluated). In the package it always does. In this repo the tasks come from the tasks project's output, which
+        a design-time build (an IDE, dotnet format) can run before anything is built: failing there would make the
+        project load with default settings, so those targets skip their task instead and _AssemblyInfoTasksMissing says why.
+    -->
+    <Target Name="_AssemblyInfoTasksMissing" Condition="!Exists('$(AssemblyInfoTasksAssembly)')">
+        <Message Importance="low" Text="Rocket.Surgery.AssemblyInfo: $(AssemblyInfoTasksAssembly) does not exist (yet), so its tasks are skipped." />
+    </Target>
+
     <UsingTask
         TaskName="Rocket.Surgery.AssemblyInfo.Tasks.WriteAssemblyInfoManifest"
         AssemblyFile="$(AssemblyInfoTasksAssembly)"

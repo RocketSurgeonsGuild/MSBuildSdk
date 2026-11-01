@@ -28,7 +28,7 @@
     <Target
         Name="GenerateAssemblyInfoManifest"
         BeforeTargets="CoreCompile"
-        DependsOnTargets="_AssemblyInfoManifestFile;PrepareConstants;_InjectResourcesAdditionalFiles"
+        DependsOnTargets="_AssemblyInfoManifestFile;PrepareConstants;_InjectResourcesAdditionalFiles;_AssemblyInfoTasksMissing"
         Condition="'$(GenerateAssemblyInfoManifest)' == 'true'"
         Returns="$(AssemblyInfoManifestFile)"
     >
@@ -39,6 +39,7 @@
             Resources="@(EmbeddedResource)"
             TextExtensions="$(EmbeddedResourceStringExtensions)"
             ManifestFile="$(AssemblyInfoManifestFile)"
+            Condition="Exists('$(AssemblyInfoTasksAssembly)')"
         />
         <ItemGroup>
             <FileWrites Include="$(AssemblyInfoManifestFile)" />

@@ -20,9 +20,9 @@ internal sealed class AssemblyInfoManifest
     public const string FileSuffix = ".AssemblyInfo.json";
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
-    public string Generator { get; set; }
+    public string? Generator { get; set; }
     public string AssemblyName { get; set; } = "";
-    public string TargetFramework { get; set; }
+    public string? TargetFramework { get; set; }
 
     /// <summary>The constants, by the dotted path the producer generated them under (e.g. <c>Git.Branch</c>).</summary>
     public List<ManifestConstant> Constants { get; } = [];
@@ -36,7 +36,7 @@ internal sealed class AssemblyInfoManifest
 /// <param name="Type">The C# type of the constant (<c>string</c>, <c>int</c>, ...).</param>
 /// <param name="Comment">The comment, if the item had one.</param>
 [DebuggerDisplay("{Path} = {Value}")]
-internal sealed record ManifestConstant(string Path, string Value, string Type = "string", string Comment = null);
+internal sealed record ManifestConstant(string Path, string Value, string Type = "string", string? Comment = null);
 
 /// <summary>An embedded resource in the manifest.</summary>
 /// <param name="Path">The project-relative path, with <c>/</c> separators, e.g. <c>Content/Styles/Main.css</c>.</param>
@@ -44,7 +44,7 @@ internal sealed record ManifestConstant(string Path, string Value, string Type =
 /// <param name="Kind"><c>text</c> or <c>binary</c>.</param>
 /// <param name="Comment">The comment, if the item had one.</param>
 [DebuggerDisplay("{Path}")]
-internal sealed record ManifestResource(string Path, string ManifestResourceName, string Kind = ManifestResource.Binary, string Comment = null)
+internal sealed record ManifestResource(string Path, string ManifestResourceName, string Kind = ManifestResource.Binary, string? Comment = null)
 {
     public const string Text = "text";
     public const string Binary = "binary";
