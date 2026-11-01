@@ -7,7 +7,7 @@ namespace Rocket.Surgery.AssemblyInfo.Manifest;
 /// A <c>@(Constant)</c> item as ConstantsGenerator reads it: the item spec, the metadata, and nothing escaped.
 /// </summary>
 [DebuggerDisplay("{Root}/{Name} = {Value}")]
-internal sealed record ProjectConstant(string Name, string Value, string Type = null, string Comment = null, string Root = null, string RootComment = null);
+internal sealed record ProjectConstant(string Name, string Value, string? Type = null, string? Comment = null, string? Root = null, string? RootComment = null);
 
 /// <summary>
 /// Reads and writes <c>$(AssemblyName).AssemblyInfo.constants.json</c>: every <c>@(Constant)</c> of the project, for
@@ -46,42 +46,7 @@ internal static class ProjectConstantsJson
     /// <exception cref="FormatException">The text is not JSON, or not shaped like a constants file.</exception>
     public static List<ProjectConstant> Read(string text)
     {
-        var root = ManifestJson.Parse(text) as Dictionary<string, object> ?? throw new FormatException("The constants file is not a JSON object.");
-
-<<<<<<< TODO: Unmerged change from project 'Rocket.Surgery.AssemblyInfo.Tests(net10.0)', Before:
-        return ManifestJson
-              .GetArray(root, "constants")
-              .Select(
-                   item => item as Dictionary<string, object?> ?? throw new FormatException("A constant is not a JSON object.")
-               )
-              .Select(
-                   constant => new ProjectConstant(
-                       ManifestJson.GetString(constant, "name") ?? throw new FormatException("A constant has no name."),
-                       ManifestJson.GetString(constant, "value") ?? "",
-                       ManifestJson.GetString(constant, "type"),
-                       ManifestJson.GetString(constant, "comment"),
-                       ManifestJson.GetString(constant, "root"),
-                       ManifestJson.GetString(constant, "rootComment")
-                   )
-               )
-              .ToList();
-=======
-        return [.. ManifestJson
-              .GetArray(root, "constants")
-              .Select(
-                   item => item as Dictionary<string, object> ?? throw new FormatException("A constant is not a JSON object.")
-               )
-              .Select(
-                   constant => new ProjectConstant(
-                       ManifestJson.GetString(constant, "name") ?? throw new FormatException("A constant has no name."),
-                       ManifestJson.GetString(constant, "value") ?? "",
-                       ManifestJson.GetString(constant, "type"),
-                       ManifestJson.GetString(constant, "comment"),
-                       ManifestJson.GetString(constant, "root"),
-                       ManifestJson.GetString(constant, "rootComment")
-                   )
-               )];
->>>>>>> After
+        var root = ManifestJson.Parse(text) as Dictionary<string, object?> ?? throw new FormatException("The constants file is not a JSON object.");
         return [.. ManifestJson
               .GetArray(root, "constants")
               .Select(
@@ -99,7 +64,7 @@ internal static class ProjectConstantsJson
                )];
     }
 
-    private static void AppendOptional(StringBuilder json, string name, string value)
+    private static void AppendOptional(StringBuilder json, string name, string? value)
     {
         if (!string.IsNullOrEmpty(value))
             ManifestJson.AppendMember(json.Append(",\n"), "      ", name, value!);

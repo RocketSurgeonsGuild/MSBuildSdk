@@ -78,10 +78,10 @@ public class DependenciesGenerator : IIncrementalGenerator
                             (x, ct) =>
                             {
                                 var options = x.Right.GetOptions(x.Left);
-                                return  !options.TryGetValue("build_metadata.AssemblyInfoDependencyManifest.AssemblyName", out var assemblyName)
-                                 || string.IsNullOrEmpty(assemblyName) 
-                                    ?   null  
-                                    :  new ManifestInput(x.Left.Path, assemblyName!, x.Left.GetText(ct)?.ToString() ?? "");
+                                return !options.TryGetValue("build_metadata.AssemblyInfoDependencyManifest.AssemblyName", out var assemblyName)
+                                 || string.IsNullOrEmpty(assemblyName)
+                                    ? null
+                                    : new ManifestInput(x.Left.Path, assemblyName!, x.Left.GetText(ct)?.ToString() ?? "");
                             }
                         )
                        .Where(x => x is not null)
@@ -316,91 +316,22 @@ public class DependenciesGenerator : IIncrementalGenerator
 
     private static (string Namespace, string Name)? GetAttributeTypeName(MetadataReader reader, CustomAttribute attribute)
     {
-        switch (attribute.Constructor.Kind)
+        // The constructor of an attribute from another assembly is a member reference, of one from this assembly a method.
+        if (attribute.Constructor.Kind == HandleKind.MemberReference)
         {
-            case HandleKind.MemberReference:
-                var member = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
-                if (member.Parent.Kind != HandleKind.TypeReference)
-                    return null;
-
-                var reference = reader.GetTypeReference((TypeReferenceHandle)member.Parent);
-                return (reader.GetString(reference.Namespace), reader.GetString(reference.Name));
-            case HandleKind.MethodDefinition:
-                var method = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
-                var definition = reader.GetTypeDefinition(method.GetDeclaringType());
-                return (reader.GetString(definition.Namespace), reader.GetString(definition.Name));
-            case HandleKind.ModuleDefinition:
-                break;
-            case HandleKind.TypeReference:
-                break;
-            case HandleKind.TypeDefinition:
-                break;
-            case HandleKind.FieldDefinition:
-                break;
-            case HandleKind.Parameter:
-                break;
-            case HandleKind.InterfaceImplementation:
-                break;
-            case HandleKind.Constant:
-                break;
-            case HandleKind.CustomAttribute:
-                break;
-            case HandleKind.DeclarativeSecurityAttribute:
-                break;
-            case HandleKind.StandaloneSignature:
-                break;
-            case HandleKind.EventDefinition:
-                break;
-            case HandleKind.PropertyDefinition:
-                break;
-            case HandleKind.MethodImplementation:
-                break;
-            case HandleKind.ModuleReference:
-                break;
-            case HandleKind.TypeSpecification:
-                break;
-            case HandleKind.AssemblyDefinition:
-                break;
-            case HandleKind.AssemblyFile:
-                break;
-            case HandleKind.AssemblyReference:
-                break;
-            case HandleKind.ExportedType:
-                break;
-            case HandleKind.GenericParameter:
-                break;
-            case HandleKind.MethodSpecification:
-                break;
-            case HandleKind.GenericParameterConstraint:
-                break;
-            case HandleKind.ManifestResource:
-                break;
-            case HandleKind.Document:
-                break;
-            case HandleKind.MethodDebugInformation:
-                break;
-            case HandleKind.LocalScope:
-                break;
-            case HandleKind.LocalVariable:
-                break;
-            case HandleKind.LocalConstant:
-                break;
-            case HandleKind.ImportScope:
-                break;
-            case HandleKind.CustomDebugInformation:
-                break;
-            case HandleKind.NamespaceDefinition:
-                break;
-            case HandleKind.UserString:
-                break;
-            case HandleKind.String:
-                break;
-            case HandleKind.Blob:
-                break;
-            case HandleKind.Guid:
-                break;
-            default:
+            var member = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+            if (member.Parent.Kind != HandleKind.TypeReference)
                 return null;
+
+            var reference = reader.GetTypeReference((TypeReferenceHandle)member.Parent);
+            return (reader.GetString(reference.Namespace), reader.GetString(reference.Name));
+        }
+
+        if (attribute.Constructor.Kind == HandleKind.MethodDefinition)
+        {
+            var method = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
+            var definition = reader.GetTypeDefinition(method.GetDeclaringType());
+            return (reader.GetString(definition.Namespace), reader.GetString(definition.Name));
         }
 
         return null;
