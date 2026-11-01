@@ -1,52 +1,72 @@
 using System.Text;
+using System.Xml.Linq;
 
 #pragma warning disable RS1035
 namespace Rocket.Surgery.AssemblyInfo;
 
 /// <summary>
-/// The text escaping between AssemblyInfo.Constants.targets and <see cref="ConstantsGenerator" />. Editorconfig values
-/// are a single line, so the targets escape the Value and Comment of every <c>@(Constant)</c> with the backtick as the
-/// escape character, and the generator reverses it here.
+/// How the generators turn constant text into C#: the same newline and doc-comment handling for a project's own
+/// constants (ConstantsGenerator) and for its dependencies' (DependenciesGenerator).
 /// </summary>
 internal static class ConstantText
 {
     /// <summary>
-    /// Reverses the escaping done by the targets, reading left to right: two backticks are one backtick, and a backtick
-    /// followed by <c>n</c> is a newline (<see cref="Environment.NewLine" />). Any other backtick is kept as it is.
+    /// Every kind of line break (CRLF, LF, CR, and the Unicode line breaks U+0085, U+2028, U+2029) becomes
+    /// <see cref="Environment.NewLine" />, so the generated code has the build machine's newlines whatever the value had.
     /// </summary>
-    /// <remarks>
-    /// Reading left to right is what keeps a newline apart from a literal backtick followed by n: the text
-    /// <c>a`n</c> in a value arrives as <c>a``n</c>, which is a backtick and an n, while a real newline arrives as <c>`n</c>.
-    /// </remarks>
-    public static string Unescape(string value)
+    public static string NormalizeNewLines(string text)
     {
-        if (value.IndexOf('`') < 0)
-            return value;
-
-        var result = new StringBuilder(value.Length);
-        for (var i = 0; i < value.Length; i++)
+        var result = new StringBuilder(text.Length);
+        for (var i = 0; i < text.Length; i++)
         {
-            var c = value[i];
-            if (c == '`' && i + 1 < value.Length)
+            var c = text[i];
+            if (c == '\r')
             {
-                switch (value[i + 1])
-                {
-                    case '`':
-                        result.Append('`');
-                        i++;
-                        continue;
-                    case 'n':
-                        result.Append(Environment.NewLine);
-                        i++;
-                        continue;
-                    default:
-                        break;
-                }
-            }
+                // CRLF is one newline.
+                if (i + 1 < text.Length && text[i + 1] == '\n')
+                    i++;
 
-            result.Append(c);
+                result.Append(Environment.NewLine);
+            }
+            else if (IsLineBreak(c))
+            {
+                result.Append(Environment.NewLine);
+            }
+            else
+            {
+                result.Append(c);
+            }
         }
 
         return result.ToString();
+    }
+
+    /// <summary>
+    /// The <c>///</c> lines of a doc comment for <paramref name="text" />. The newlines at the very start and end are
+    /// dropped; with <paramref name="trimWhitespace" />, so is other whitespace at either end (an explicit comment is
+    /// trimmed, a value used as the comment is not).
+    /// </summary>
+    public static string DocComment(string text, bool trimWhitespace)
+    {
+        var escaped = new XText(NormalizeNewLines(text)).ToString();
+        if (trimWhitespace)
+            escaped = TrimWhitespaceExceptNewLines(escaped);
+
+        var lines = escaped.Trim('\r', '\n').Split([Environment.NewLine], StringSplitOptions.None);
+        return "/// " + string.Join(Environment.NewLine + "/// ", lines);
+    }
+
+    private static bool IsLineBreak(char c) => c is '\n' or '\r' or (char)0x85 or (char)0x2028 or (char)0x2029;
+
+    private static string TrimWhitespaceExceptNewLines(string text)
+    {
+        var start = 0;
+        var end = text.Length;
+        while (start < end && char.IsWhiteSpace(text[start]) && !IsLineBreak(text[start]))
+            start++;
+        while (end > start && char.IsWhiteSpace(text[end - 1]) && !IsLineBreak(text[end - 1]))
+            end--;
+
+        return text[start..end];
     }
 }

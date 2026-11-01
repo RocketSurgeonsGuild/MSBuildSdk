@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Rocket.Surgery.AssemblyInfo.Manifest;
 using Rocket.Surgery.Extensions.Testing;
 using Rocket.Surgery.Extensions.Testing.SourceGenerators;
 
@@ -33,7 +34,10 @@ public abstract class GeneratorTest() : LoggerTest<TestRecord>(new())
 /// <summary>Adds generator inputs shaped like AssemblyInfo.Constants.targets / AssemblyInfo.Resources.targets produce.</summary>
 public static class GeneratorTestContextBuilderExtensions
 {
-    /// <summary>A @(Constant) item.</summary>
+    /// <summary>
+    /// A @(Constant) item, in a constants file of its own (AssemblyInfo.Constants.targets writes all of a project's
+    /// constants to one; the generator reads any number).
+    /// </summary>
     public static GeneratorTestContextBuilder AddConstant(
         this GeneratorTestContextBuilder builder,
         string name,
@@ -44,15 +48,13 @@ public static class GeneratorTestContextBuilderExtensions
         string? rootComment = null
     )
     {
-        var text = new EmptyAdditionalText(name);
+        var text = new JsonAdditionalText(
+            $"{( string.IsNullOrEmpty(root) ? "" : root + "/" )}{name}{ProjectConstantsJson.FileSuffix}",
+            ProjectConstantsJson.Write([new(name, value, type, comment, root, rootComment)])
+        );
         return builder
               .AddAdditionalTexts(text)
-              .AddOption(text, "build_metadata.Constant.ItemType", "Constant")
-              .AddOption(text, "build_metadata.Constant.Value", value)
-              .AddOption(text, "build_metadata.Constant.Type", type ?? "")
-              .AddOption(text, "build_metadata.Constant.Comment", comment ?? "")
-              .AddOption(text, "build_metadata.Constant.Root", root ?? "")
-              .AddOption(text, "build_metadata.Constant.RootComment", rootComment ?? "");
+              .AddOption(text, "build_metadata.AssemblyInfoConstantsInput.AssemblyInfoConstants", "true");
     }
 
     /// <summary>An @(EmbeddedResource) item; <paramref name="path" /> is its project-relative path.</summary>
@@ -85,6 +87,13 @@ public static class GeneratorTestContextBuilderExtensions
               .AddOption(text, "build_metadata.EmbeddedResource.Value", "")
               .AddOption(text, "build_metadata.EmbeddedResource.Kind", "")
               .AddOption(text, "build_metadata.EmbeddedResource.Comment", "");
+    }
+
+    private sealed class JsonAdditionalText(string path, string json) : AdditionalText
+    {
+        public override string Path { get; } = path;
+
+        public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From(json, Encoding.UTF8);
     }
 
     private sealed class EmptyAdditionalText(string path) : AdditionalText

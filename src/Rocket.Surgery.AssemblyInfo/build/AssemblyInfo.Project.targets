@@ -19,6 +19,7 @@
                 Include="@(ProjectPropertyDistinct -> 'Project.%(Identity)')"
                 Value="$(%(ProjectPropertyDistinct.Identity))"
                 Comment="%(ProjectPropertyDistinct.Comment)"
+                Manifest="%(ProjectPropertyDistinct.Manifest)"
                 Root="."
             />
         </ItemGroup>

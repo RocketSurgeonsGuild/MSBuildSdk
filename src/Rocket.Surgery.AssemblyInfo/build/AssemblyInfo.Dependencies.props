@@ -1,0 +1,11 @@
+<Project>
+    <!--
+        Assembly-name patterns AssemblyInfo.Dependencies leaves out (; or , separated, * and ? are wildcards, the whole name
+        must match, case does not matter). The default only applies when the property is unset: set it to replace the
+        default, $(AssemblyInfoDependencyIgnore);More.* to extend it, or ; to clear it. Imported before the project body
+        so that both of those work in the project file.
+    -->
+    <PropertyGroup>
+        <AssemblyInfoDependencyIgnore Condition="'$(AssemblyInfoDependencyIgnore)' == ''">Microsoft.*;System.*</AssemblyInfoDependencyIgnore>
+    </PropertyGroup>
+</Project>

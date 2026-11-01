@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 using Rocket.Surgery.AssemblyInfo.Constants;
+using Rocket.Surgery.AssemblyInfo.Manifest;
 
 using Scriban;
 
@@ -29,31 +29,33 @@ public class ConstantsGenerator : IIncrementalGenerator
         true
     );
 
+    private static readonly DiagnosticDescriptor DependenciesRootIsReserved = new(
+        "RSAI007",
+        "The Dependencies root is reserved for AssemblyInfo.Dependencies",
+        "Constant '{0}' is under the Dependencies root, which AssemblyInfo.Dependencies uses; give it another Root or name",
+        "AssemblyInfo",
+        DiagnosticSeverity.Error,
+        true
+    );
+
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // AssemblyInfo.Constants.targets writes every @(Constant) to one file, $(AssemblyName).AssemblyInfo.constants.json.
         var files = context.AdditionalTextsProvider
             .Combine(context.AnalyzerConfigOptionsProvider)
             .Where(x =>
-                x.Right.GetOptions(x.Left).TryGetValue("build_metadata.Constant.ItemType", out var itemType)
-                && itemType == "Constant")
-            .Select((x, ct) =>
+                x.Right.GetOptions(x.Left).TryGetValue("build_metadata.AssemblyInfoConstantsInput.AssemblyInfoConstants", out var isConstants)
+                && bool.TryParse(isConstants, out var value) && value)
+            .Select((x, ct) => x.Left.GetText(ct)?.ToString() ?? "")
+            .SelectMany((text, _) => ReadConstants(text))
+            .Select((constant, ct) =>
             {
-                var options = x.Right.GetOptions(x.Left);
-                options.TryGetValue("build_metadata.Constant.Value", out var value);
-                options.TryGetValue("build_metadata.Constant.Type", out var type);
-                options.TryGetValue("build_metadata.Constant.Comment", out var comment);
-                options.TryGetValue("build_metadata.Constant.Root", out var root);
-                options.TryGetValue("build_metadata.Constant.RootComment", out var rootComment);
-
+                var (value, type, comment, root, rootComment) = (constant.Value, constant.Type, constant.Comment, constant.Root, constant.RootComment);
                 if (string.IsNullOrEmpty(rootComment))
                     rootComment = "Provides access project-defined constants.";
 
-                // Revert auto-escaping due to https://github.com/dotnet/roslyn/issues/51692
-                if (value?.StartsWith("|") == true && value.EndsWith("|"))
-                    value = value[1..^1].Replace('|', ';');
-
-                var name = Path.GetFileName(x.Left.Path);
+                var name = constant.Name;
                 if (string.IsNullOrEmpty(root))
                 {
                     root = "Constants";
@@ -101,12 +103,38 @@ public class ConstantsGenerator : IIncrementalGenerator
             return;
         }
 
-        comment = comment is not null
-            ? "/// " + string.Join(Environment.NewLine + "/// ", ConstantText.Unescape(new XText(comment).ToString().Trim()).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None))
-            : "/// " + string.Join(Environment.NewLine + "/// ", ConstantText.Unescape(new XText(value).ToString()).Trim(['\r', '\n']).Split([Environment.NewLine], StringSplitOptions.None));
+        // AssemblyInfo.Dependencies (DependenciesGenerator) owns this root.
+        if (root == DependenciesGenerator.RootName || root.StartsWith(DependenciesGenerator.RootName + ".", StringComparison.Ordinal))
+        {
+            spc.ReportDiagnostic(Diagnostic.Create(DependenciesRootIsReserved, Location.None, $"{root}.{name}"));
+            return;
+        }
 
-        // Revert the escaping of newlines and backticks performed in MSBuild to workaround the limitation in editorconfig.
-        var rootArea = Area.Load([new(name, ConstantText.Unescape(value).Trim(['\r', '\n']), comment, type ?? "string"),], root, rootComment);
+        comment = comment is not null ? ConstantText.DocComment(comment, trimWhitespace: true) : ConstantText.DocComment(value, trimWhitespace: false);
+
+        var rootArea = Area.Load([new(name, ConstantText.NormalizeNewLines(value).Trim(['\r', '\n']), comment, type ?? "string"),], root, rootComment);
+        var output = Render(rootArea, ns, visibility, cs);
+
+        var hintName = string.Concat($"{root}.{name}.g.cs".Select(c => char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_' ? c : '_'));
+        spc.AddSource(hintName, SourceText.From(output, Encoding.UTF8));
+    }
+
+    /// <summary>The constants in one constants file; a file that cannot be read has none (the targets always write a valid one).</summary>
+    private static IEnumerable<ProjectConstant> ReadConstants(string text)
+    {
+        try
+        {
+            return ProjectConstantsJson.Read(text);
+        }
+        catch (FormatException)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>Renders <c>Constants.sbntxt</c> for an area tree: the constants under <c>AssemblyInfo</c>.</summary>
+    internal static string Render(Area rootArea, string? ns, string? visibility, CSharpParseOptions cs)
+    {
         // For now, we only support C# though
         const string file = "Constants.sbntxt";
         var template = Template.Parse(EmbeddedResource.GetContent(file), file);
@@ -116,19 +144,13 @@ public class ConstantsGenerator : IIncrementalGenerator
 
         var output = template.Render(model, member => member.Name);
 
-        if (parse.Language == LanguageNames.CSharp)
-        {
-            // Apply formatting since indenting isn't that nice in Scriban when rendering nested
-            // structures via functions.
-            // We alos rewrite to prepend a newline leading trivia before the raw string literals if any
-            var node = new RawStringLiteralRewriter().Visit(
-                SyntaxFactory.ParseCompilationUnit(output, options: cs).NormalizeWhitespace(eol: Environment.NewLine));
+        // Apply formatting since indenting isn't that nice in Scriban when rendering nested
+        // structures via functions.
+        // We alos rewrite to prepend a newline leading trivia before the raw string literals if any
+        var node = new RawStringLiteralRewriter().Visit(
+            SyntaxFactory.ParseCompilationUnit(output, options: cs).NormalizeWhitespace(eol: Environment.NewLine));
 
-            output = node.GetText().ToString();
-        }
-
-        var hintName = string.Concat($"{root}.{name}.g.cs".Select(c => char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_' ? c : '_'));
-        spc.AddSource(hintName, SourceText.From(output, Encoding.UTF8));
+        return node.GetText().ToString();
     }
 
     private class RawStringLiteralRewriter : CSharpSyntaxRewriter

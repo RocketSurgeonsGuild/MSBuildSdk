@@ -1,0 +1,27 @@
+﻿{
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.ConstantsGenerator: [],
+    Rocket.Surgery.AssemblyInfo.DependenciesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.ResourcesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.StringsGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoDependencyReferences: {TempPath}assemblyinfo-dependencies/{id}/Framework.Thing.dll,
+    build_property.AssemblyInfoFrameworkDependencyReferences: {TempPath}assemblyinfo-dependencies/{id}/Framework.Thing.dll,
+    build_property.EmbeddedResourceStringExtensions: .txt|.json
+  },
+  References: [
+    Framework.Thing.dll,
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Collections.Concurrent.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Linq.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

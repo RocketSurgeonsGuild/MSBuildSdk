@@ -1,19 +1,18 @@
 ﻿{
   FileOptions: {
-    Ticks: {
-      build_metadata.Constant.Comment: see ``code``,
-      build_metadata.Constant.ItemType: Constant,
-      build_metadata.Constant.Root: ,
-      build_metadata.Constant.RootComment: ,
-      build_metadata.Constant.Type: ,
-      build_metadata.Constant.Value: run ``npm`` now
+    /packages/rocket.surgery.lib/lib/net10.0/Rocket.Surgery.Lib.AssemblyInfo.json: {
+      build_metadata.AssemblyInfoDependencyManifest.AssemblyName: Rocket.Surgery.Lib
     }
   },
   FinalDiagnostics: [],
   GeneratorDiagnostics: {
     Rocket.Surgery.AssemblyInfo.ConstantsGenerator: [],
+    Rocket.Surgery.AssemblyInfo.DependenciesGenerator: [],
     Rocket.Surgery.AssemblyInfo.ResourcesGenerator: [],
     Rocket.Surgery.AssemblyInfo.StringsGenerator: []
+  },
+  GlobalOptions: {
+    build_property.EmbeddedResourceStringExtensions: .txt|.json
   },
   References: [
     Microsoft.Extensions.DependencyInjection.Abstractions.dll,

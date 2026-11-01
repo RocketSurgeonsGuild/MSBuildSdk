@@ -56,6 +56,7 @@
             <Constant
                 Include="@(AssemblyInfoAttribute -> 'Attributes.%(Name)')"
                 Value="%(AssemblyInfoAttribute._Parameter1)"
+                Manifest="$([MSBuild]::ValueOrDefault('%(AssemblyInfoAttribute.Manifest)', 'true'))"
                 Root="."
                 RootComment="Provides access to assembly attributes defined in the project as constants."
             />

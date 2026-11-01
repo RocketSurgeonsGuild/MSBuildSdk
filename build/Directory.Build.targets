@@ -3,5 +3,13 @@
     <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net11.0')) and '$(TargetPlatformIdentifier)' != 'browser' and '$(RuntimeIdentifier)' != 'browser-wasm' and '$(UseRuntimeAsync)' != 'false'">
         <Features>$(Features);runtime-async=on</Features>
     </PropertyGroup>
+    <!--
+        The package's MSBuild tasks, from the tasks project built by the ProjectReference in Directory.Build.props; out of
+        process, so the dll is not locked. Here rather than in the props, where $(Configuration) may not be set yet.
+    -->
+    <PropertyGroup>
+        <AssemblyInfoTasksAssembly>$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo.Tasks/bin/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.Tasks.dll</AssemblyInfoTasksAssembly>
+        <AssemblyInfoTasksFactory>TaskHostFactory</AssemblyInfoTasksFactory>
+    </PropertyGroup>
     <Import Project="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.targets" />
 </Project>

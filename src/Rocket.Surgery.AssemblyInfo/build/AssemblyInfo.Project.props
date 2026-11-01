@@ -1,13 +1,14 @@
 <Project>
+    <!-- Manifest="true": these are always in $(AssemblyName).AssemblyInfo.json; other ProjectProperty items need it set. -->
     <ItemGroup>
-        <ProjectProperty Include="AssemblyName" />
-        <ProjectProperty Include="RootNamespace" />
+        <ProjectProperty Include="AssemblyName" Manifest="true" />
+        <ProjectProperty Include="RootNamespace" Manifest="true" />
 
-        <ProjectProperty Include="TargetFrameworkIdentifier" />
-        <ProjectProperty Include="TargetFrameworkMoniker" />
-        <ProjectProperty Include="TargetFrameworkVersion" />
+        <ProjectProperty Include="TargetFrameworkIdentifier" Manifest="true" />
+        <ProjectProperty Include="TargetFrameworkMoniker" Manifest="true" />
+        <ProjectProperty Include="TargetFrameworkVersion" Manifest="true" />
 
-        <ProjectProperty Include="RuntimeIdentifier" />
-        <ProjectProperty Include="RuntimeIdentifiers" />
+        <ProjectProperty Include="RuntimeIdentifier" Manifest="true" />
+        <ProjectProperty Include="RuntimeIdentifiers" Manifest="true" />
     </ItemGroup>
 </Project>

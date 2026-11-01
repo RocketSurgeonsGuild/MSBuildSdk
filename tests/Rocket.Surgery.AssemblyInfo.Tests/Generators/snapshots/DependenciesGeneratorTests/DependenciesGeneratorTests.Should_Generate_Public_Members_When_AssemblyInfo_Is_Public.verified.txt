@@ -1,0 +1,31 @@
+﻿{
+  FileOptions: {
+    /packages/lib/lib/net10.0/Lib.AssemblyInfo.json: {
+      build_metadata.AssemblyInfoDependencyManifest.AssemblyName: Lib
+    }
+  },
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Rocket.Surgery.AssemblyInfo.ConstantsGenerator: [],
+    Rocket.Surgery.AssemblyInfo.DependenciesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.ResourcesGenerator: [],
+    Rocket.Surgery.AssemblyInfo.StringsGenerator: []
+  },
+  GlobalOptions: {
+    build_property.AssemblyInfoNamespace: MyNamespace,
+    build_property.AssemblyInfoVisibility: public,
+    build_property.EmbeddedResourceStringExtensions: .txt|.json
+  },
+  References: [
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    System.Collections.Concurrent.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Linq.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

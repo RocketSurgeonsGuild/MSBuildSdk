@@ -16,6 +16,9 @@
         <IsPackable>false</IsPackable>
         <MergeCoverage>true</MergeCoverage>
         <IncludeTestAssembly>true</IncludeTestAssembly>
+        <!-- The targets are imported from src/, so the tasks come from the tasks project; out of process, so the dll is not locked. -->
+        <AssemblyInfoTasksAssembly>$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.Tasks/bin/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.Tasks.dll</AssemblyInfoTasksAssembly>
+        <AssemblyInfoTasksFactory>TaskHostFactory</AssemblyInfoTasksFactory>
     </PropertyGroup>
 
     <Import Project="../../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.props" />
@@ -27,6 +30,7 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Features" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" PrivateAssets="all" />
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj" OutputItemType="Analyzer" />
+        <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.Tasks/Rocket.Surgery.AssemblyInfo.Tasks.csproj" ReferenceOutputAssembly="false" />
         <!-- Built only so PackagedGeneratorTests can inspect the analyzers/dotnet/roslynX.Y assemblies. -->
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" ReferenceOutputAssembly="false" />
@@ -37,6 +41,7 @@
         <PackageReference Include="Scriban" />
         <EmbeddedResource Include="Rocket.Surgery.AssemblyInfo.Tests.csproj" />
         <Compile Include="../../src/Rocket.Surgery.AssemblyInfo/Strings/*.cs" />
+        <Compile Include="../../src/Rocket.Surgery.AssemblyInfo/Manifest/*.cs" Link="Manifest/%(Filename)%(Extension)" />
         <Compile Remove="**/snapshots/**/*.cs" />
         <None Remove="**/snapshots/**" />
     </ItemGroup>

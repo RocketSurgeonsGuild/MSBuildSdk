@@ -144,6 +144,17 @@ public sealed class SdkTestProject : IDisposable
         return string.Join(Environment.NewLine, lines);
     }
 
+    /// <summary>Builds a project and returns MSBuild's output, for assertions on what the build did.</summary>
+    public async Task<string> DotnetBuild(string projectPath, string arguments = "")
+    {
+        var psi = CreateHermeticStartInfo($"build {arguments}".TrimEnd());
+        psi.WorkingDirectory = Path.Combine(Directory, projectPath);
+        var (exitCode, stdout, stderr) = await ProcessRunner.RunAndCaptureAsync(psi);
+        return exitCode != 0
+            ? throw new TUnitException($"dotnet build failed for {projectPath}:\n{stdout}\n{stderr}")
+            : stdout;
+    }
+
     public async Task DotnetPack(string projectPath)
     {
         var psi = CreateHermeticStartInfo("pack -bl");

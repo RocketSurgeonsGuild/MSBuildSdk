@@ -1,0 +1,9 @@
+<Project>
+    <!--
+        Where the MSBuild tasks of this package are. The repo's own tests point it at the tasks project's output, and set
+        AssemblyInfoTasksFactory=TaskHostFactory so that MSBuild loads them out of process and does not lock the file.
+    -->
+    <PropertyGroup>
+        <AssemblyInfoTasksAssembly Condition="'$(AssemblyInfoTasksAssembly)' == ''">$(MSBuildThisFileDirectory)../tasks/netstandard2.0/Rocket.Surgery.AssemblyInfo.Tasks.dll</AssemblyInfoTasksAssembly>
+    </PropertyGroup>
+</Project>

@@ -2,4 +2,6 @@
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Git.props" />
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Project.props" />
     <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Resources.props" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Tasks.props" />
+    <Import Project="$(MSBuildThisFileDirectory)AssemblyInfo.Dependencies.props" />
 </Project>

@@ -78,18 +78,18 @@
             <EmptySourceControlValue>[pending build]</EmptySourceControlValue>
         </PropertyGroup>
         <ItemGroup Condition="'$(EnableSourceControlManagerQueries)' != 'true'">
-            <Constant Include="Git.Branch" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Commit" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Sha" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Root" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Url" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Branch" Manifest="true" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Commit" Manifest="true" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Sha" Manifest="true" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Root" Manifest="false" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Url" Manifest="true" Value="$(EmptySourceControlValue)" Root="." RootComment="$(AssemblyInfoGitComment)" />
         </ItemGroup>
         <ItemGroup Condition="'$(EnableSourceControlManagerQueries)' == 'true'">
-            <Constant Include="Git.Branch" Value="$(RepositoryBranch)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Commit" Value="$(RepositoryCommit)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Sha" Value="$(RepositorySha)" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Root" Value="$(RepositoryRoot.Replace('\', '/'))" Root="." RootComment="$(AssemblyInfoGitComment)" />
-            <Constant Include="Git.Url" Value="$(RepositoryUrl)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Branch" Manifest="true" Value="$(RepositoryBranch)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Commit" Manifest="true" Value="$(RepositoryCommit)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Sha" Manifest="true" Value="$(RepositorySha)" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Root" Manifest="false" Value="$(RepositoryRoot.Replace('\', '/'))" Root="." RootComment="$(AssemblyInfoGitComment)" />
+            <Constant Include="Git.Url" Manifest="true" Value="$(RepositoryUrl)" Root="." RootComment="$(AssemblyInfoGitComment)" />
         </ItemGroup>
     </Target>
 </Project>

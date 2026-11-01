@@ -1,0 +1,26 @@
+﻿{
+  "schemaVersion": 1,
+  "generator": "Rocket.Surgery.AssemblyInfo/1.2.3",
+  "assemblyName": "Lib",
+  "targetFramework": "net10.0",
+  "constants": [
+    {
+      "path": "Git.Branch",
+      "value": "main",
+      "type": "string"
+    },
+    {
+      "path": "Constants.Answer",
+      "value": "42",
+      "type": "int",
+      "comment": "The answer"
+    }
+  ],
+  "resources": [
+    {
+      "path": "Content/Hello.txt",
+      "manifestResourceName": "Lib.Content.Hello.txt",
+      "kind": "text"
+    }
+  ]
+}

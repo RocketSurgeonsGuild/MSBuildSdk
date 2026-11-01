@@ -18,5 +18,9 @@
             ReferenceOutputAssembly="false"
             AdditionalProperties="GeneratePackageOnBuild=false"
         />
+        <ProjectReference
+            Include="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo.Tasks/Rocket.Surgery.AssemblyInfo.Tasks.csproj"
+            ReferenceOutputAssembly="false"
+        />
     </ItemGroup>
 </Project>
