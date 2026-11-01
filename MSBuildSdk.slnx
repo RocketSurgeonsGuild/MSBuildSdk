@@ -36,6 +36,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj" />
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.Tasks/Rocket.Surgery.AssemblyInfo.Tasks.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.BlazorWebAssembly/Rocket.Surgery.Sdk.BlazorWebAssembly.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Razor/Rocket.Surgery.Sdk.Razor.csproj" />
     <Project Path="src/Rocket.Surgery.Sdk.Script/Rocket.Surgery.Sdk.Script.csproj" />

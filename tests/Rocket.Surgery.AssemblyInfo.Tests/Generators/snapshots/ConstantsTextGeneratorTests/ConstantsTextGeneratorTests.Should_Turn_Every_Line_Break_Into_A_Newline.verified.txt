@@ -1,12 +1,7 @@
 ﻿{
   FileOptions: {
-    Multi: {
-      build_metadata.Constant.Comment: doc first`ndoc second,
-      build_metadata.Constant.ItemType: Constant,
-      build_metadata.Constant.Root: ,
-      build_metadata.Constant.RootComment: ,
-      build_metadata.Constant.Type: ,
-      build_metadata.Constant.Value: first`nsecond`nthird
+    Multi.AssemblyInfo.constants.json: {
+      build_metadata.AssemblyInfoConstantsInput.AssemblyInfoConstants: true
     }
   },
   FinalDiagnostics: [],

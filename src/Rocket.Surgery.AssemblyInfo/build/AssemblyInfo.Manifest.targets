@@ -1,0 +1,82 @@
+<Project>
+    <!--
+        Writes $(AssemblyName).AssemblyInfo.json next to the assembly and packs it into lib/<tfm>/, so that a project
+        referencing this one (by ProjectReference or PackageReference) and Rocket.Surgery.AssemblyInfo can generate
+        AssemblyInfo.Dependencies from it. See AssemblyInfo.Dependencies.targets for that side.
+
+        What goes in is opt-in: a constant needs Manifest="true", which the targets set on Git (except Git.Root),
+        Metadata, Attributes and the default project properties; resources go in unless they have Manifest="false".
+    -->
+    <PropertyGroup>
+        <GenerateAssemblyInfoManifest Condition="'$(GenerateAssemblyInfoManifest)' == ''">true</GenerateAssemblyInfoManifest>
+        <TargetsForTfmSpecificContentInPackage Condition="'$(GenerateAssemblyInfoManifest)' == 'true'"
+            >$(TargetsForTfmSpecificContentInPackage);_AssemblyInfoManifestPackageFiles</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="_AssemblyInfoManifestFile">
+        <PropertyGroup>
+            <AssemblyInfoManifestFile Condition="'$(AssemblyInfoManifestFile)' == ''"
+                >$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', '$(AssemblyName).AssemblyInfo.json'))</AssemblyInfoManifestFile>
+        </PropertyGroup>
+    </Target>
+
+    <!--
+        No Inputs/Outputs: most of what goes in comes from properties (the commit, the version), not files. The task only
+        rewrites the file when its content changes instead, so the timestamp consumers see only moves when they need to
+        rebuild.
+    -->
+    <Target
+        Name="GenerateAssemblyInfoManifest"
+        BeforeTargets="CoreCompile"
+        DependsOnTargets="_AssemblyInfoManifestFile;PrepareConstants;_InjectResourcesAdditionalFiles"
+        Condition="'$(GenerateAssemblyInfoManifest)' == 'true'"
+        Returns="$(AssemblyInfoManifestFile)"
+    >
+        <WriteAssemblyInfoManifest
+            AssemblyName="$(AssemblyName)"
+            TargetFramework="$(TargetFramework)"
+            Constants="@(Constant)"
+            Resources="@(EmbeddedResource)"
+            TextExtensions="$(EmbeddedResourceStringExtensions)"
+            ManifestFile="$(AssemblyInfoManifestFile)"
+        />
+        <ItemGroup>
+            <FileWrites Include="$(AssemblyInfoManifestFile)" />
+        </ItemGroup>
+    </Target>
+
+    <!--
+        Next to the assembly in the output directory, which is where a ProjectReference consumer finds it: its ReferencePath
+        is this project's output assembly. A Copy here rather than a None item with CopyToOutputDirectory, which would also
+        copy it into the output of every project that references this one.
+    -->
+    <Target
+        Name="_CopyAssemblyInfoManifestToOutputDirectory"
+        AfterTargets="CopyFilesToOutputDirectory"
+        DependsOnTargets="_AssemblyInfoManifestFile"
+        Condition="'$(GenerateAssemblyInfoManifest)' == 'true' and Exists('$(AssemblyInfoManifestFile)')"
+    >
+        <Copy SourceFiles="$(AssemblyInfoManifestFile)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true">
+            <Output TaskParameter="CopiedFiles" ItemName="FileWrites" />
+        </Copy>
+    </Target>
+
+    <!--
+        Packed next to the assembly. Only when the build output goes to lib/: a package that ships its assembly elsewhere
+        (tools/, analyzers/) is not referenced by consumers, and a lib/ folder holding only the manifest would make NuGet
+        think the package supports that framework.
+    -->
+    <Target
+        Name="_AssemblyInfoManifestPackageFiles"
+        DependsOnTargets="_AssemblyInfoManifestFile"
+        Condition="'$(IncludeBuildOutput)' != 'false' and ('$(BuildOutputTargetFolder)' == '' or '$(BuildOutputTargetFolder)' == 'lib')"
+    >
+        <ItemGroup>
+            <TfmSpecificPackageFile
+                Include="$(AssemblyInfoManifestFile)"
+                PackagePath="lib/$(TargetFramework)/$(AssemblyName).AssemblyInfo.json"
+                Condition="Exists('$(AssemblyInfoManifestFile)')"
+            />
+        </ItemGroup>
+    </Target>
+</Project>

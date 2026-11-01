@@ -20,7 +20,7 @@ internal record Area(string Name, string Prefix)
     public List<Area> NestedAreas { get; init; } = [];
     public List<Constant> Values { get; init; } = [];
 
-    private static string EscapeIdentifier(string identifier)
+    internal static string EscapeIdentifier(string identifier)
     {
         if (string.IsNullOrWhiteSpace(identifier))
         {

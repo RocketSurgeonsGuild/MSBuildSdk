@@ -20,6 +20,7 @@
         <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.6.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="../Rocket.Surgery.AssemblyInfo.Tasks/Rocket.Surgery.AssemblyInfo.Tasks.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
         <PackageReference Include="Scriban" Pack="false" IncludeAssets="build" />
     </ItemGroup>
     <ItemGroup>
@@ -27,6 +28,8 @@
         <None Include="$(_AnalyzersLocation)roslyn5.0/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
         <None Include="$(_AnalyzersLocation)roslyn5.3/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.3/cs" Visible="false" />
         <None Include="$(_AnalyzersLocation)roslyn5.6/$(Configuration)/netstandard2.0/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.6/cs" Visible="false" />
+        <!-- The MSBuild tasks (AssemblyInfo.Tasks.targets loads them from here). -->
+        <None Include="../Rocket.Surgery.AssemblyInfo.Tasks/bin/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.Tasks.dll" Pack="true" PackagePath="tasks/netstandard2.0" Visible="false" />
     </ItemGroup>
     <ItemGroup>
         <Using Remove="System.Diagnostics.CodeAnalysis.NotNullAttribute" />

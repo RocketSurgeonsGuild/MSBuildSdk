@@ -335,6 +335,7 @@ exposes build-time information as a generated `AssemblyInfo` class. It is not in
 | `AssemblyInfo.Constants.*` | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes |
 | `AssemblyInfo.Resources.*` | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()` |
 | `AssemblyInfo.Strings.*` | strings from `.resx` files |
+| `AssemblyInfo.Dependencies.<Name>.*` | what each reference exposes (see [Dependencies](#dependencies)) |
 
 | Property | Default | Purpose |
 | --- | --- | --- |
@@ -345,18 +346,86 @@ exposes build-time information as a generated `AssemblyInfo` class. It is not in
 Diagnostics: `RSAI001` (warning) when no Source Link provider is available, so `Git.*` values may be
 empty; `RSAI002` (error) when `AssemblyInfoNamespace` is set on C# older than 10; `RSAI003` (warning)
 when a `.resx` string mixes named (`{name}`) and indexed (`{0}`) format arguments, because no
-`AssemblyInfo.Strings` member is generated for it. `RSAI001` and `RSAI002` were `TA001` and `MA002` in
+`AssemblyInfo.Strings` member is generated for it. `RSAI004`–`RSAI007` are about dependencies (below). `RSAI001` and `RSAI002` were `TA001` and `MA002` in
 MyAssembly, so update any suppressions.
 
 Values and comments of `@(Constant)` items (and so of `Project`, `Metadata`, `Attributes` and `Git`) can hold
 any text: quotes and apostrophes, `$`, `%`, `;`, backslashes and non-ASCII characters come out exactly as
 written. Every kind of line break (CRLF, LF, CR and the Unicode line and paragraph separators) becomes the
-build machine's newline, and the newlines at the very start and end of a value are dropped. To get the text
-across, the package's build targets compile a small inline MSBuild task (`RoslynCodeTaskFactory`, which the
-dotnet CLI and Visual Studio both provide), which adds about a quarter of a second to the first project built
-in an MSBuild process and a few milliseconds to each project after it.
+build machine's newline, and the newlines at the very start and end of a value are dropped. The constants
+reach the generator in one file, `obj/<config>/<tfm>/$(AssemblyName).AssemblyInfo.constants.json`, which the
+package's MSBuild task only rewrites when a constant changes, so a project with nothing changed is not recompiled.
 
 Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyNamespace` →
 `AssemblyInfoNamespace`, `MyAssemblyVisibility` → `AssemblyInfoVisibility`, `MyAssemblyGitComment`
 → `AssemblyInfoGitComment`; the generated class `MyAssembly` → `AssemblyInfo`, and its `Info` area →
 `Attributes`. Code that uses `MyAssembly.*` has to be updated.
+
+### Dependencies
+
+`AssemblyInfo.Dependencies` describes the project's references, one class per assembly, with dots flattened to
+underscores (`Rocket.Surgery.Foo` → `AssemblyInfo.Dependencies.Rocket_Surgery_Foo`):
+
+- A reference **built with Rocket.Surgery.AssemblyInfo** (a package or a project reference) gets what it put in its
+  manifest: the same `Attributes`, `Metadata`, `Project`, `Git` and `Constants` tree it generated for itself, plus its
+  embedded resources (`ManifestResourceName`, `Text`, `GetBytes()`, `GetStream()`, loaded from that assembly).
+- **Any other reference** gets what its own metadata says: `Attributes.*` (`Version`, `Company`, `InformationalVersion`,
+  …), `Metadata.*` (`[AssemblyMetadata]`, with dots in keys flattened), `Git.Commit`/`Git.Sha` from the `+<commit>` of the
+  informational version, `Git.Url` from the `RepositoryUrl` metadata, and its manifest resources.
+
+```csharp
+Console.WriteLine(AssemblyInfo.Dependencies.Newtonsoft_Json.Attributes.InformationalVersion);
+Console.WriteLine(AssemblyInfo.Dependencies.MyCompany_Shared.Git.Sha);
+var schema = AssemblyInfo.Dependencies.MyCompany_Shared.Resources.Schemas.order.Text;
+```
+
+#### The manifest
+
+Every project that references Rocket.Surgery.AssemblyInfo writes `$(AssemblyName).AssemblyInfo.json` next to its
+assembly, copies it to the output directory and packs it into `lib/<tfm>/` (one per target framework). Nothing is added
+to the assembly itself. Because the package is public even when `AssemblyInfo` is internal, what goes in is opt-in:
+
+| In the manifest | |
+| --- | --- |
+| `Git.Branch`, `Git.Commit`, `Git.Sha`, `Git.Url`; `Attributes.*`; `Metadata.*`; embedded resources; the default `ProjectProperty` items | always (`Manifest="false"` on the `AssemblyAttribute`, `AssemblyMetadata`, `EmbeddedResource` or `ProjectProperty` item leaves it out) |
+| `Git.Root`, other `ProjectProperty` items (such as `ProjectFile`), `@(Constant)` and `@(FileConstant)` items | only with `Manifest="true"` |
+
+```xml
+<Constant Include="ApiVersion" Value="3" Type="int" Manifest="true" />
+<ProjectProperty Include="PackageId" Manifest="true" />
+```
+
+The file is only rewritten when its content changes, so an unchanged manifest does not rebuild its consumers. Set
+`GenerateAssemblyInfoManifest=false` to not write it.
+
+#### Choosing dependencies
+
+Every reference except framework assemblies (targeting packs, .NET Framework reference assemblies and the
+`NETStandard.Library` facades) is described, minus the ignore patterns. A pattern is an assembly name in which `*` matches
+any run of characters and `?` matches one; it has to match the whole name, ignoring case, so a pattern without a wildcard
+is an exact name (`corelib` matches nothing, `*corelib` matches `System.Private.CoreLib`).
+
+| Property / item | Default | Purpose |
+| --- | --- | --- |
+| `AssemblyInfoDependencyIgnore` | `Microsoft.*;System.*` | `;`- or `,`-separated ignore patterns. The default only applies while the property is unset: setting it replaces the default, `$(AssemblyInfoDependencyIgnore);Vendor.*` extends it, and `;` clears it. |
+| `@(AssemblyInfoDependencyIgnore)` | | More ignore patterns, always added to the property's. |
+| `@(AssemblyInfoDependency)` | | Assemblies to describe even when an ignore pattern or the framework filter would leave them out. |
+| `AssemblyInfo="true"` / `"false"` on a `PackageReference`, `ProjectReference` or `Reference` | | Always / never describe the assemblies it brings in; `false` wins over everything. |
+| `AssemblyInfoIncludeFrameworkDependencies` | `false` | Describe framework assemblies too (resource names only, no accessors). |
+| `AssemblyInfoDependencies` | `true` | `false` turns `AssemblyInfo.Dependencies` off. |
+
+MSBuild expands `*` and `?` in an item's `Include` as a file glob, so an item puts a wildcard pattern in `Pattern`:
+
+```xml
+<AssemblyInfoDependencyIgnore Include="vendor packages" Pattern="Vendor.*" />
+<AssemblyInfoDependency Include="Microsoft.Extensions.Hosting" />
+```
+
+The default is set when the package's props are imported, which is after `Directory.Build.props`: extend it from there
+with an item (or write the default out), because `$(AssemblyInfoDependencyIgnore)` is still empty at that point.
+
+`AssemblyInfo.Dependencies` is a reserved root: a `@(Constant)` under it fails with `RSAI007` (error). The other
+diagnostics: `RSAI004` (warning) when a manifest is from a newer Rocket.Surgery.AssemblyInfo than the consumer's, and
+`RSAI005` (warning) when one cannot be read, in both cases the dependency only gets what its attributes say; `RSAI006`
+(info) when two assembly names flatten to the same class name, in which case the second gets a numeric suffix
+(`Foo_Bar_2`).

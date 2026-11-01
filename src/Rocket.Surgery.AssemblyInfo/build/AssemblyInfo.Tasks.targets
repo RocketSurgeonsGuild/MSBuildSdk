@@ -1,0 +1,35 @@
+<Project>
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.WriteAssemblyInfoManifest"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        Condition="'$(AssemblyInfoTasksFactory)' == ''"
+    />
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.ResolveAssemblyInfoDependencies"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        Condition="'$(AssemblyInfoTasksFactory)' == ''"
+    />
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.WriteAssemblyInfoConstants"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        Condition="'$(AssemblyInfoTasksFactory)' == ''"
+    />
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.WriteAssemblyInfoManifest"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        TaskFactory="$(AssemblyInfoTasksFactory)"
+        Condition="'$(AssemblyInfoTasksFactory)' != ''"
+    />
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.ResolveAssemblyInfoDependencies"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        TaskFactory="$(AssemblyInfoTasksFactory)"
+        Condition="'$(AssemblyInfoTasksFactory)' != ''"
+    />
+    <UsingTask
+        TaskName="Rocket.Surgery.AssemblyInfo.Tasks.WriteAssemblyInfoConstants"
+        AssemblyFile="$(AssemblyInfoTasksAssembly)"
+        TaskFactory="$(AssemblyInfoTasksFactory)"
+        Condition="'$(AssemblyInfoTasksFactory)' != ''"
+    />
+</Project>

@@ -1,0 +1,56 @@
+<Project>
+    <!--
+        Generates AssemblyInfo.Dependencies: what each reference exposes. A reference built with Rocket.Surgery.AssemblyInfo
+        has a $(AssemblyName).AssemblyInfo.json manifest next to its assembly (see AssemblyInfo.Manifest.targets), which the
+        generator reads; for any other reference it reads the assembly's own attributes.
+
+        Which references: every non-framework reference, minus
+          - AssemblyInfoDependencyIgnore (property, see AssemblyInfo.Dependencies.props) and @(AssemblyInfoDependencyIgnore)
+            items. MSBuild treats * and ? in an Include as a file glob, so an item puts a wildcard pattern in Pattern="...":
+                <AssemblyInfoDependencyIgnore Include="Vendor" Pattern="Vendor.*" />
+          - AssemblyInfo="false" on the PackageReference, ProjectReference or Reference.
+        plus framework assemblies when AssemblyInfoIncludeFrameworkDependencies=true. An @(AssemblyInfoDependency) item (same
+        Pattern rule) or AssemblyInfo="true" keeps a reference that would otherwise be left out. AssemblyInfoDependencies=false
+        turns it all off.
+    -->
+    <ItemGroup>
+        <CompilerVisibleProperty Include="AssemblyInfoDependencyReferences" />
+        <CompilerVisibleProperty Include="AssemblyInfoFrameworkDependencyReferences" />
+        <CompilerVisibleItemMetadata Include="AssemblyInfoDependencyManifest" MetadataName="AssemblyName" />
+    </ItemGroup>
+
+    <!-- No Inputs/Outputs: this only makes items. The manifests it finds are compiler inputs, which is what rebuilds on change. -->
+    <Target
+        Name="ResolveAssemblyInfoDependencies"
+        DependsOnTargets="ResolveAssemblyReferences"
+        BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun"
+        Condition="'$(AssemblyInfoDependencies)' != 'false'"
+    >
+        <ResolveAssemblyInfoDependencies
+            References="@(ReferencePath)"
+            PackageReferences="@(PackageReference)"
+            Includes="@(AssemblyInfoDependency)"
+            IgnorePatterns="$(AssemblyInfoDependencyIgnore)"
+            IgnoreItems="@(AssemblyInfoDependencyIgnore)"
+            IncludeFrameworkDependencies="$(AssemblyInfoIncludeFrameworkDependencies)"
+        >
+            <Output TaskParameter="Dependencies" ItemName="AssemblyInfoResolvedDependency" />
+        </ResolveAssemblyInfoDependencies>
+
+        <ItemGroup>
+            <AssemblyInfoDependencyManifest
+                Include="%(AssemblyInfoResolvedDependency.Manifest)"
+                Condition="'%(AssemblyInfoResolvedDependency.Manifest)' != ''"
+                AssemblyName="%(AssemblyInfoResolvedDependency.Identity)"
+            />
+            <AdditionalFiles Include="@(AssemblyInfoDependencyManifest)" />
+        </ItemGroup>
+
+        <!-- The paths the compiler gets (reference assemblies for project references), which the generator matches on. -->
+        <PropertyGroup>
+            <AssemblyInfoDependencyReferences>@(AssemblyInfoResolvedDependency->'%(CompilePath)', '|')</AssemblyInfoDependencyReferences>
+            <AssemblyInfoFrameworkDependencyReferences
+                >@(AssemblyInfoResolvedDependency->WithMetadataValue('IsFramework', 'true')->'%(CompilePath)', '|')</AssemblyInfoFrameworkDependencyReferences>
+        </PropertyGroup>
+    </Target>
+</Project>
