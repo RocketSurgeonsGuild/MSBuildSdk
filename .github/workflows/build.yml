@@ -30,6 +30,13 @@ jobs:
               with:
                   clean: 'false'
                   fetch-depth: '0'
+            # A tag checks out as a detached HEAD, and GitVersion only names the branch when one's tip is that commit. Once
+            # main moves past the tagged commit (or the tag isn't on a branch tip) it falls back to "(no branch)" and
+            # versions the release as <next patch>--no-branch-.1. A local main at the tag makes it resolve to the tag.
+            - name: 🏷️ Put the tag on a branch for GitVersion
+              if: startsWith(github.ref, 'refs/tags/')
+              # Pinned to the tagged commit (GITHUB_SHA), never origin/main, which may be ahead of the tag.
+              run: git checkout -B main "$GITHUB_SHA"
             - name: 🛠️ Setup mise
               uses: jdx/mise-action@v5
               with:
