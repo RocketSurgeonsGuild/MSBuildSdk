@@ -35,7 +35,8 @@ jobs:
             # versions the release as <next patch>--no-branch-.1. A local main at the tag makes it resolve to the tag.
             - name: 🏷️ Put the tag on a branch for GitVersion
               if: startsWith(github.ref, 'refs/tags/')
-              run: git checkout -B main
+              # Pinned to the tagged commit (GITHUB_SHA), never origin/main, which may be ahead of the tag.
+              run: git checkout -B main "$GITHUB_SHA"
             - name: 🛠️ Setup mise
               uses: jdx/mise-action@v5
               with:
