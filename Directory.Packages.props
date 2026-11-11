@@ -11,6 +11,7 @@
     <GlobalPackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="5.0.1" />
     <GlobalPackageReference Include="Roslynator.CodeFixes" Version="5.0.1" />
     <GlobalPackageReference Include="Roslynator.Refactorings" Version="5.0.1" />
+    <GlobalPackageReference Include="ZeroAlloc.Analyzers" Version="1.13.0" />
     <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
     <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.13" />
