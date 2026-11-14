@@ -1,7 +1,4 @@
 <Project>
-    <PropertyGroup>
-        <BuildScriptsRoot>$(MSBuildThisFileDirectory)</BuildScriptsRoot>
-    </PropertyGroup>
     <!--
         The build script uses this repo's own Rocket.Surgery.AssemblyInfo generator: the project
         reference supplies the generator and the imports supply what its NuGet package's build/
@@ -11,7 +8,6 @@
     -->
     <Import Project="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/build/Rocket.Surgery.AssemblyInfo.props" />
     <ItemGroup>
-        <ProjectProperty Include="BuildScriptsRoot" />
         <ProjectReference
             Include="$(MSBuildThisFileDirectory)../src/Rocket.Surgery.AssemblyInfo/Rocket.Surgery.AssemblyInfo.csproj"
             OutputItemType="Analyzer"
