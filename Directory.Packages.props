@@ -15,7 +15,6 @@
     <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
     <GlobalPackageReference Include="Microsoft.Sbom.Targets" Version="4.1.13" />
-    <GlobalPackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1" />
     <GlobalPackageReference Include="xunit.analyzers" Version="2.3.0" />
     <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.172" />
   </ItemGroup>
@@ -30,7 +29,6 @@
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <PackageVersion Include="Scriban" Version="7.6.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.FakeItEasy" Version="11.0.1" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.1" />
