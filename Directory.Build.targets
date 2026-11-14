@@ -42,4 +42,14 @@
     </ItemGroup>
     <Import Project="$(MSBuildThisFileDirectory)src/common/ContinuousIntegration.targets" />
     <Import Project="$(MSBuildThisFileDirectory)src/common/GitVersion.targets" />
+    <!--
+        On CI, skip Verify's sponsor check: the Verify_SponsorshipExemption in Directory.Build.props already settles it. The check calls
+        MSBuild on every project reference of each test project's inner build, and each call waits for the node that owns that
+        configuration, which holds up test builds behind unrelated compiles (LaunchPad #3203 measured 12,226 s of that waiting).
+        ContinuousIntegrationBuild comes from src/common/ContinuousIntegration.props (imported by Directory.Build.props); it is
+        checked here, with the other CI settings, once every props file has set it. The suffix is Verify's hash of its package id; if Verify renames the property this just stops applying.
+    -->
+    <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
+        <_SponsorCheck_OwnerVerified_Verify_eea2745e>true</_SponsorCheck_OwnerVerified_Verify_eea2745e>
+    </PropertyGroup>
 </Project>
