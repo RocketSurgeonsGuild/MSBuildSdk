@@ -335,7 +335,7 @@ exposes build-time information as a generated `AssemblyInfo` class. It is not in
 | `AssemblyInfo.Constants.*` | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes |
 | `AssemblyInfo.Resources.*` | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()` |
 | `AssemblyInfo.Strings.*` | strings from `.resx` files |
-| `AssemblyInfo.Dependencies.<Name>.*` | what each reference exposes (see [Dependencies](#dependencies)) |
+| `AssemblyInfo.Dependencies.<Name>.*` | what each reference exposes; opt-in with `AssemblyInfoDependencies=true` (see [Dependencies](#dependencies)) |
 
 | Property | Default | Purpose |
 | --- | --- | --- |
@@ -363,7 +363,14 @@ Renamed from MyAssembly (the old names still work as fallbacks): `MyAssemblyName
 
 ### Dependencies
 
-`AssemblyInfo.Dependencies` describes the project's references, one class per assembly, with dots flattened to
+`AssemblyInfo.Dependencies` is off by default, because resolving and reading every reference adds noticeable build
+time. Turn it on with:
+
+```xml
+<AssemblyInfoDependencies>true</AssemblyInfoDependencies>
+```
+
+It describes the project's references, one class per assembly, with dots flattened to
 underscores (`Rocket.Surgery.Foo` → `AssemblyInfo.Dependencies.Rocket_Surgery_Foo`):
 
 - A reference **built with Rocket.Surgery.AssemblyInfo** (a package or a project reference) gets what it put in its
@@ -412,7 +419,7 @@ is an exact name (`corelib` matches nothing, `*corelib` matches `System.Private.
 | `@(AssemblyInfoDependency)` | | Assemblies to describe even when an ignore pattern or the framework filter would leave them out. |
 | `AssemblyInfo="true"` / `"false"` on a `PackageReference`, `ProjectReference` or `Reference` | | Always / never describe the assemblies it brings in; `false` wins over everything. |
 | `AssemblyInfoIncludeFrameworkDependencies` | `false` | Describe framework assemblies too (resource names only, no accessors). |
-| `AssemblyInfoDependencies` | `true` | `false` turns `AssemblyInfo.Dependencies` off. |
+| `AssemblyInfoDependencies` | `false` | `true` turns `AssemblyInfo.Dependencies` on. |
 
 MSBuild expands `*` and `?` in an item's `Include` as a file glob, so an item puts a wildcard pattern in `Pattern`:
 

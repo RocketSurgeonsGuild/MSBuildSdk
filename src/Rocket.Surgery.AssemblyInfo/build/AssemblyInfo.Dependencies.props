@@ -6,6 +6,8 @@
         so that both of those work in the project file.
     -->
     <PropertyGroup>
+        <!-- Off by default: resolving and reading every reference costs more build time than it is worth for most projects. -->
+        <AssemblyInfoDependencies Condition="'$(AssemblyInfoDependencies)' == ''">false</AssemblyInfoDependencies>
         <AssemblyInfoDependencyIgnore Condition="'$(AssemblyInfoDependencyIgnore)' == ''">Microsoft.*;System.*</AssemblyInfoDependencyIgnore>
     </PropertyGroup>
 </Project>
