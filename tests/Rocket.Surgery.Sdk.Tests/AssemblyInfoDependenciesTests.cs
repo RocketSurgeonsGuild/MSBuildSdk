@@ -190,6 +190,7 @@ public class AssemblyInfoDependenciesTests
             <TargetFramework>{{targetFramework}}</TargetFramework>
             <OutputType>Exe</OutputType>
             <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)../feed</RestoreAdditionalProjectSources>
+            <AssemblyInfoDependencies>true</AssemblyInfoDependencies>
             {{properties}}
           </PropertyGroup>
           <ItemGroup>
