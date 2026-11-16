@@ -1,18 +1,33 @@
 # Rocket.Surgery.Sdk
 
-MSBuild project SDKs that distill the Rocket Surgeons Guild build conventions into a single
-versioned package family — compiler defaults, analyzers, standardized editorconfigs, NuGet audit,
-source link, and Microsoft.Testing.Platform test wiring.
+MSBuild project SDKs that apply the Rocket Surgeons Guild build conventions from one versioned package family:
+compiler defaults, analyzers, shared editorconfig profiles, NuGet audit, Source Link, GitVersion and
+Microsoft.Testing.Platform test wiring. Swap `Microsoft.NET.Sdk` for `Rocket.Surgery.Sdk` and a project gets all of it,
+with every default overridable from the project.
 
-| Package | Chains to | Use for |
-| --- | --- | --- |
-| `Rocket.Surgery.Sdk` | Microsoft.NET.Sdk | Libraries, console apps, file-based apps |
-| `Rocket.Surgery.Sdk.Web` | Microsoft.NET.Sdk.Web | ASP.NET Core |
-| `Rocket.Surgery.Sdk.Razor` | Microsoft.NET.Sdk.Razor | Razor class libraries |
-| `Rocket.Surgery.Sdk.BlazorWebAssembly` | Microsoft.NET.Sdk.BlazorWebAssembly | Blazor WASM |
-| `Rocket.Surgery.Sdk.Test` | Microsoft.NET.Sdk | Test projects (Microsoft.Testing.Platform) |
-| `Rocket.Surgery.Sdk.WindowsDesktop` | Microsoft.NET.Sdk.WindowsDesktop | WPF / WinForms |
-| `Rocket.Surgery.Sdk.Script` | Microsoft.NET.Sdk | File-based C# apps (`#:sdk` shorthand) |
+The repository also ships [Rocket.Surgery.AssemblyInfo](#assemblyinfo), a source generator that exposes build-time
+information (assembly attributes, git details, constants, embedded resources and `.resx` strings) as a generated
+`AssemblyInfo` class.
+
+[![github-release-badge]][github-release]
+[![github-license-badge]][github-license]
+[![github-build-badge]][github-build]
+
+## Packages
+
+| Package                                                                            | NuGet                                                                                             | Chains to                             | Use for                                    |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------ |
+| [Rocket.Surgery.Sdk][nuget-Rocket.Surgery.Sdk]                                     | [![nuget-Rocket.Surgery.Sdk-badge]][nuget-Rocket.Surgery.Sdk]                                     | `Microsoft.NET.Sdk`                   | Libraries, console apps, file-based apps   |
+| [Rocket.Surgery.Sdk.Web][nuget-Rocket.Surgery.Sdk.Web]                             | [![nuget-Rocket.Surgery.Sdk.Web-badge]][nuget-Rocket.Surgery.Sdk.Web]                             | `Microsoft.NET.Sdk.Web`               | ASP.NET Core                               |
+| [Rocket.Surgery.Sdk.Razor][nuget-Rocket.Surgery.Sdk.Razor]                         | [![nuget-Rocket.Surgery.Sdk.Razor-badge]][nuget-Rocket.Surgery.Sdk.Razor]                         | `Microsoft.NET.Sdk.Razor`             | Razor class libraries                      |
+| [Rocket.Surgery.Sdk.BlazorWebAssembly][nuget-Rocket.Surgery.Sdk.BlazorWebAssembly] | [![nuget-Rocket.Surgery.Sdk.BlazorWebAssembly-badge]][nuget-Rocket.Surgery.Sdk.BlazorWebAssembly] | `Microsoft.NET.Sdk.BlazorWebAssembly` | Blazor WebAssembly                         |
+| [Rocket.Surgery.Sdk.Test][nuget-Rocket.Surgery.Sdk.Test]                           | [![nuget-Rocket.Surgery.Sdk.Test-badge]][nuget-Rocket.Surgery.Sdk.Test]                           | `Microsoft.NET.Sdk`                   | Test projects (Microsoft.Testing.Platform) |
+| [Rocket.Surgery.Sdk.WindowsDesktop][nuget-Rocket.Surgery.Sdk.WindowsDesktop]       | [![nuget-Rocket.Surgery.Sdk.WindowsDesktop-badge]][nuget-Rocket.Surgery.Sdk.WindowsDesktop]       | `Microsoft.NET.Sdk.WindowsDesktop`    | WPF and Windows Forms                      |
+| [Rocket.Surgery.Sdk.Script][nuget-Rocket.Surgery.Sdk.Script]                       | [![nuget-Rocket.Surgery.Sdk.Script-badge]][nuget-Rocket.Surgery.Sdk.Script]                       | `Microsoft.NET.Sdk`                   | File-based C# apps (`#:sdk` shorthand)     |
+
+| Package                                                          | NuGet                                                                           | What it does                                                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Rocket.Surgery.AssemblyInfo][nuget-Rocket.Surgery.AssemblyInfo] | [![nuget-Rocket.Surgery.AssemblyInfo-badge]][nuget-Rocket.Surgery.AssemblyInfo] | Source generator for a build-time `AssemblyInfo` class (formerly `Rocket.Surgery.MyAssembly`) |
 
 ## Requirements
 
@@ -25,8 +40,8 @@ Pin the version once in `global.json`:
 ```json
 {
     "msbuild-sdks": {
-        "Rocket.Surgery.Sdk": "2026.7.0",
-        "Rocket.Surgery.Sdk.Test": "2026.7.0"
+        "Rocket.Surgery.Sdk": "2026.11.2",
+        "Rocket.Surgery.Sdk.Test": "2026.11.2"
     }
 }
 ```
@@ -39,12 +54,12 @@ Pin the version once in `global.json`:
 </Project>
 ```
 
-Or inline: `<Project Sdk="Rocket.Surgery.Sdk/2026.7.0">`.
+Or inline: `<Project Sdk="Rocket.Surgery.Sdk/2026.11.2">`.
 
 ### File-based C# apps (.NET 10+)
 
 ```csharp
-#:sdk Rocket.Surgery.Sdk@2026.7.0
+#:sdk Rocket.Surgery.Sdk@2026.11.2
 
 Console.WriteLine("Hello");
 ```
@@ -57,8 +72,8 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - No default `TargetFramework`: a csproj sets `TargetFramework` or `TargetFrameworks` itself, as with Microsoft.NET.Sdk
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
-- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK, individually overridable — see [Injected package versions](#injected-package-versions) below)
-- Shared editorconfig profiles (common, coding style, JetBrains, Roslynator, tests, samples, file-based apps, per-SDK-variant) applied as global analyzer configs — your own `.editorconfig` always wins
+- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK and individually overridable, see [Injected package versions](#injected-package-versions) below)
+- Shared editorconfig profiles (common, coding style, JetBrains, Roslynator, tests, samples, file-based apps, per-SDK-variant) applied as global analyzer configs; your own `.editorconfig` always wins
 - `NuGetAudit=true` (mode `all`, level `moderate`)
 - Source link / deterministic CI builds auto-detected via `ContinuousIntegrationBuild` (GitHub Actions, Azure DevOps, GitLab CI env vars); build-provenance `AssemblyMetadata` (commit SHA, run/job/pipeline IDs, etc.) is embedded automatically on those providers
 - `TreatWarningsAsErrors=true` in CI and Release builds only; `WarningsAsErrors` always includes `RS0017` (broken public API tracking)
@@ -81,18 +96,20 @@ Use `Rocket.Surgery.Sdk` (or `Rocket.Surgery.Sdk.Test`, which also sets `IsTestP
 is automatic, based on your `PackageReference`s:
 
 - `TUnit` → `Rocket.Surgery.Extensions.Testing.TUnit`
+- `TUnit.AspNetCore` → `Rocket.Surgery.Extensions.Testing.TUnit.AspNetCore`
+- `TUnit.Aspire` → `Rocket.Surgery.Extensions.Testing.TUnit.Aspire`
 
 Every test project also gets `Microsoft.Testing.Extensions.CrashDump`, `HangDump`, `TrxReport`,
-`HotReload`, `AzureDevOpsReport` and `GitHubActionsReport` on by default, plus `CodeCoverage` — with the matching command-line options wired through `dotnet test` automatically: crash/hang
+`HotReload`, `AzureDevOpsReport` and `GitHubActionsReport` on by default, plus `CodeCoverage`, with the matching command-line options wired through `dotnet test` automatically: crash/hang
 dumps (mini, 1-hour hang timeout), TRX reports, `--report-azdo` (Azure Pipelines) and `--report-gh`
-(GitHub Actions) — both are harmless no-ops outside their respective CI, and (once
+(GitHub Actions), both harmless no-ops outside their respective CI, and (once
 `RsgSdk_Testing_Extensions` is on) `--minimum-expected-tests 1` so a run that discovers zero tests
-fails — set `RsgSdk_Testing_MinimumExpectedTests=0` to disable. Coverage (cobertura, via the SDK's
+fails; set `RsgSdk_Testing_MinimumExpectedTests=0` to disable it. Coverage (cobertura, via the SDK's
 default `coverage.runsettings`, overridable with `RunSettingsFilePath`) is collected by default;
 set `RsgSdk_Testing_CodeCoverage=false` to disable it. `HotReload` activates via `TESTINGPLATFORM_HOTRELOAD_ENABLED=1` (set automatically by
 `dotnet watch`), not a command-line flag, so there's nothing to wire for it beyond the package
 reference. Analyzers are skipped when compiling for `dotnet test`
-(`RocketSurgeryOptimizeTestBuild=true` to enable — it's opt-in). `Microsoft.Testing.Extensions.Retry`
+(opt in with `RocketSurgeryOptimizeTestBuild=true`). `Microsoft.Testing.Extensions.Retry`
 is opt-in too: set `RsgSdk_Testing_Retry=true` and `RsgSdk_Testing_RetryCount` to the
 number of retries.
 
@@ -103,67 +120,67 @@ All defaults are guarded (`Condition="'$(Property)' == ''"`), so anything set in
 
 ### Analyzers (`src/common/Analyzers.props`)
 
-| Property | Default | Purpose |
-| --- | --- | --- |
-| `RocketSurgeryAnalyzers` | `true` | Master switch for every analyzer package below |
-| `RocketSurgeryPublicApiAnalyzers` | `true` | Inject `Microsoft.CodeAnalysis.PublicApiAnalyzers` |
-| `RocketSurgeryBannedApiAnalyzers` | `true` | Inject `Microsoft.CodeAnalysis.BannedApiAnalyzers` + wire up `BannedSymbols.txt` |
-| `RocketSurgeryBannedNewtonsoftJson` | `true` | Also wire up `BannedSymbols.NewtonsoftJson.txt` (requires `RocketSurgeryBannedApiAnalyzers`) |
-| `RocketSurgeryCodeAnalysisAnalyzers` | `true` | Inject `Microsoft.CodeAnalysis.Analyzers` |
-| `RocketSurgeryRoslynatorAnalyzers` | `true` | Inject `Roslynator.Analyzers` + `Roslynator.Formatting.Analyzers` |
-| `RocketSurgeryEditorConfig` | `true` | Master switch for the shipped global editorconfig profiles |
-| `RocketSurgeryEditorConfigJetBrains` | `true` | Include `JetBrains.editorconfig` |
-| `RocketSurgeryEditorConfigRoslynator` | `true` | Include `Roslynator.editorconfig` |
-| `RocketSurgeryJetBrainsAnnotations` | `true` | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
+| Property                              | Default | Purpose                                                                                                                    |
+| ------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `RocketSurgeryAnalyzers`              | `true`  | Master switch for every analyzer package below                                                                             |
+| `RocketSurgeryPublicApiAnalyzers`     | `true`  | Inject `Microsoft.CodeAnalysis.PublicApiAnalyzers`                                                                         |
+| `RocketSurgeryBannedApiAnalyzers`     | `true`  | Inject `Microsoft.CodeAnalysis.BannedApiAnalyzers` + wire up `BannedSymbols.txt`                                           |
+| `RocketSurgeryBannedNewtonsoftJson`   | `true`  | Also wire up `BannedSymbols.NewtonsoftJson.txt` (requires `RocketSurgeryBannedApiAnalyzers`)                               |
+| `RocketSurgeryCodeAnalysisAnalyzers`  | `true`  | Inject `Microsoft.CodeAnalysis.Analyzers`                                                                                  |
+| `RocketSurgeryRoslynatorAnalyzers`    | `true`  | Inject `Roslynator.Analyzers` + `Roslynator.Formatting.Analyzers`                                                          |
+| `RocketSurgeryEditorConfig`           | `true`  | Master switch for the shipped global editorconfig profiles                                                                 |
+| `RocketSurgeryEditorConfigJetBrains`  | `true`  | Include `JetBrains.editorconfig`                                                                                           |
+| `RocketSurgeryEditorConfigRoslynator` | `true`  | Include `Roslynator.editorconfig`                                                                                          |
+| `RocketSurgeryJetBrainsAnnotations`   | `true`  | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
 
-Editorconfig profiles are also applied automatically per project shape — `Tests.editorconfig` when
+Editorconfig profiles are also applied automatically per project shape: `Tests.editorconfig` when
 `IsTestProject=true`, `Samples.editorconfig` when `IsSampleProject=true`,
 `SingleFileApp.editorconfig` when `RocketSurgerySingleFileApp=true`, and (if one exists)
-`editorconfig/$(RocketSurgerySdkName).editorconfig` per SDK variant — none of these have their own
+`editorconfig/$(RocketSurgerySdkName).editorconfig` per SDK variant. None of these have their own
 opt-out property beyond `RocketSurgeryEditorConfig`.
 
 ### Compiler & analysis defaults (`src/common/Common.props`)
 
-| Property | Default | Condition |
-| --- | --- | --- |
-| `LangVersion` | `preview` | — |
-| `Features` | `strict` | — |
-| `Nullable` | `enable` | — |
-| `ImplicitUsings` | `enable` | — |
-| `ProduceReferenceAssembly` | `true` | not a single-file app |
-| `AnalysisMode` | `AllEnabledByDefault` | — |
-| `AnalysisLevel` | `latest` | — |
-| `EnableNETAnalyzers` | `true` | — |
-| `GenerateDocumentationFile` | `true` | not a test, sample, or single-file-app project (flipped back to `false` for test/sample projects if it was this SDK that defaulted it) |
-| `NuGetAudit` | `true` | — |
-| `NuGetAuditMode` | `all` | — |
-| `NuGetAuditLevel` | `moderate` | — |
-| `RocketSurgeryDefaultWarningsAsErrors` | `true` | appends `RS0017` to `WarningsAsErrors` |
-| `RocketSurgeryWarningsAsErrors` | `true` | gates whether `TreatWarningsAsErrors` gets defaulted at all |
-| `TreatWarningsAsErrors` | `true` | only when `RocketSurgeryWarningsAsErrors=true` **and** (`ContinuousIntegrationBuild=true` **or** `Configuration=Release`) |
-| `RocketSurgerySourceLink` | `true` | gates the Source Link section below |
-| `RocketSurgerySingleFileApp` | `true` | only when `FileBasedProgram=true` (file-based `dotnet run app.cs` apps) |
-| `IsTestProject` / `UseMicrosoftTestingPlatformRunner` | `true` | only for `Rocket.Surgery.Sdk.Test` |
-| `OutputType` | `Exe` | only for `Rocket.Surgery.Sdk.Test`, so restore fetches the apphost pack for older target frameworks |
-| `PublishRepositoryUrl` | `true` | — |
-| `PublishDocumentationFile` | `true` | — |
-| `PublishReferencesDocumentationFiles` | `true` | — |
-| `PublishReferencesSymbols` | `true` | — |
-| `CopyDebugSymbolFilesFromPackages` | `true` | — |
-| `CopyDocumentationFilesFromPackages` | `true` | — |
+| Property                                              | Default               | Condition                                                                                                                              |
+| ----------------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `LangVersion`                                         | `preview`             |                                                                                                                                        |
+| `Features`                                            | `strict`              |                                                                                                                                        |
+| `Nullable`                                            | `enable`              |                                                                                                                                        |
+| `ImplicitUsings`                                      | `enable`              |                                                                                                                                        |
+| `ProduceReferenceAssembly`                            | `true`                | not a single-file app                                                                                                                  |
+| `AnalysisMode`                                        | `AllEnabledByDefault` |                                                                                                                                        |
+| `AnalysisLevel`                                       | `latest`              |                                                                                                                                        |
+| `EnableNETAnalyzers`                                  | `true`                |                                                                                                                                        |
+| `GenerateDocumentationFile`                           | `true`                | not a test, sample, or single-file-app project (flipped back to `false` for test/sample projects if it was this SDK that defaulted it) |
+| `NuGetAudit`                                          | `true`                |                                                                                                                                        |
+| `NuGetAuditMode`                                      | `all`                 |                                                                                                                                        |
+| `NuGetAuditLevel`                                     | `moderate`            |                                                                                                                                        |
+| `RocketSurgeryDefaultWarningsAsErrors`                | `true`                | appends `RS0017` to `WarningsAsErrors`                                                                                                 |
+| `RocketSurgeryWarningsAsErrors`                       | `true`                | gates whether `TreatWarningsAsErrors` gets defaulted at all                                                                            |
+| `TreatWarningsAsErrors`                               | `true`                | only when `RocketSurgeryWarningsAsErrors=true` **and** (`ContinuousIntegrationBuild=true` **or** `Configuration=Release`)              |
+| `RocketSurgerySourceLink`                             | `true`                | gates the Source Link section below                                                                                                    |
+| `RocketSurgerySingleFileApp`                          | `true`                | only when `FileBasedProgram=true` (file-based `dotnet run app.cs` apps)                                                                |
+| `IsTestProject` / `UseMicrosoftTestingPlatformRunner` | `true`                | only for `Rocket.Surgery.Sdk.Test`                                                                                                     |
+| `OutputType`                                          | `Exe`                 | only for `Rocket.Surgery.Sdk.Test`, so restore fetches the apphost pack for older target frameworks                                    |
+| `PublishRepositoryUrl`                                | `true`                |                                                                                                                                        |
+| `PublishDocumentationFile`                            | `true`                |                                                                                                                                        |
+| `PublishReferencesDocumentationFiles`                 | `true`                |                                                                                                                                        |
+| `PublishReferencesSymbols`                            | `true`                |                                                                                                                                        |
+| `CopyDebugSymbolFilesFromPackages`                    | `true`                |                                                                                                                                        |
+| `CopyDocumentationFilesFromPackages`                  | `true`                |                                                                                                                                        |
 
-`IsSampleProject` (default `false`, never set by the SDK — you opt in) relaxes packing,
+`IsSampleProject` (default `false`, never set by the SDK, you opt in) relaxes packing,
 documentation, and `RS0017` public-API tracking; see `src/common/Common.targets`.
 
 ### Build/publish behavior (`src/common/Common.targets`)
 
-| Property | Default | Condition |
-| --- | --- | --- |
-| `RollForward` | `LatestMajor` | `OutputType=Exe` and not a test project |
-| `GenerateSBOM` | `true` | CI build **and** `IsPackable=true` (opt out with `GenerateSBOM=false`) |
-| `EnablePackageValidation` | `true` | only once `PackageValidationBaselineVersion` is set to your last released version |
-| `IsPackable` | `false` | test projects and sample projects |
-| `Features` | appends `runtime-async=on` | only when `RocketSurgeryRuntimeAsync=true`, see [Runtime async](#runtime-async) |
+| Property                  | Default                    | Condition                                                                         |
+| ------------------------- | -------------------------- | --------------------------------------------------------------------------------- |
+| `RollForward`             | `LatestMajor`              | `OutputType=Exe` and not a test project                                           |
+| `GenerateSBOM`            | `true`                     | CI build **and** `IsPackable=true` (opt out with `GenerateSBOM=false`)            |
+| `EnablePackageValidation` | `true`                     | only once `PackageValidationBaselineVersion` is set to your last released version |
+| `IsPackable`              | `false`                    | test projects and sample projects                                                 |
+| `Features`                | appends `runtime-async=on` | only when `RocketSurgeryRuntimeAsync=true`, see [Runtime async](#runtime-async)   |
 
 Assemblies get a `RocketSurgery.Sdk.Name` metadata attribute whenever `RocketSurgerySdkName` is set
 (one fixed value per SDK package, e.g. `Rocket.Surgery.Sdk.Web`) and `GenerateAssemblyInfo=true`.
@@ -180,18 +197,18 @@ or on the command line) to turn on `<Features>runtime-async=on</Features>` for:
   runtime identifier (Blazor WebAssembly included) never get it: Mono WebAssembly can't run
   runtime-async IL and fails with `InvalidProgramException`.
 
-| Property | Default | Purpose |
-| --- | --- | --- |
-| `RocketSurgeryRuntimeAsync` | *(unset/off)* | opt-in: append `runtime-async=on` to `Features` for eligible target frameworks |
-| `UseRuntimeAsync` | *(unset)* | set to `false` to opt a single project back out once the switch is on |
+| Property                    | Default       | Purpose                                                                        |
+| --------------------------- | ------------- | ------------------------------------------------------------------------------ |
+| `RocketSurgeryRuntimeAsync` | _(unset/off)_ | opt-in: append `runtime-async=on` to `Features` for eligible target frameworks |
+| `UseRuntimeAsync`           | _(unset)_     | set to `false` to opt a single project back out once the switch is on          |
 
 ### Source Link (`src/common/SourceLink.props`, only when `RocketSurgerySourceLink=true`)
 
-| Property | Default |
-| --- | --- |
-| `IncludeSymbols` | `true` |
-| `SymbolPackageFormat` | `snupkg` |
-| `DebugType` | `portable` |
+| Property              | Default    |
+| --------------------- | ---------- |
+| `IncludeSymbols`      | `true`     |
+| `SymbolPackageFormat` | `snupkg`   |
+| `DebugType`           | `portable` |
 
 `EmbeddedResourceUseDependentUponConvention` defaults to `true` regardless of `RocketSurgerySourceLink`.
 `EmbedUntrackedSources` is not set by this SDK; the .NET SDK already defaults it to `true`.
@@ -201,45 +218,45 @@ or on the command line) to turn on `<Features>runtime-async=on</Features>` for:
 Only active when the matching `GitVersion_*` variable is present, and never overrides a value you set.
 Opt out entirely with `RocketSurgeryGitVersion=false`.
 
-| Property | Source |
-| --- | --- |
-| `Version`, `PackageVersion` | `GitVersion_SemVer` |
-| `AssemblyVersion` | `GitVersion_Major` → `<major>.0.0.0` |
-| `FileVersion` | `GitVersion_AssemblySemVer` |
-| `InformationalVersion` | `GitVersion_InformationalVersion` |
+| Property                                      | Source                                                                              |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `Version`, `PackageVersion`                   | `GitVersion_SemVer`                                                                 |
+| `AssemblyVersion`                             | `GitVersion_Major` → `<major>.0.0.0`                                                |
+| `FileVersion`                                 | `GitVersion_AssemblySemVer`                                                         |
+| `InformationalVersion`                        | `GitVersion_InformationalVersion`                                                   |
 | `IncludeSourceRevisionInInformationalVersion` | `false` when `GitVersion_InformationalVersion` is set (it already contains the sha) |
 
 Every `GitVersion_*` variable is also added as `AssemblyMetadata` when `GitVersion_SemVer` is present.
 
 ### Testing (`src/common/Testing.props` / `Testing.targets`, only imported for test projects)
 
-| Property | Default | Condition |
-| --- | --- | --- |
-| `RsgSdk_Testing_Extensions` | `true` | master switch for everything below |
-| `RsgSdk_Testing_CodeCoverage` | `true` | - |
-| `RsgSdk_Testing_TrxReport` | `true` | — |
-| `RsgSdk_Testing_CrashDump` | `true` | — |
-| `RsgSdk_Testing_HangDump` | `true` | — |
-| `RsgSdk_Testing_HotReload` | `true` | — |
-| `RsgSdk_Testing_AzureDevOpsReport` | `true` | enables `Microsoft.Testing.Extensions.AzureDevOpsReport` + `--report-azdo` (no-op outside Azure Pipelines) |
-| `RsgSdk_Testing_GitHubActionsReport` | `true` | enables `Microsoft.Testing.Extensions.GitHubActionsReport` + `--report-gh` (no-op outside GitHub Actions) |
-| `RsgSdk_Testing_Retry` | `false` | opt-in — enables `Microsoft.Testing.Extensions.Retry` |
-| `RsgSdk_Testing_MinimumExpectedTests` | `0`, raised to `1` | raised to `1` only when `RsgSdk_Testing_Extensions=true`; set to `0` to disable the "zero tests discovered" failure |
-| `RsgSdk_Testing_RetryCount` | `0` | only used when `RsgSdk_Testing_Retry=true` |
-| `RsgSdk_Testing_HangDumpTimeout` | `1h` | only when `RsgSdk_Testing_Extensions=true` |
-| `RocketSurgeryOptimizeTestBuild` | *(unset/off)* | opt-in — set to `true` to skip analyzers when compiling for `dotnet test` |
-| `TestingPlatformDotnetTestSupport` | `true` | — |
-| `MergeCoverage` | `true` | — |
-| `IncludeTestAssembly` | `true` | — |
-| `RunSettingsFilePath` | `$(MSBuildThisFileDirectory)coverage.runsettings` | the SDK's own default runsettings; override to point at your own |
+| Property                              | Default                                           | Condition                                                                                                           |
+| ------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `RsgSdk_Testing_Extensions`           | `true`                                            | master switch for everything below                                                                                  |
+| `RsgSdk_Testing_CodeCoverage`         | `true`                                            | -                                                                                                                   |
+| `RsgSdk_Testing_TrxReport`            | `true`                                            |                                                                                                                     |
+| `RsgSdk_Testing_CrashDump`            | `true`                                            |                                                                                                                     |
+| `RsgSdk_Testing_HangDump`             | `true`                                            |                                                                                                                     |
+| `RsgSdk_Testing_HotReload`            | `true`                                            |                                                                                                                     |
+| `RsgSdk_Testing_AzureDevOpsReport`    | `true`                                            | enables `Microsoft.Testing.Extensions.AzureDevOpsReport` + `--report-azdo` (no-op outside Azure Pipelines)          |
+| `RsgSdk_Testing_GitHubActionsReport`  | `true`                                            | enables `Microsoft.Testing.Extensions.GitHubActionsReport` + `--report-gh` (no-op outside GitHub Actions)           |
+| `RsgSdk_Testing_Retry`                | `false`                                           | opt-in, enables `Microsoft.Testing.Extensions.Retry`                                                                |
+| `RsgSdk_Testing_MinimumExpectedTests` | `0`, raised to `1`                                | raised to `1` only when `RsgSdk_Testing_Extensions=true`; set to `0` to disable the "zero tests discovered" failure |
+| `RsgSdk_Testing_RetryCount`           | `0`                                               | only used when `RsgSdk_Testing_Retry=true`                                                                          |
+| `RsgSdk_Testing_HangDumpTimeout`      | `1h`                                              | only when `RsgSdk_Testing_Extensions=true`                                                                          |
+| `RocketSurgeryOptimizeTestBuild`      | _(unset/off)_                                     | opt-in, set to `true` to skip analyzers when compiling for `dotnet test`                                            |
+| `TestingPlatformDotnetTestSupport`    | `true`                                            |                                                                                                                     |
+| `MergeCoverage`                       | `true`                                            |                                                                                                                     |
+| `IncludeTestAssembly`                 | `true`                                            |                                                                                                                     |
+| `RunSettingsFilePath`                 | `$(MSBuildThisFileDirectory)coverage.runsettings` | the SDK's own default runsettings; override to point at your own                                                    |
 
 Framework adapters (`Rocket.Surgery.Extensions.Testing.TUnit`) are added automatically
-by inspecting your `PackageReference`s (`TUnit`) — there is no property to force them
+by inspecting your `PackageReference`s (`TUnit`, `TUnit.AspNetCore`, `TUnit.Aspire`). There is no property to force them
 on or off independently of `RsgSdk_Testing_Extensions`.
 
 ### Injected package versions
 
-There's no checked-in `Packages.props` to hand-maintain — `common/Packages.props` is generated at
+There's no checked-in `Packages.props` to hand-maintain: `common/Packages.props` is generated at
 pack time (see `src/Directory.Build.targets`) from this repo's own `Directory.Packages.props`.
 Every `PackageVersion` / `GlobalPackageReference` whose package id starts with one of these
 prefixes is picked up automatically:
@@ -251,18 +268,18 @@ prefixes is picked up automatically:
 - `Microsoft.Sbom.Targets` (exact match)
 - `JetBrains.Annotations.Sources` (exact match)
 
-Adding a new package to that list is enough to make the SDK inject a version default for it — no
+Adding a new package to that list is enough to make the SDK inject a version default for it, with no
 manual property to add or keep in sync. The generated property name follows a fixed pattern: strip
 the dots from the package id and wrap it as `RsgSdk_<PackageIdNoDots>_Version`. For example:
 
-| Package | Generated property |
-| --- | --- |
-| `Roslynator.Analyzers` | `RsgSdk_RoslynatorAnalyzers_Version` |
+| Package                                     | Generated property                                       |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `Roslynator.Analyzers`                      | `RsgSdk_RoslynatorAnalyzers_Version`                     |
 | `Microsoft.CodeAnalysis.PublicApiAnalyzers` | `RsgSdk_MicrosoftCodeAnalysisPublicApiAnalyzers_Version` |
-| `Microsoft.Testing.Extensions.CrashDump` | `RsgSdk_MicrosoftTestingExtensionsCrashDump_Version` |
-| `Rocket.Surgery.Extensions.Testing.TUnit` | `RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version` |
+| `Microsoft.Testing.Extensions.CrashDump`    | `RsgSdk_MicrosoftTestingExtensionsCrashDump_Version`     |
+| `Rocket.Surgery.Extensions.Testing.TUnit`   | `RsgSdk_RocketSurgeryExtensionsTestingTUnit_Version`     |
 
-Every one of these is overridable the same way as any other SDK default — set the property in your
+Every one of these is overridable the same way as any other SDK default: set the property in your
 project, `Directory.Build.props`, or on the command line before the SDK evaluates it. To see the
 full current list, either inspect `common/Packages.props` inside a packed nupkg, or run
 `dotnet build -getProperty:RsgSdk_RoslynatorAnalyzers_Version` (etc.) against a consumer project.
@@ -275,8 +292,8 @@ present, the matching `ci/*.targets` file also adds provenance `AssemblyMetadata
 SHA, run/job/pipeline/build IDs, repository info, etc.) pulled from that provider's environment
 variables.
 
-> Migrating a repo that used `GlobalPackageReference` for these analyzers? Remove those entries —
-> the SDK injects them.
+> Migrating a repo that used `GlobalPackageReference` for these analyzers? Remove those entries,
+> because the SDK injects them.
 
 ## Migrating from Rocket.Surgery.MSBuild.*
 
@@ -290,14 +307,14 @@ referencing the package switches the bundled copy off. AppVeyor detection was no
 
 Renamed switches:
 
-| Rocket.Surgery.MSBuild.GlobalAnalyzerConfig | Rocket.Surgery.Sdk |
-| --- | --- |
-| `RSGEditorConfigEnabled` | `RocketSurgeryEditorConfig` |
-| `RSGRiderEnabled` | `RocketSurgeryEditorConfigJetBrains` |
-| `RSGRoslynatorEnabled` | `RocketSurgeryEditorConfigRoslynator` |
-| `RSGBannedApisEnabled` | `RocketSurgeryBannedApiAnalyzers` |
-| `RSGBannedNewtonsoftJsonEnabled` | `RocketSurgeryBannedNewtonsoftJson` |
-| `RSGSingleFileApp` | `RocketSurgerySingleFileApp` |
+| Rocket.Surgery.MSBuild.GlobalAnalyzerConfig | Rocket.Surgery.Sdk                    |
+| ------------------------------------------- | ------------------------------------- |
+| `RSGEditorConfigEnabled`                    | `RocketSurgeryEditorConfig`           |
+| `RSGRiderEnabled`                           | `RocketSurgeryEditorConfigJetBrains`  |
+| `RSGRoslynatorEnabled`                      | `RocketSurgeryEditorConfigRoslynator` |
+| `RSGBannedApisEnabled`                      | `RocketSurgeryBannedApiAnalyzers`     |
+| `RSGBannedNewtonsoftJsonEnabled`            | `RocketSurgeryBannedNewtonsoftJson`   |
+| `RSGSingleFileApp`                          | `RocketSurgerySingleFileApp`          |
 
 ## Contributing
 
@@ -314,7 +331,7 @@ Run `mise install` before building: it installs the .NET SDK and the extra .NET 
 
 Versions follow `<year>.<month>.<build>` (e.g. `2026.7.1`) and a release is published weekly by
 GitHub Actions using [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)
-(OIDC — no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
+(OIDC, no API keys). One-time setup: on nuget.org, add a trusted publishing policy for
 `RocketSurgeonsGuild/MSBuildSdk` with workflow `release.yml`.
 
 ## AssemblyInfo
@@ -326,27 +343,27 @@ exposes build-time information as a generated `AssemblyInfo` class. It is not in
 <PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
 ```
 
-| Area | Source |
-| --- | --- |
-| `AssemblyInfo.Attributes.*` | assembly attributes (`Title`, `Version`, `Company`, …) |
-| `AssemblyInfo.Metadata.*` | `@(AssemblyMetadata)` items |
-| `AssemblyInfo.Project.*` | `@(ProjectProperty)` items (defaults include `AssemblyName`, `RootNamespace`, target framework and runtime identifiers) |
-| `AssemblyInfo.Git.*` | `Branch`, `Commit`, `Sha`, `Root`, `Url` |
-| `AssemblyInfo.Constants.*` | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes |
-| `AssemblyInfo.Resources.*` | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()` |
-| `AssemblyInfo.Strings.*` | strings from `.resx` files |
-| `AssemblyInfo.Dependencies.<Name>.*` | what each reference exposes; opt-in with `AssemblyInfoDependencies=true` (see [Dependencies](#dependencies)) |
+| Area                                 | Source                                                                                                                  |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `AssemblyInfo.Attributes.*`          | assembly attributes (`Title`, `Version`, `Company`, …)                                                                  |
+| `AssemblyInfo.Metadata.*`            | `@(AssemblyMetadata)` items                                                                                             |
+| `AssemblyInfo.Project.*`             | `@(ProjectProperty)` items (defaults include `AssemblyName`, `RootNamespace`, target framework and runtime identifiers) |
+| `AssemblyInfo.Git.*`                 | `Branch`, `Commit`, `Sha`, `Root`, `Url`                                                                                |
+| `AssemblyInfo.Constants.*`           | `@(Constant)` and `@(FileConstant)` items; dotted names (and a dotted `Root`) become nested classes                     |
+| `AssemblyInfo.Resources.*`           | `@(EmbeddedResource)` items, as `Text` / `GetBytes()` / `GetStream()`                                                   |
+| `AssemblyInfo.Strings.*`             | strings from `.resx` files                                                                                              |
+| `AssemblyInfo.Dependencies.<Name>.*` | what each reference exposes; opt-in with `AssemblyInfoDependencies=true` (see [Dependencies](#dependencies))            |
 
-| Property | Default | Purpose |
-| --- | --- | --- |
-| `AssemblyInfoNamespace` | *(none)* | Namespace for the generated class (C# 10+) |
-| `AssemblyInfoVisibility` | `internal` | Set to `public` to expose the class |
-| `AssemblyInfoGitComment` | *(none)* | XML doc comment for the `Git` area |
+| Property                 | Default    | Purpose                                    |
+| ------------------------ | ---------- | ------------------------------------------ |
+| `AssemblyInfoNamespace`  | _(none)_   | Namespace for the generated class (C# 10+) |
+| `AssemblyInfoVisibility` | `internal` | Set to `public` to expose the class        |
+| `AssemblyInfoGitComment` | _(none)_   | XML doc comment for the `Git` area         |
 
 Diagnostics: `RSAI001` (warning) when no Source Link provider is available, so `Git.*` values may be
 empty; `RSAI002` (error) when `AssemblyInfoNamespace` is set on C# older than 10; `RSAI003` (warning)
 when a `.resx` string mixes named (`{name}`) and indexed (`{0}`) format arguments, because no
-`AssemblyInfo.Strings` member is generated for it. `RSAI004`–`RSAI007` are about dependencies (below). `RSAI001` and `RSAI002` were `TA001` and `MA002` in
+`AssemblyInfo.Strings` member is generated for it. `RSAI004` to `RSAI007` are about dependencies (below). `RSAI001` and `RSAI002` were `TA001` and `MA002` in
 MyAssembly, so update any suppressions.
 
 Values and comments of `@(Constant)` items (and so of `Project`, `Metadata`, `Attributes` and `Git`) can hold
@@ -392,10 +409,10 @@ Every project that references Rocket.Surgery.AssemblyInfo writes `$(AssemblyName
 assembly, copies it to the output directory and packs it into `lib/<tfm>/` (one per target framework). Nothing is added
 to the assembly itself. Because the package is public even when `AssemblyInfo` is internal, what goes in is opt-in:
 
-| In the manifest | |
-| --- | --- |
+| In the manifest                                                                                                                         |                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `Git.Branch`, `Git.Commit`, `Git.Sha`, `Git.Url`; `Attributes.*`; `Metadata.*`; embedded resources; the default `ProjectProperty` items | always (`Manifest="false"` on the `AssemblyAttribute`, `AssemblyMetadata`, `EmbeddedResource` or `ProjectProperty` item leaves it out) |
-| `Git.Root`, other `ProjectProperty` items (such as `ProjectFile`), `@(Constant)` and `@(FileConstant)` items | only with `Manifest="true"` |
+| `Git.Root`, other `ProjectProperty` items (such as `ProjectFile`), `@(Constant)` and `@(FileConstant)` items                            | only with `Manifest="true"`                                                                                                            |
 
 ```xml
 <Constant Include="ApiVersion" Value="3" Type="int" Manifest="true" />
@@ -412,14 +429,14 @@ Every reference except framework assemblies (targeting packs, .NET Framework ref
 any run of characters and `?` matches one; it has to match the whole name, ignoring case, so a pattern without a wildcard
 is an exact name (`corelib` matches nothing, `*corelib` matches `System.Private.CoreLib`).
 
-| Property / item | Default | Purpose |
-| --- | --- | --- |
-| `AssemblyInfoDependencyIgnore` | `Microsoft.*;System.*` | `;`- or `,`-separated ignore patterns. The default only applies while the property is unset: setting it replaces the default, `$(AssemblyInfoDependencyIgnore);Vendor.*` extends it, and `;` clears it. |
-| `@(AssemblyInfoDependencyIgnore)` | | More ignore patterns, always added to the property's. |
-| `@(AssemblyInfoDependency)` | | Assemblies to describe even when an ignore pattern or the framework filter would leave them out. |
-| `AssemblyInfo="true"` / `"false"` on a `PackageReference`, `ProjectReference` or `Reference` | | Always / never describe the assemblies it brings in; `false` wins over everything. |
-| `AssemblyInfoIncludeFrameworkDependencies` | `false` | Describe framework assemblies too (resource names only, no accessors). |
-| `AssemblyInfoDependencies` | `false` | `true` turns `AssemblyInfo.Dependencies` on. |
+| Property / item                                                                              | Default                | Purpose                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AssemblyInfoDependencyIgnore`                                                               | `Microsoft.*;System.*` | `;`- or `,`-separated ignore patterns. The default only applies while the property is unset: setting it replaces the default, `$(AssemblyInfoDependencyIgnore);Vendor.*` extends it, and `;` clears it. |
+| `@(AssemblyInfoDependencyIgnore)`                                                            |                        | More ignore patterns, always added to the property's.                                                                                                                                                   |
+| `@(AssemblyInfoDependency)`                                                                  |                        | Assemblies to describe even when an ignore pattern or the framework filter would leave them out.                                                                                                        |
+| `AssemblyInfo="true"` / `"false"` on a `PackageReference`, `ProjectReference` or `Reference` |                        | Always / never describe the assemblies it brings in; `false` wins over everything.                                                                                                                      |
+| `AssemblyInfoIncludeFrameworkDependencies`                                                   | `false`                | Describe framework assemblies too (resource names only, no accessors).                                                                                                                                  |
+| `AssemblyInfoDependencies`                                                                   | `false`                | `true` turns `AssemblyInfo.Dependencies` on.                                                                                                                                                            |
 
 MSBuild expands `*` and `?` in an item's `Include` as a file glob, so an item puts a wildcard pattern in `Pattern`:
 
@@ -436,3 +453,28 @@ diagnostics: `RSAI004` (warning) when a manifest is from a newer Rocket.Surgery.
 `RSAI005` (warning) when one cannot be read, in both cases the dependency only gets what its attributes say; `RSAI006`
 (info) when two assembly names flatten to the same class name, in which case the second gets a numeric suffix
 (`Foo_Bar_2`).
+
+<!-- references -->
+
+[github-release]: https://github.com/RocketSurgeonsGuild/MSBuildSdk/releases/latest
+[github-release-badge]: https://img.shields.io/github/release/RocketSurgeonsGuild/MSBuildSdk.svg?logo=github&style=flat "Latest Release"
+[github-license]: https://github.com/RocketSurgeonsGuild/MSBuildSdk/blob/main/LICENSE
+[github-license-badge]: https://img.shields.io/github/license/RocketSurgeonsGuild/MSBuildSdk.svg?style=flat "License"
+[github-build]: https://github.com/RocketSurgeonsGuild/MSBuildSdk/actions/workflows/build.yml
+[github-build-badge]: https://github.com/RocketSurgeonsGuild/MSBuildSdk/actions/workflows/build.yml/badge.svg?branch=main "Build"
+[nuget-Rocket.Surgery.Sdk]: https://www.nuget.org/packages/Rocket.Surgery.Sdk/
+[nuget-Rocket.Surgery.Sdk-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.Web]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.Web/
+[nuget-Rocket.Surgery.Sdk.Web-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.Web.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.Razor]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.Razor/
+[nuget-Rocket.Surgery.Sdk.Razor-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.Razor.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.BlazorWebAssembly]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.BlazorWebAssembly/
+[nuget-Rocket.Surgery.Sdk.BlazorWebAssembly-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.BlazorWebAssembly.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.Test]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.Test/
+[nuget-Rocket.Surgery.Sdk.Test-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.Test.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.WindowsDesktop]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.WindowsDesktop/
+[nuget-Rocket.Surgery.Sdk.WindowsDesktop-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.WindowsDesktop.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.Sdk.Script]: https://www.nuget.org/packages/Rocket.Surgery.Sdk.Script/
+[nuget-Rocket.Surgery.Sdk.Script-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.Sdk.Script.svg?logo=nuget&style=flat
+[nuget-Rocket.Surgery.AssemblyInfo]: https://www.nuget.org/packages/Rocket.Surgery.AssemblyInfo/
+[nuget-Rocket.Surgery.AssemblyInfo-badge]: https://img.shields.io/nuget/v/Rocket.Surgery.AssemblyInfo.svg?logo=nuget&style=flat

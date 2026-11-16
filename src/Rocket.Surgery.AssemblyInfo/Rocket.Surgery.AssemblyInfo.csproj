@@ -8,6 +8,8 @@
         <NoWarn>NU5105;$(NoWarn)</NoWarn>
         <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
         <_AnalyzersLocation>$(MSBuildThisFileDirectory)../Rocket.Surgery.AssemblyInfo.supports/bin/</_AnalyzersLocation>
+        <PackageTags>$(PackageTags);source-generator;roslyn;assemblyinfo;assembly-metadata;build-info;git;embedded-resources;resx;constants;myassembly</PackageTags>
+        <PackageDescription>Source generator that writes an AssemblyInfo class with build-time values: assembly attributes and metadata, project properties, git branch and commit, MSBuild constants, embedded resources and .resx strings.</PackageDescription>
     </PropertyGroup>
     <ItemGroup>
         <None Remove="*.sbntxt" />
