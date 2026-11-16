@@ -2,5 +2,6 @@
     <!-- Packaging shell only — see Directory.Build.props and Directory.Build.targets in src/ (the nuspec is generated when packing). -->
     <PropertyGroup>
         <PackageTags>$(PackageTags);microsoft.net.sdk.blazorwebassembly;blazor;blazor-webassembly;webassembly;wasm</PackageTags>
+        <PackageDescription>MSBuild project SDK for Blazor WebAssembly apps that chains to Microsoft.NET.Sdk.BlazorWebAssembly and applies the shared build defaults: analyzers, editorconfig profiles, NuGet audit, Source Link and GitVersion.</PackageDescription>
     </PropertyGroup>
 </Project>

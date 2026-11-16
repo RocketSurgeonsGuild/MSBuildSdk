@@ -9,7 +9,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- Tags every package shares; src/Directory.Build.props adds the SDK family's and each project appends its own with $(PackageTags);... -->
-    <PackageTags>rocket-surgery;rocket-surgeons-guild;msbuild</PackageTags>
+    <PackageTags>rocket-surgery;msbuild</PackageTags>
     <LangVersion>preview</LangVersion>
     <Features>strict</Features>
     <Nullable>enable</Nullable>
