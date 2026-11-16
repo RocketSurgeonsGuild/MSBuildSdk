@@ -17,5 +17,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <ImplicitUsings>disable</ImplicitUsings>
+    <PackageTags>$(PackageTags);msbuild-sdk;sdk;build-defaults;analyzers;roslynator;editorconfig;sourcelink;nuget-audit;gitversion</PackageTags>
   </PropertyGroup>
 </Project>

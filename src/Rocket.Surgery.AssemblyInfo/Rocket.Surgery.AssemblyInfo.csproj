@@ -8,6 +8,7 @@
         <NoWarn>NU5105;$(NoWarn)</NoWarn>
         <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
         <_AnalyzersLocation>$(MSBuildThisFileDirectory)../Rocket.Surgery.AssemblyInfo.supports/bin/</_AnalyzersLocation>
+        <PackageTags>$(PackageTags);source-generator;roslyn;assemblyinfo;assembly-metadata;build-info;git;embedded-resources;resx;constants;myassembly</PackageTags>
     </PropertyGroup>
     <ItemGroup>
         <None Remove="*.sbntxt" />
