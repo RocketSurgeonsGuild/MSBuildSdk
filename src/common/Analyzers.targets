@@ -38,6 +38,7 @@
         <RsgSdkImplicitPackageReference Include="Roslynator.Refactorings" Version="$(RsgSdk_RoslynatorRefactorings_Version)" Condition="'$(RocketSurgeryRoslynatorAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
         <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisBannedApiAnalyzers_Version)" Condition="'$(RocketSurgeryBannedApiAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
         <RsgSdkImplicitPackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RsgSdk_MicrosoftCodeAnalysisAnalyzers_Version)" Condition="'$(RocketSurgeryCodeAnalysisAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <RsgSdkImplicitPackageReference Include="ZeroAlloc.Analyzers" Version="$(RsgSdk_ZeroAllocAnalyzers_Version)" Condition="'$(RocketSurgeryZeroAllocAnalyzers)' == 'true'" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     </ItemGroup>
 
     <!--
@@ -47,5 +48,13 @@
     <ItemGroup Condition="'$(RocketSurgeryJetBrainsAnnotations)' == 'true' and '$(Language)' == 'C#'">
         <RsgSdkImplicitPackageReference Include="JetBrains.Annotations.Sources" Version="$(RsgSdk_JetBrainsAnnotationsSources_Version)" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
         <Using Include="JetBrains.Annotations" Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'" />
+    </ItemGroup>
+
+    <!--
+        JetBrains external annotations for the BCL and common libraries (nullability / purity hints for Rider and ReSharper).
+        Opt out with RocketSurgeryJetBrainsExternalAnnotations=false. Independent of RocketSurgeryAnalyzers.
+    -->
+    <ItemGroup Condition="'$(RocketSurgeryJetBrainsExternalAnnotations)' == 'true'">
+        <RsgSdkImplicitPackageReference Include="JetBrains.ExternalAnnotations" Version="$(RsgSdk_JetBrainsExternalAnnotations_Version)" PrivateAssets="all" />
     </ItemGroup>
 </Project>

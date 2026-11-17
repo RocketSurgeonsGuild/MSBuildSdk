@@ -15,5 +15,7 @@
     <RocketSurgeryEditorConfigJetBrains Condition="'$(RocketSurgeryEditorConfigJetBrains)' == ''">true</RocketSurgeryEditorConfigJetBrains>
     <RocketSurgeryEditorConfigRoslynator Condition="'$(RocketSurgeryEditorConfigRoslynator)' == ''">true</RocketSurgeryEditorConfigRoslynator>
     <RocketSurgeryJetBrainsAnnotations Condition="'$(RocketSurgeryJetBrainsAnnotations)' == ''">true</RocketSurgeryJetBrainsAnnotations>
+    <RocketSurgeryJetBrainsExternalAnnotations Condition="'$(RocketSurgeryJetBrainsExternalAnnotations)' == ''">true</RocketSurgeryJetBrainsExternalAnnotations>
+    <RocketSurgeryZeroAllocAnalyzers Condition="'$(RocketSurgeryZeroAllocAnalyzers)' == ''">true</RocketSurgeryZeroAllocAnalyzers>
   </PropertyGroup>
 </Project>

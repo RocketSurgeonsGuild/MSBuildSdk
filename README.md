@@ -72,7 +72,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - No default `TargetFramework`: a csproj sets `TargetFramework` or `TargetFrameworks` itself, as with Microsoft.NET.Sdk
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
-- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK and individually overridable, see [Injected package versions](#injected-package-versions) below)
+- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers, Microsoft.CodeAnalysis.Analyzers, ZeroAlloc.Analyzers and JetBrains.ExternalAnnotations injected (versions pinned by the SDK and individually overridable, see [Injected package versions](#injected-package-versions) below)
 - Shared editorconfig profiles (common, coding style, JetBrains, Roslynator, tests, samples, file-based apps, per-SDK-variant) applied as global analyzer configs; your own `.editorconfig` always wins
 - `NuGetAudit=true` (mode `all`, level `moderate`)
 - Source link / deterministic CI builds auto-detected via `ContinuousIntegrationBuild` (GitHub Actions, Azure DevOps, GitLab CI env vars); build-provenance `AssemblyMetadata` (commit SHA, run/job/pipeline IDs, etc.) is embedded automatically on those providers
@@ -132,6 +132,8 @@ All defaults are guarded (`Condition="'$(Property)' == ''"`), so anything set in
 | `RocketSurgeryEditorConfigJetBrains`  | `true`  | Include `JetBrains.editorconfig`                                                                                           |
 | `RocketSurgeryEditorConfigRoslynator` | `true`  | Include `Roslynator.editorconfig`                                                                                          |
 | `RocketSurgeryJetBrainsAnnotations`   | `true`  | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
+| `RocketSurgeryJetBrainsExternalAnnotations` | `true` | Inject `JetBrains.ExternalAnnotations` (independent of `RocketSurgeryAnalyzers`)                                      |
+| `RocketSurgeryZeroAllocAnalyzers`     | `true`  | Inject `ZeroAlloc.Analyzers`                                                                                               |
 
 Editorconfig profiles are also applied automatically per project shape: `Tests.editorconfig` when
 `IsTestProject=true`, `Samples.editorconfig` when `IsSampleProject=true`,
@@ -267,6 +269,8 @@ prefixes is picked up automatically:
 - `Microsoft.CodeAnalysis.`
 - `Microsoft.Sbom.Targets` (exact match)
 - `JetBrains.Annotations.Sources` (exact match)
+- `JetBrains.ExternalAnnotations` (exact match)
+- `ZeroAlloc.Analyzers` (exact match)
 
 Adding a new package to that list is enough to make the SDK inject a version default for it, with no
 manual property to add or keep in sync. The generated property name follows a fixed pattern: strip
