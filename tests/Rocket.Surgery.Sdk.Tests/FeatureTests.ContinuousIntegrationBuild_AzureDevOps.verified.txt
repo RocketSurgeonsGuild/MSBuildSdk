@@ -85,6 +85,7 @@
       RsgSdk_RoslynatorFormattingAnalyzers_Version: Version_9,
       RsgSdk_RoslynatorRefactorings_Version: Version_9,
       RsgSdk_Testing_CodeCoverage: true,
+      RsgSdk_Testing_CoverageSettings: true,
       RsgSdk_Testing_CrashDump: true,
       RsgSdk_Testing_Extensions: true,
       RsgSdk_Testing_HangDump: true,

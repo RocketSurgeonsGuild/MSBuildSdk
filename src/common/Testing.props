@@ -20,6 +20,7 @@
     <RsgSdk_Testing_CrashDump Condition="'$(RsgSdk_Testing_CrashDump)' == ''">true</RsgSdk_Testing_CrashDump>
     <RsgSdk_Testing_TrxReport Condition="'$(RsgSdk_Testing_TrxReport)' == ''">true</RsgSdk_Testing_TrxReport>
     <RsgSdk_Testing_CodeCoverage Condition="'$(RsgSdk_Testing_CodeCoverage)' == ''">true</RsgSdk_Testing_CodeCoverage>
+    <RsgSdk_Testing_CoverageSettings Condition="'$(RsgSdk_Testing_CoverageSettings)' == ''">true</RsgSdk_Testing_CoverageSettings>
     <RsgSdk_Testing_RetryCount Condition="'$(RsgSdk_Testing_RetryCount)' == ''">0</RsgSdk_Testing_RetryCount>
   </PropertyGroup>
 </Project>
