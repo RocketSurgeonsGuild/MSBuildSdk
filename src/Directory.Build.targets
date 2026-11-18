@@ -94,6 +94,8 @@
       <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.CodeAnalysis." />
       <_RocketSurgeryPackagesPropsPrefix Include="Microsoft.Sbom.Targets" />
       <_RocketSurgeryPackagesPropsPrefix Include="JetBrains.Annotations.Sources" />
+      <_RocketSurgeryPackagesPropsPrefix Include="JetBrains.ExternalAnnotations" />
+      <_RocketSurgeryPackagesPropsPrefix Include="ZeroAlloc.Analyzers" />
     </ItemGroup>
 
     <GenerateRocketSurgeryPackagesProps

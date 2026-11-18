@@ -25,7 +25,9 @@
         (it slows local runs).
     -->
   <PropertyGroup Condition="'$(RsgSdk_Testing_Extensions)' == 'true'">
-    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage</TestingPlatformCommandLineArguments>
+    <!-- The coverage-settings option takes a single value: a runner that passes its own (a build pipeline) sets RsgSdk_Testing_CoverageSettings=false. -->
+    <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CodeCoverage)' == 'true' and '$(RsgSdk_Testing_CoverageSettings)' == 'true'">$(TestingPlatformCommandLineArguments) --coverage-settings "$(RunSettingsFilePath)"</TestingPlatformCommandLineArguments>
     <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_TrxReport)' == 'true'">$(TestingPlatformCommandLineArguments) --report-trx</TestingPlatformCommandLineArguments>
     <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_CrashDump)' == 'true'">$(TestingPlatformCommandLineArguments) --crashdump --crashdump-type mini</TestingPlatformCommandLineArguments>
     <TestingPlatformCommandLineArguments Condition="'$(RsgSdk_Testing_HangDump)' == 'true'">$(TestingPlatformCommandLineArguments) --hangdump --hangdump-timeout $(RsgSdk_Testing_HangDumpTimeout) --hangdump-type mini</TestingPlatformCommandLineArguments>

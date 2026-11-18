@@ -72,7 +72,7 @@ File-based apps are detected automatically and get a relaxed analyzer profile.
 - No default `TargetFramework`: a csproj sets `TargetFramework` or `TargetFrameworks` itself, as with Microsoft.NET.Sdk
 - `AnalysisMode=AllEnabledByDefault`, `AnalysisLevel=latest`, `EnableNETAnalyzers=true`
 - `GenerateDocumentationFile=true` for regular projects (off for test/sample/single-file-app projects)
-- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers and Microsoft.CodeAnalysis.Analyzers injected (versions pinned by the SDK and individually overridable, see [Injected package versions](#injected-package-versions) below)
+- Roslynator, BannedApiAnalyzers, PublicApiAnalyzers, Microsoft.CodeAnalysis.Analyzers, ZeroAlloc.Analyzers and JetBrains.ExternalAnnotations injected (versions pinned by the SDK and individually overridable, see [Injected package versions](#injected-package-versions) below)
 - Shared editorconfig profiles (common, coding style, JetBrains, Roslynator, tests, samples, file-based apps, per-SDK-variant) applied as global analyzer configs; your own `.editorconfig` always wins
 - `NuGetAudit=true` (mode `all`, level `moderate`)
 - Source link / deterministic CI builds auto-detected via `ContinuousIntegrationBuild` (GitHub Actions, Azure DevOps, GitLab CI env vars); build-provenance `AssemblyMetadata` (commit SHA, run/job/pipeline IDs, etc.) is embedded automatically on those providers
@@ -120,18 +120,20 @@ All defaults are guarded (`Condition="'$(Property)' == ''"`), so anything set in
 
 ### Analyzers (`src/common/Analyzers.props`)
 
-| Property                              | Default | Purpose                                                                                                                    |
-| ------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `RocketSurgeryAnalyzers`              | `true`  | Master switch for every analyzer package below                                                                             |
-| `RocketSurgeryPublicApiAnalyzers`     | `true`  | Inject `Microsoft.CodeAnalysis.PublicApiAnalyzers`                                                                         |
-| `RocketSurgeryBannedApiAnalyzers`     | `true`  | Inject `Microsoft.CodeAnalysis.BannedApiAnalyzers` + wire up `BannedSymbols.txt`                                           |
-| `RocketSurgeryBannedNewtonsoftJson`   | `true`  | Also wire up `BannedSymbols.NewtonsoftJson.txt` (requires `RocketSurgeryBannedApiAnalyzers`)                               |
-| `RocketSurgeryCodeAnalysisAnalyzers`  | `true`  | Inject `Microsoft.CodeAnalysis.Analyzers`                                                                                  |
-| `RocketSurgeryRoslynatorAnalyzers`    | `true`  | Inject `Roslynator.Analyzers` + `Roslynator.Formatting.Analyzers`                                                          |
-| `RocketSurgeryEditorConfig`           | `true`  | Master switch for the shipped global editorconfig profiles                                                                 |
-| `RocketSurgeryEditorConfigJetBrains`  | `true`  | Include `JetBrains.editorconfig`                                                                                           |
-| `RocketSurgeryEditorConfigRoslynator` | `true`  | Include `Roslynator.editorconfig`                                                                                          |
-| `RocketSurgeryJetBrainsAnnotations`   | `true`  | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
+| Property                                    | Default | Purpose                                                                                                                    |
+| ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `RocketSurgeryAnalyzers`                    | `true`  | Master switch for every analyzer package below                                                                             |
+| `RocketSurgeryPublicApiAnalyzers`           | `true`  | Inject `Microsoft.CodeAnalysis.PublicApiAnalyzers`                                                                         |
+| `RocketSurgeryBannedApiAnalyzers`           | `true`  | Inject `Microsoft.CodeAnalysis.BannedApiAnalyzers` + wire up `BannedSymbols.txt`                                           |
+| `RocketSurgeryBannedNewtonsoftJson`         | `true`  | Also wire up `BannedSymbols.NewtonsoftJson.txt` (requires `RocketSurgeryBannedApiAnalyzers`)                               |
+| `RocketSurgeryCodeAnalysisAnalyzers`        | `true`  | Inject `Microsoft.CodeAnalysis.Analyzers`                                                                                  |
+| `RocketSurgeryRoslynatorAnalyzers`          | `true`  | Inject `Roslynator.Analyzers` + `Roslynator.Formatting.Analyzers`                                                          |
+| `RocketSurgeryEditorConfig`                 | `true`  | Master switch for the shipped global editorconfig profiles                                                                 |
+| `RocketSurgeryEditorConfigJetBrains`        | `true`  | Include `JetBrains.editorconfig`                                                                                           |
+| `RocketSurgeryEditorConfigRoslynator`       | `true`  | Include `Roslynator.editorconfig`                                                                                          |
+| `RocketSurgeryJetBrainsAnnotations`         | `true`  | Inject `JetBrains.Annotations.Sources` + `using JetBrains.Annotations;` (C# only; independent of `RocketSurgeryAnalyzers`) |
+| `RocketSurgeryJetBrainsExternalAnnotations` | `true`  | Inject `JetBrains.ExternalAnnotations` (independent of `RocketSurgeryAnalyzers`)                                           |
+| `RocketSurgeryZeroAllocAnalyzers`           | `true`  | Inject `ZeroAlloc.Analyzers`                                                                                               |
 
 Editorconfig profiles are also applied automatically per project shape: `Tests.editorconfig` when
 `IsTestProject=true`, `Samples.editorconfig` when `IsSampleProject=true`,
@@ -230,25 +232,26 @@ Every `GitVersion_*` variable is also added as `AssemblyMetadata` when `GitVersi
 
 ### Testing (`src/common/Testing.props` / `Testing.targets`, only imported for test projects)
 
-| Property                              | Default                                           | Condition                                                                                                           |
-| ------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `RsgSdk_Testing_Extensions`           | `true`                                            | master switch for everything below                                                                                  |
-| `RsgSdk_Testing_CodeCoverage`         | `true`                                            | -                                                                                                                   |
-| `RsgSdk_Testing_TrxReport`            | `true`                                            |                                                                                                                     |
-| `RsgSdk_Testing_CrashDump`            | `true`                                            |                                                                                                                     |
-| `RsgSdk_Testing_HangDump`             | `true`                                            |                                                                                                                     |
-| `RsgSdk_Testing_HotReload`            | `true`                                            |                                                                                                                     |
-| `RsgSdk_Testing_AzureDevOpsReport`    | `true`                                            | enables `Microsoft.Testing.Extensions.AzureDevOpsReport` + `--report-azdo` (no-op outside Azure Pipelines)          |
-| `RsgSdk_Testing_GitHubActionsReport`  | `true`                                            | enables `Microsoft.Testing.Extensions.GitHubActionsReport` + `--report-gh` (no-op outside GitHub Actions)           |
-| `RsgSdk_Testing_Retry`                | `false`                                           | opt-in, enables `Microsoft.Testing.Extensions.Retry`                                                                |
-| `RsgSdk_Testing_MinimumExpectedTests` | `0`, raised to `1`                                | raised to `1` only when `RsgSdk_Testing_Extensions=true`; set to `0` to disable the "zero tests discovered" failure |
-| `RsgSdk_Testing_RetryCount`           | `0`                                               | only used when `RsgSdk_Testing_Retry=true`                                                                          |
-| `RsgSdk_Testing_HangDumpTimeout`      | `1h`                                              | only when `RsgSdk_Testing_Extensions=true`                                                                          |
-| `RocketSurgeryOptimizeTestBuild`      | _(unset/off)_                                     | opt-in, set to `true` to skip analyzers when compiling for `dotnet test`                                            |
-| `TestingPlatformDotnetTestSupport`    | `true`                                            |                                                                                                                     |
-| `MergeCoverage`                       | `true`                                            |                                                                                                                     |
-| `IncludeTestAssembly`                 | `true`                                            |                                                                                                                     |
-| `RunSettingsFilePath`                 | `$(MSBuildThisFileDirectory)coverage.runsettings` | the SDK's own default runsettings; override to point at your own                                                    |
+| Property                              | Default                                           | Condition                                                                                                                                 |
+| ------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `RsgSdk_Testing_Extensions`           | `true`                                            | master switch for everything below                                                                                                        |
+| `RsgSdk_Testing_CodeCoverage`         | `true`                                            | -                                                                                                                                         |
+| `RsgSdk_Testing_CoverageSettings`     | `true`                                            | passes `--coverage-settings $(RunSettingsFilePath)`; set `false` when the test runner already passes its own (the option takes one value) |
+| `RsgSdk_Testing_TrxReport`            | `true`                                            |                                                                                                                                           |
+| `RsgSdk_Testing_CrashDump`            | `true`                                            |                                                                                                                                           |
+| `RsgSdk_Testing_HangDump`             | `true`                                            |                                                                                                                                           |
+| `RsgSdk_Testing_HotReload`            | `true`                                            |                                                                                                                                           |
+| `RsgSdk_Testing_AzureDevOpsReport`    | `true`                                            | enables `Microsoft.Testing.Extensions.AzureDevOpsReport` + `--report-azdo` (no-op outside Azure Pipelines)                                |
+| `RsgSdk_Testing_GitHubActionsReport`  | `true`                                            | enables `Microsoft.Testing.Extensions.GitHubActionsReport` + `--report-gh` (no-op outside GitHub Actions)                                 |
+| `RsgSdk_Testing_Retry`                | `false`                                           | opt-in, enables `Microsoft.Testing.Extensions.Retry`                                                                                      |
+| `RsgSdk_Testing_MinimumExpectedTests` | `0`, raised to `1`                                | raised to `1` only when `RsgSdk_Testing_Extensions=true`; set to `0` to disable the "zero tests discovered" failure                       |
+| `RsgSdk_Testing_RetryCount`           | `0`                                               | only used when `RsgSdk_Testing_Retry=true`                                                                                                |
+| `RsgSdk_Testing_HangDumpTimeout`      | `1h`                                              | only when `RsgSdk_Testing_Extensions=true`                                                                                                |
+| `RocketSurgeryOptimizeTestBuild`      | _(unset/off)_                                     | opt-in, set to `true` to skip analyzers when compiling for `dotnet test`                                                                  |
+| `TestingPlatformDotnetTestSupport`    | `true`                                            |                                                                                                                                           |
+| `MergeCoverage`                       | `true`                                            |                                                                                                                                           |
+| `IncludeTestAssembly`                 | `true`                                            |                                                                                                                                           |
+| `RunSettingsFilePath`                 | `$(MSBuildThisFileDirectory)coverage.runsettings` | the SDK's own default runsettings; override to point at your own                                                                          |
 
 Framework adapters (`Rocket.Surgery.Extensions.Testing.TUnit`) are added automatically
 by inspecting your `PackageReference`s (`TUnit`, `TUnit.AspNetCore`, `TUnit.Aspire`). There is no property to force them
@@ -267,6 +270,8 @@ prefixes is picked up automatically:
 - `Microsoft.CodeAnalysis.`
 - `Microsoft.Sbom.Targets` (exact match)
 - `JetBrains.Annotations.Sources` (exact match)
+- `JetBrains.ExternalAnnotations` (exact match)
+- `ZeroAlloc.Analyzers` (exact match)
 
 Adding a new package to that list is enough to make the SDK inject a version default for it, with no
 manual property to add or keep in sync. The generated property name follows a fixed pattern: strip
