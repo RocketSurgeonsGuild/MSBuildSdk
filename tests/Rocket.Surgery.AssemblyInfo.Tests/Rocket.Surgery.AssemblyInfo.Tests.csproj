@@ -35,6 +35,7 @@
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" ReferenceOutputAssembly="false" />
         <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.6.csproj" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="../../src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.9.csproj" ReferenceOutputAssembly="false" />
         <PackageReference Include="Verify.SourceGenerators" />
         <PackageReference Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" />
         <AssemblyMetadata Include="Rocket.Surgery.Build" Value="CI" />
@@ -70,6 +71,7 @@
         <Roslyn50GeneratorAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.supports/bin/roslyn5.0/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.dll'))</Roslyn50GeneratorAssembly>
         <Roslyn53GeneratorAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.supports/bin/roslyn5.3/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.dll'))</Roslyn53GeneratorAssembly>
         <Roslyn56GeneratorAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.supports/bin/roslyn5.6/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.dll'))</Roslyn56GeneratorAssembly>
+        <Roslyn59GeneratorAssembly>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)../../src/Rocket.Surgery.AssemblyInfo.supports/bin/roslyn5.9/$(Configuration)/netstandard2.0/Rocket.Surgery.AssemblyInfo.dll'))</Roslyn59GeneratorAssembly>
         <Multiline>
             A Description
       with a newline and
@@ -90,6 +92,7 @@
         <ProjectProperty Include="Roslyn50GeneratorAssembly" />
         <ProjectProperty Include="Roslyn53GeneratorAssembly" />
         <ProjectProperty Include="Roslyn56GeneratorAssembly" />
+        <ProjectProperty Include="Roslyn59GeneratorAssembly" />
         <Constant Include="Foo.Raw" Value="$(Multiline)" Comment="$(Multiline)" />
         <Constant Include="Foo.Bar" Value="Baz" Comment="Yay!" />
         <Constant Include="Foo.Hello" Value="World" Comment="Comments make everything better 😍" />

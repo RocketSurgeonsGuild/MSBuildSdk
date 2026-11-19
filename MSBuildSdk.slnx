@@ -49,6 +49,7 @@
     <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.0.csproj" />
     <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.3.csproj" />
     <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.6.csproj" />
+    <Project Path="src/Rocket.Surgery.AssemblyInfo.supports/Rocket.Surgery.AssemblyInfo.roslyn5.9.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Rocket.Surgery.AssemblyInfo.Tests/Rocket.Surgery.AssemblyInfo.Tests.csproj" />
