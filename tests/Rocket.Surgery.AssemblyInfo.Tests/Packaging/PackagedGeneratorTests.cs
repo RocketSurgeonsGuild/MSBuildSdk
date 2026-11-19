@@ -5,7 +5,7 @@ namespace Rocket.Surgery.AssemblyInfo.Tests.Packaging;
 
 /// <summary>
 /// The package ships extra builds of the generators for older Roslyn hosts
-/// (analyzers/dotnet/roslyn5.0/cs, roslyn5.3/cs and roslyn5.6/cs); make sure those builds actually contain them.
+/// (analyzers/dotnet/roslyn5.0/cs, roslyn5.3/cs, roslyn5.6/cs and roslyn5.9/cs); make sure those builds actually contain them.
 /// </summary>
 public class PackagedGeneratorTests
 {
@@ -14,6 +14,7 @@ public class PackagedGeneratorTests
         MyNamespace.AssemblyInfo.Project.Roslyn50GeneratorAssembly,
         MyNamespace.AssemblyInfo.Project.Roslyn53GeneratorAssembly,
         MyNamespace.AssemblyInfo.Project.Roslyn56GeneratorAssembly,
+        MyNamespace.AssemblyInfo.Project.Roslyn59GeneratorAssembly,
     ];
 
     private static readonly string[] GeneratorTypeNames =
