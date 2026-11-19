@@ -4,7 +4,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
+    <GlobalPackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.12.0" />
     <GlobalPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="5.6.0" />
     <GlobalPackageReference Include="Roslynator.Analyzers" Version="5.0.1" />
     <GlobalPackageReference Include="Roslynator.Formatting.Analyzers" Version="5.0.1" />
@@ -20,12 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Rocket.Surgery.AssemblyInfo (src/) and its tests -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
     <!-- Test-only: keeps the Workspaces/Features stack pulled in by the source-generator test helpers on the same Roslyn. -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.9.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.12.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.12.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.12.0" ExcludeFromSdkPackagesProps="true" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.12.0" ExcludeFromSdkPackagesProps="true" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <PackageVersion Include="Scriban" Version="7.6.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
@@ -49,7 +49,7 @@
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.12.2" />
     <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
     <!-- The build host's generators (ConfigureDovetail and the module scan); they have to be direct references of build/Build.cs. -->
-    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.5.3" />
+    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.7.1" />
     <PackageVersion Include="Specular" Version="0.4.1" />
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
