@@ -47,7 +47,7 @@
     <PackageVersion Include="Microsoft.Build" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.12.2" />
-    <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
+    <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.5" />
     <!-- The build host's generators (ConfigureDovetail and the module scan); they have to be direct references of build/Build.cs. -->
     <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.8.0" />
     <PackageVersion Include="Specular" Version="0.4.1" />
