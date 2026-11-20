@@ -56,7 +56,7 @@
     <PackageVersion Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
     <PackageVersion Include="JetBrains.Annotations.Sources" Version="2026.2.0" />
     <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.269" />
-    <PackageVersion Include="ProcessX" Version="1.5.6" />
+    <PackageVersion Include="ProcessX" Version="2.0.0" />
     <PackageVersion Include="System.Interactive" Version="7.0.1" />
     <!-- Pinned to the last version without a System.Text.Json dependency (2.x+ requires >=10.0.2, which
              conflicts with the pinned System.Text.Json used by the older Roslyn-host support projects). -->
