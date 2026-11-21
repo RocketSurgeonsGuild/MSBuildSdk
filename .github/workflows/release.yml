@@ -3,11 +3,11 @@ name: release
 on:
   schedule:
     # Weekly, Monday 08:00 UTC. Skipped automatically when there are no new commits.
-    - cron: '0 8 * * 1'
+    - cron: "0 8 * * 1"
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version override (default: <year>.<month>.<build-count-this-month>)'
+        description: "Version override (default: <year>.<month>.<build-count-this-month>)"
         required: false
         type: string
 
@@ -22,6 +22,9 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      skip: ${{ steps.version.outputs.skip }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,3 +77,18 @@ jobs:
           # A tag pushed with GITHUB_TOKEN doesn't start a workflow run, but a dispatch does: build.yml builds the tag
           # and its publish job pushes the packages to nuget.org.
           gh workflow run build.yml --ref "v$VERSION"
+
+  # Publishing with GITHUB_TOKEN doesn't raise the release event close-milestone.yml listens for, so close it here.
+  close_milestone:
+    needs: release
+    if: needs.release.outputs.skip != 'true'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    uses: RocketSurgeonsGuild/actions/.github/workflows/close-milestone.yml@v0.4.0
+    with:
+      release-tag: v${{ needs.release.outputs.version }}
+      versioning: calver
+    secrets:
+      RSG_BOT_TOKEN: ${{ secrets.RSG_BOT_TOKEN }}
