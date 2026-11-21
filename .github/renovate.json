@@ -48,6 +48,29 @@
       "matchCategories": ["js"],
       "automerge": true,
       "labels": [":truck: private-dependencies"]
+    },
+    {
+      "description": "Shipped: src/Directory.Build.targets writes these into the SDK's common/Packages.props, so a bump changes what every consumer's build pulls in. The org preset marks them private; this repository ships them",
+      "matchDepNames": [
+        "Rocket.Surgery.Extensions.*",
+        "Microsoft.Testing.Extensions.*",
+        "Roslynator",
+        "Roslynator.*",
+        "Microsoft.CodeAnalysis.Analyzers",
+        "Microsoft.CodeAnalysis.BannedApiAnalyzers",
+        "Microsoft.CodeAnalysis.PublicApiAnalyzers",
+        "Microsoft.CodeAnalysis.CSharp",
+        "Microsoft.Sbom.Targets",
+        "JetBrains.Annotations.Sources",
+        "JetBrains.ExternalAnnotations",
+        "ZeroAlloc.Analyzers"
+      ],
+      "labels": [":package: dependencies"]
+    },
+    {
+      "description": "Only the tests (System.Interactive) and the AssemblyInfo generator at compile time (Scriban, PrivateAssets=all) use these: consumers of this repository's packages never get them",
+      "matchDepNames": ["System.Interactive", "System.Interactive.*", "Scriban"],
+      "labels": [":truck: private-dependencies"]
     }
   ]
 }
