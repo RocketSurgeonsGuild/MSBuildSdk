@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   close_milestone:
-    uses: RocketSurgeonsGuild/actions/.github/workflows/close-milestone.yml@v0.4.0
+    uses: RocketSurgeonsGuild/actions/.github/workflows/close-milestone.yml@v0.5.0
     with:
       versioning: calver
     secrets:
